@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Xirod";
+  src: url("../src/assets/fonts/juristdire.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/Inter.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+
+@theme {
+  --font-display: "Xirod", sans-serif;    /* ✅ Xirod - maxsus shrift */
+  --font-body: "Inter", sans-serif;       /* ✅ Inter - asosiy shrift */
+  --breakpoint-3xl: 1920px;
+  --color-primary: #3b82f6;
+}
+
+@layer base {
+  /* ✅ Barcha matnlar uchun Inter (asosiy) */
+  html, body {
+    font-family: var(--font-body), sans-serif;
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    -webkit-font-shoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #000000;
+    color: #ffffff;
+    overflow-x: hidden;
+  }
+
+  /* ✅ Sarlavhalar uchun Xirod */
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display), sans-serif;
+  }
+  
+  /* Logo va brand nomi uchun Xirod */
+  .logo, .brand-name {
+    font-family: var(--font-display), sans-serif;
+  }
+
+  /* Qolgan scrollbar va animatsiyalar */
+  ::-webkit-scrollbar {
+    width: 10px;
+  }
+  
+  ::-webkit-scrollbar-track {
+    background: #0a0a0a;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #1e3a8a, #1e40af);
+    border-radius: 5px;
+  }
+  
+  ::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #60a5fa, #3b82f6);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #1e40af #0a0a0a;
+  }
+
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.5; }
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .animate-fadeIn {
+    animation: fadeIn 0.5s ease-out; /* ✅ 's' qo'shildi */
+  }
+  
+  .animate-pulse {
+    animation: pulse 3s ease-in-out infinite;
+  }
+
+  .animate-spin-slow {
+    animation: spin 8s linear infinite;
+  }
+
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+}
