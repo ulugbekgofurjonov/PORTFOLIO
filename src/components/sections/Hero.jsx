@@ -1,7 +1,7 @@
 import { ChevronDown, Star, Sparkles, Code2, Rocket } from "lucide-react";
 import { PERSONAL_INFO, STATS } from "../../utils/constants";
 import { scrollToSection } from "../../hooks/useScrollSpy";
-import FadeIn from "../animations/fadein";
+import FadeIn from "../animations/FadeIn";
 import RadialGradientBackground from "../backgrounds/RadialGradientBackground";
 import { useState, useEffect, useRef } from "react";
 
