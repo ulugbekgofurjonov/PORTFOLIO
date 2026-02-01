@@ -5,6 +5,7 @@ export const PERSONAL_INFO = {
     title: "Frontend Dasturchi",
     location: "Uzbekistan", // ← Buni qo'shing
     email: "ulugbekgofurjonov001@gmail.com",
+    phone: "+998 88 202 70 72",
     tagline: "Zamonaviy veb-texnologiyalar bilan interfeyslar yaratuvchi dasturchi.",
     resume: "./resume.pdf",
     bio: [

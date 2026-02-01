@@ -22,16 +22,14 @@ const Projects = () => {
         
         {/* Header Section */}
         <div className="text-center mb-12 sm:mb-16 lg:mb-20">
+          
           <h2 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 tracking-tight">
             <span className="bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 bg-clip-text text-transparent">
-              Featured
+              Loyihalarim
             </span>{' '}
-            <span className="text-slate-900 dark:text-white">Work</span>
           </h2>
           <div className="w-16 sm:w-20 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 mx-auto mb-4 sm:mb-6 rounded-full"></div>
-          <p className="text-base sm:text-lg lg:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Crafting digital experiences with precision and creativity
-          </p>
+          
         </div>
 
         {/* Filter Buttons */}
@@ -176,10 +174,10 @@ const Projects = () => {
           <div className="text-center py-16 sm:py-20 lg:py-24">
             <div className="text-6xl sm:text-7xl lg:text-8xl mb-4 sm:mb-6">🔍</div>
             <h3 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white mb-2 sm:mb-3">
-              No Projects Found
+              Hech qanday loyiha topilmadi.
             </h3>
             <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400">
-              Try selecting a different category
+              Boshqa toifani tanlashga harakat qiling.
             </p>
           </div>
         )}
