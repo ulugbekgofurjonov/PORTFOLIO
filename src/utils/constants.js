@@ -16,6 +16,7 @@ export const PERSONAL_INFO = {
 export const SOCIAL_LINKS = {
     github: "https://github.com/ulugbekgofurjonov",
     telegram: "https://t.me/UlugbekGofurjonov",
+    instagram: "https://instagram.com/gofurrjonov"
 }
 
 export const STATS = [
