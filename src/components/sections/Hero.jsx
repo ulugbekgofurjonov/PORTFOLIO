@@ -137,7 +137,7 @@ const Hero = () => {
       />
 
       {/* Content container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center -mt-[100px]">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center ">
         {/* Premium Badge with glassmorphism - Blue theme */}
         <FadeIn delay={0}>
           <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 py-2.5 sm:py-3.5 mb-8 sm:mb-12 backdrop-blur-xl bg-white/5 border border-white/10 rounded-full shadow-2xl hover:bg-blue-500/10 hover:border-blue-400/30 transition-all duration-500 group hover:scale-105">
