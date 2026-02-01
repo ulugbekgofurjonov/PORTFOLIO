@@ -178,9 +178,7 @@ const Footer = () => {
             <span className="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 rounded-full text-xs font-medium text-gray-300 transition-colors duration-300 border border-gray-800">
               Next.js
             </span>
-            <span className="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 rounded-full text-xs font-medium text-gray-300 transition-colors duration-300 border border-gray-800">
-              TypeScript
-            </span>
+          
             <span className="px-3 py-1.5 bg-gray-900 hover:bg-gray-800 rounded-full text-xs font-medium text-gray-300 transition-colors duration-300 border border-gray-800">
               Tailwind CSS
             </span>
