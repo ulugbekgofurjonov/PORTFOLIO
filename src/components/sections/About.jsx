@@ -97,7 +97,7 @@ const About = () => {
       id="about"
       className="relative min-h-screen py-20 sm:py-24 lg:py-32 overflow-hidden"
     >
-
+      <RadialGradientBackground/>
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <FadeIn delay={0}>
