@@ -7,7 +7,6 @@ const PROJECTS_PER_PAGE = 6;
 const Projects = () => {
   const [activeCategory, setActiveCategory] = useState('All');
   const [filteredProjects, setFilteredProjects] = useState(projects);
-  const [hoveredId, setHoveredId] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const sectionRef = useRef(null);
 
@@ -142,9 +141,6 @@ const Projects = () => {
                   key={project.id}
                   project={project}
                   index={index}
-                  isHovered={hoveredId === project.id}
-                  onMouseEnter={() => setHoveredId(project.id)}
-                  onMouseLeave={() => setHoveredId(null)}
                 />
               ))}
             </div>
@@ -240,7 +236,7 @@ const FilterButtons = React.memo(({ categories, activeCategory, onCategoryChange
 FilterButtons.displayName = 'FilterButtons';
 
 // Separate ProjectCard component
-const ProjectCard = React.memo(({ project, index, isHovered, onMouseEnter, onMouseLeave }) => {
+const ProjectCard = React.memo(({ project, index }) => {
   const handleImageError = (e) => {
     e.target.src = 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80';
   };
@@ -248,8 +244,6 @@ const ProjectCard = React.memo(({ project, index, isHovered, onMouseEnter, onMou
   return (
     <article
       className="group relative h-full flex flex-col"
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
       style={{
         animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
       }}
@@ -282,21 +276,23 @@ const ProjectCard = React.memo(({ project, index, isHovered, onMouseEnter, onMou
               aria-hidden="true"
             />
             
-            {/* Overlay buttons */}
-            <div className="absolute inset-0 flex items-center justify-center gap-3 sm:gap-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
-              <ActionButton
-                href={project.demoUrl}
-                icon={<ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />}
-                label="Live"
-                variant="primary"
-              />
-              
-              <ActionButton
-                href={project.githubUrl}
-                icon={<Github className="w-4 h-4 sm:w-5 sm:h-5" />}
-                label="Code"
-                variant="secondary"
-              />
+            {/* Action buttons - Always visible */}
+            <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 flex items-center justify-between">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <ActionButton
+                  href={project.demoUrl}
+                  icon={<ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />}
+                  label="Live Demo"
+                  variant="primary"
+                />
+                
+                <ActionButton
+                  href={project.githubUrl}
+                  icon={<Github className="w-4 h-4 sm:w-5 sm:h-5" />}
+                  label="GitHub"
+                  variant="secondary"
+                />
+              </div>
             </div>
           </div>
 
@@ -342,11 +338,11 @@ ProjectCard.displayName = 'ProjectCard';
 
 // Action Button Component
 const ActionButton = ({ href, icon, label, variant }) => {
-  const baseClasses = "flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full font-semibold text-sm sm:text-base shadow-lg transform hover:scale-105 transition-all duration-300";
+  const baseClasses = "flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full font-medium text-xs sm:text-sm shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300";
   
   const variantClasses = variant === 'primary'
-    ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:shadow-xl hover:shadow-cyan-500/50"
-    : "bg-slate-800/80 backdrop-blur-sm text-white border-2 border-cyan-500/50 hover:border-cyan-400";
+    ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:shadow-cyan-500/50 backdrop-blur-sm"
+    : "bg-slate-800/80 backdrop-blur-sm text-white border border-slate-700 hover:border-cyan-500 hover:bg-slate-800";
 
   return (
     <a
@@ -355,7 +351,7 @@ const ActionButton = ({ href, icon, label, variant }) => {
       rel="noopener noreferrer"
       onClick={(e) => e.stopPropagation()}
       className={`${baseClasses} ${variantClasses}`}
-      aria-label={label}
+      aria-label={`${label} - ${variant === 'primary' ? 'Live demo' : 'Source code'}`}
     >
       {icon}
       <span className="hidden sm:inline">{label}</span>
@@ -365,7 +361,7 @@ const ActionButton = ({ href, icon, label, variant }) => {
 
 // Tech Badge Component
 const TechBadge = React.memo(({ tech }) => (
-  <span className="px-3 sm:px-4 py-1.5 sm:py-2 bg-slate-800 text-slate-300 rounded-lg text-xs sm:text-sm font-medium hover:bg-gradient-to-r hover:from-cyan-500/20 hover:to-blue-600/20 hover:text-cyan-400 transition-all duration-300 cursor-default border border-slate-700 hover:border-cyan-500/50">
+  <span className="px-2.5 sm:px-3 py-1.5 bg-slate-800 text-slate-300 rounded-lg text-xs font-medium hover:bg-gradient-to-r hover:from-cyan-500/20 hover:to-blue-600/20 hover:text-cyan-400 transition-all duration-300 cursor-default border border-slate-700 hover:border-cyan-500/50">
     {tech}
   </span>
 ));
