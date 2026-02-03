@@ -127,7 +127,6 @@ const Contact = () => {
       aria-labelledby="contact-heading"
     >
       {/* Background gradient for mobile */}
-      <div className="absolute inset-0 bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950" />
       
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         
