@@ -20,7 +20,7 @@ export const SOCIAL_LINKS = {
 }
 
 export const STATS = [
-    { label: "Tajriba", value: "8 Oy" },
+    { label: "Tajriba", value: "7 Oy" },
     { label: "Loyihalar", value: "10+" },
     { label: "Texnologiya", value: "6+" },
 ]

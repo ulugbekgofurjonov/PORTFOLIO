@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   User,
   MapPin,
@@ -10,12 +10,16 @@ import {
   Target,
   Award,
   Phone,
+  Copy,
+  Check,
 } from "lucide-react";
 import { PERSONAL_INFO } from "../../utils/constants";
 import FadeIn from "../animations/FadeIn";
 import RadialGradientBackground from "../backgrounds/RadialGradientBackground";
 
 const About = () => {
+  const [copiedPhone, setCopiedPhone] = useState(false);
+
   // Professional journey
   const journey = [
     {
@@ -92,180 +96,200 @@ const About = () => {
     },
   ];
 
+  const handleCopyPhone = async () => {
+    try {
+      await navigator.clipboard.writeText(PERSONAL_INFO.phone);
+      setCopiedPhone(true);
+      setTimeout(() => setCopiedPhone(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy:", error);
+    }
+  };
+
   return (
     <section
       id="about"
-      className="relative min-h-screen py-20 sm:py-24 lg:py-32 overflow-hidden"
+      className="relative min-h-screen py-16 sm:py-20 lg:py-24 overflow-hidden"
     >
-      <RadialGradientBackground/>
-      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
+      <RadialGradientBackground />
+      
+      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         {/* Header */}
         <FadeIn delay={0}>
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-2 px-5 py-2.5 mb-6 backdrop-blur-xl bg-white/5 border border-white/10 rounded-full">
-              <User className="w-4 h-4 text-blue-400" />
-              <span className="text-sm text-white/90 font-semibold tracking-wider uppercase">
+          <div className="text-center mb-12 sm:mb-16 lg:mb-20">
+            <div className="inline-flex items-center gap-2 sm:gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 mb-5 sm:mb-6 backdrop-blur-2xl bg-white/5 border border-white/10 rounded-full shadow-xl hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500 group">
+              <User className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform duration-300" />
+              <span className="text-xs sm:text-sm text-white/90 font-semibold tracking-wider uppercase">
                 Men Haqimda
               </span>
             </div>
 
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6 px-4">
               Salom, Men{" "}
               <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-sky-400 bg-clip-text text-transparent">
                 {PERSONAL_INFO.name}
               </span>
             </h2>
 
-            <p className="text-xl sm:text-2xl text-gray-300 max-w-3xl mx-auto font-medium">
+            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-gray-300 max-w-3xl mx-auto font-medium px-4">
               {PERSONAL_INFO.title}
             </p>
           </div>
         </FadeIn>
 
         {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 mb-20">
+        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 xl:gap-16 mb-12 sm:mb-16 lg:mb-20">
           {/* Left Column - Bio & Contact */}
-          <div className="space-y-8">
+          <div className="space-y-6 sm:space-y-8">
             {/* Bio Card */}
             <FadeIn delay={100}>
-              <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 bg-blue-500/20 rounded-lg">
-                    <Briefcase className="w-6 h-6 text-blue-400" />
+              <div className="backdrop-blur-2xl bg-gradient-to-br from-white/5 via-white/8 to-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500 group relative overflow-hidden">
+                {/* Shimmer effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1500" />
+                
+                <div className="flex items-center gap-3 mb-5 sm:mb-6 relative z-10">
+                  <div className="p-2 sm:p-2.5 bg-blue-500/20 rounded-lg sm:rounded-xl group-hover:bg-blue-500/30 transition-colors duration-300">
+                    <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white">
                     Mening Hikoyam
                   </h3>
                 </div>
 
-                <div className="space-y-4 text-gray-300 leading-relaxed">
+                <div className="space-y-3 sm:space-y-4 text-gray-300 leading-relaxed relative z-10">
                   {PERSONAL_INFO.bio.map((paragraph, index) => (
-                    <p key={index} className="text-base">
+                    <p key={index} className="text-sm sm:text-base">
                       {paragraph}
                     </p>
                   ))}
                 </div>
+                
+                {/* Corner accent */}
+                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
             </FadeIn>
 
             {/* Contact Info Card */}
             <FadeIn delay={150}>
-              <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 bg-cyan-500/20 rounded-lg">
-                    <Mail className="w-6 h-6 text-cyan-400" />
+              <div className="backdrop-blur-2xl bg-gradient-to-br from-white/5 via-white/8 to-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500 group relative overflow-hidden">
+                {/* Shimmer effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1500" />
+                
+                <div className="flex items-center gap-3 mb-5 sm:mb-6 relative z-10">
+                  <div className="p-2 sm:p-2.5 bg-cyan-500/20 rounded-lg sm:rounded-xl group-hover:bg-cyan-500/30 transition-colors duration-300">
+                    <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white">Bog'lanish</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold text-white">Bog'lanish</h3>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-start gap-4">
-                    <div className="p-2 bg-blue-500/10 rounded-lg mt-1">
-                      <Mail className="w-5 h-5 text-blue-400" />
+                <div className="space-y-4 sm:space-y-5 relative z-10">
+                  {/* Email */}
+                  <div className="flex items-start gap-3 sm:gap-4 group/item">
+                    <div className="p-2 bg-blue-500/10 rounded-lg mt-0.5 sm:mt-1 group-hover/item:bg-blue-500/20 transition-colors duration-300">
+                      <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-400 mb-1">Email</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm text-gray-400 mb-1">Email</p>
                       <a
                         href={`mailto:${PERSONAL_INFO.email}`}
-                        className="text-white hover:text-blue-400 transition-colors font-medium"
+                        className="text-sm sm:text-base text-white hover:text-blue-400 transition-colors font-medium break-all"
                       >
                         {PERSONAL_INFO.email}
                       </a>
                     </div>
                   </div>
-                  <div className="flex items-start gap-4">
-                    <div className="p-2 bg-blue-500/10 rounded-lg mt-1">
-                      <Phone className="w-5 h-5 text-blue-400" />
+
+                  {/* Phone */}
+                  <div className="flex items-start gap-3 sm:gap-4 group/item">
+                    <div className="p-2 bg-blue-500/10 rounded-lg mt-0.5 sm:mt-1 group-hover/item:bg-blue-500/20 transition-colors duration-300">
+                      <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-400 mb-1">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm text-gray-400 mb-1">
                         Telefon raqam
                       </p>
                       <div className="flex items-center gap-2">
                         <a
                           href={`tel:${PERSONAL_INFO.phone}`}
-                          className="text-white hover:text-blue-400 transition-colors font-medium"
+                          className="text-sm sm:text-base text-white hover:text-blue-400 transition-colors font-medium"
                         >
                           {PERSONAL_INFO.phone}
                         </a>
                         <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(PERSONAL_INFO.phone);
-                            // Ixtiyoriy: bildirishnoma
-                          }}
-                          className="p-1.5 hover:bg-blue-500/10 rounded transition-colors group"
+                          onClick={handleCopyPhone}
+                          className="p-1.5 hover:bg-blue-500/10 rounded-lg transition-all duration-300 group/copy relative"
                           title="Nusxalash"
+                          aria-label="Copy phone number"
                         >
-                          <svg
-                            className="w-4 h-4 text-gray-400 group-hover:text-blue-400 transition-colors"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"
-                            />
-                          </svg>
+                          {copiedPhone ? (
+                            <Check className="w-4 h-4 text-green-400" />
+                          ) : (
+                            <Copy className="w-4 h-4 text-gray-400 group-hover/copy:text-blue-400 transition-colors" />
+                          )}
                         </button>
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-4">
-                    <div className="p-2 bg-cyan-500/10 rounded-lg mt-1">
-                      <MapPin className="w-5 h-5 text-cyan-400" />
+                  {/* Location */}
+                  <div className="flex items-start gap-3 sm:gap-4 group/item">
+                    <div className="p-2 bg-cyan-500/10 rounded-lg mt-0.5 sm:mt-1 group-hover/item:bg-cyan-500/20 transition-colors duration-300">
+                      <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
                     </div>
-                    <div>
-                      <p className="text-sm text-gray-400 mb-1">Joylashuv</p>
-                      <p className="text-white font-medium">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs sm:text-sm text-gray-400 mb-1">Joylashuv</p>
+                      <p className="text-sm sm:text-base text-white font-medium">
                         {PERSONAL_INFO.location}
                       </p>
                     </div>
                   </div>
                 </div>
+                
+                {/* Corner accent */}
+                <div className="absolute bottom-0 left-0 w-24 h-24 bg-cyan-500/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
             </FadeIn>
           </div>
 
-          {/* Right Column - Journey & Expertise */}
-          <div className="space-y-8">
+          {/* Right Column - Journey */}
+          <div className="space-y-6 sm:space-y-8">
             {/* Journey Timeline */}
             <FadeIn delay={200}>
               <div>
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="p-2 bg-purple-500/20 rounded-lg">
-                    <GraduationCap className="w-6 h-6 text-purple-400" />
+                <div className="flex items-center gap-3 mb-5 sm:mb-6">
+                  <div className="p-2 sm:p-2.5 bg-purple-500/20 rounded-lg sm:rounded-xl">
+                    <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white">
+                  <h3 className="text-xl sm:text-2xl font-bold text-white">
                     Mening Yo'lim
                   </h3>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-4 sm:space-y-6">
                   {journey.map((step, index) => (
                     <div
                       key={index}
-                      className="relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500"
+                      className="relative backdrop-blur-2xl bg-gradient-to-br from-white/5 via-white/8 to-white/5 border border-white/10 rounded-xl p-5 sm:p-6 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500 group overflow-hidden"
                     >
-                      <div className="flex gap-4">
+                      {/* Shimmer effect */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1500" />
+                      
+                      <div className="flex gap-3 sm:gap-4 relative z-10">
                         <div className="flex-shrink-0">
-                          <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-lg group-hover:scale-110 transition-transform duration-300">
                             {index + 1}
                           </div>
                         </div>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-2">
-                            <span className="text-blue-400 font-semibold">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
+                            <span className="text-sm sm:text-base text-blue-400 font-semibold">
                               {step.year}
                             </span>
                           </div>
-                          <h4 className="text-lg font-bold text-white mb-2">
+                          <h4 className="text-base sm:text-lg font-bold text-white mb-1.5 sm:mb-2">
                             {step.title}
                           </h4>
-                          <p className="text-gray-400 text-sm leading-relaxed">
+                          <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
                             {step.description}
                           </p>
                         </div>
@@ -273,8 +297,11 @@ const About = () => {
 
                       {/* Connection line */}
                       {index < journey.length - 1 && (
-                        <div className="absolute left-[2.75rem] top-[5rem] w-[2px] h-6 bg-gradient-to-b from-blue-400/50 to-transparent" />
+                        <div className="absolute left-[2.25rem] sm:left-[2.75rem] top-[4.5rem] sm:top-[5rem] w-[2px] h-4 sm:h-6 bg-gradient-to-b from-blue-400/50 to-transparent" />
                       )}
+                      
+                      {/* Corner glow */}
+                      <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                     </div>
                   ))}
                 </div>
@@ -285,35 +312,41 @@ const About = () => {
 
         {/* Values Section */}
         <FadeIn delay={250}>
-          <div className="mb-20">
-            <div className="text-center mb-12">
-              <h3 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+          <div className="mb-12 sm:mb-16 lg:mb-20">
+            <div className="text-center mb-8 sm:mb-12">
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 px-4">
                 Qadriyatlarim
               </h3>
-              <p className="text-gray-400 max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-gray-400 max-w-2xl mx-auto px-4">
                 Men ishlash jarayonimda quyidagi printsiplarga amal qilaman
               </p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
               {values.map((value, index) => {
                 const Icon = value.icon;
                 return (
                   <div
                     key={index}
-                    className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-6 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500 hover:-translate-y-2 group"
+                    className="backdrop-blur-2xl bg-gradient-to-br from-white/5 via-white/8 to-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-5 sm:p-6 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500 hover:-translate-y-2 group relative overflow-hidden"
                   >
+                    {/* Shimmer effect */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1500" />
+                    
                     <div
-                      className={`w-12 h-12 rounded-lg bg-gradient-to-br ${value.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300`}
+                      className={`w-11 h-11 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br ${value.color} flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg relative z-10`}
                     >
-                      <Icon className="w-6 h-6 text-white" />
+                      <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                     </div>
-                    <h4 className="text-lg font-bold text-white mb-2">
+                    <h4 className="text-base sm:text-lg font-bold text-white mb-2 relative z-10">
                       {value.title}
                     </h4>
-                    <p className="text-sm text-gray-400 leading-relaxed">
+                    <p className="text-xs sm:text-sm text-gray-400 leading-relaxed relative z-10">
                       {value.description}
                     </p>
+                    
+                    {/* Glow effect */}
+                    <div className="absolute -inset-px rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm bg-gradient-to-br from-blue-500/20 to-cyan-500/20" />
                   </div>
                 );
               })}
@@ -324,37 +357,43 @@ const About = () => {
         {/* What I Do Section */}
         <FadeIn delay={300}>
           <div>
-            <div className="text-center mb-12">
-              <h3 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+            <div className="text-center mb-8 sm:mb-12">
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 px-4">
                 Nima Qilaman
               </h3>
-              <p className="text-gray-400 max-w-2xl mx-auto">
+              <p className="text-sm sm:text-base text-gray-400 max-w-2xl mx-auto px-4">
                 Mening asosiy yo'nalishlarim va tajribalarim
               </p>
             </div>
 
-            <div className="grid md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
               {expertise.map((item, index) => (
                 <div
                   key={index}
-                  className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500 hover:scale-105 group"
+                  className="backdrop-blur-2xl bg-gradient-to-br from-white/5 via-white/8 to-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500 hover:scale-105 group relative overflow-hidden"
                 >
-                  <h4 className="text-xl font-bold text-white mb-3 group-hover:text-blue-400 transition-colors">
+                  {/* Shimmer effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1500" />
+                  
+                  <h4 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3 group-hover:text-blue-400 transition-colors relative z-10">
                     {item.title}
                   </h4>
-                  <p className="text-gray-400 mb-6 leading-relaxed">
+                  <p className="text-sm sm:text-base text-gray-400 mb-5 sm:mb-6 leading-relaxed relative z-10">
                     {item.description}
                   </p>
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 relative z-10">
                     {item.skills.map((skill, idx) => (
                       <span
                         key={idx}
-                        className="px-3 py-1 text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full"
+                        className="px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full hover:bg-blue-500/20 hover:border-blue-500/30 transition-all duration-300"
                       >
                         {skill}
                       </span>
                     ))}
                   </div>
+                  
+                  {/* Corner glow */}
+                  <div className="absolute bottom-0 right-0 w-24 h-24 bg-blue-500/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 </div>
               ))}
             </div>

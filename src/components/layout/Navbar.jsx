@@ -85,54 +85,48 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Fixed wrapper for always-sticky navbar */}
+      {/* Fixed Navbar Container */}
       <div className="fixed top-0 left-0 right-0 z-50 w-full">
         <nav
           ref={navRef}
-          className={`w-full transition-all duration-700 ${
+          className={`w-full transition-all duration-500 ${
             isScrolled 
-              ? "bg-black/90 backdrop-blur-4xl shadow-2xl shadow-black/70 border-b border-white/10 py-3" 
-              : "bg-black/70 backdrop-blur-4xl border-b border-white/5 py-4"
+              ? "bg-black/95 backdrop-blur-2xl shadow-2xl shadow-black/50 border-b border-white/10 py-3" 
+              : "bg-black/80 backdrop-blur-xl border-b border-white/5 py-4"
           }`}
           style={{ 
             transform: "translate3d(0, 0, 0)",
-            willChange: "background-color, backdrop-filter, transform",
-            backdropFilter: "blur(40px) saturate(180%)",
-            WebkitBackdropFilter: "blur(40px) saturate(180%)",
-            backgroundColor: "rgba(0, 0, 0, 0.8)",
-            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+            willChange: "transform",
+            backdropFilter: "blur(24px) saturate(180%)",
+            WebkitBackdropFilter: "blur(24px) saturate(180%)",
           }}
         >
-          {/* Animated gradient border top */}
-          <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-blue-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          {/* Top Gradient Border */}
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-blue-500/40 to-transparent" />
           
-          {/* Mouse follow spotlight effect */}
+          {/* Mouse Follow Effect */}
           <div 
-            className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+            className="absolute inset-0 opacity-0 hover:opacity-100 transition-opacity duration-700 pointer-events-none"
             style={{
-              background: `radial-gradient(600px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(59, 130, 246, 0.08), transparent 40%)`,
-              mixBlendMode: "screen"
+              background: `radial-gradient(800px circle at ${mousePosition.x}px ${mousePosition.y}px, rgba(59, 130, 246, 0.06), transparent 50%)`,
             }}
           />
 
-          {/* Scroll Progress Bar with gradient */}
-          <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-white/10 to-transparent">
+          {/* Scroll Progress Bar */}
+          <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-white/5">
             <div 
-              className="h-full bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 shadow-lg shadow-blue-500/50 transition-all duration-300 relative overflow-hidden"
+              className="h-full bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 shadow-lg shadow-blue-500/50 transition-all duration-300 ease-out relative overflow-hidden"
               style={{ width: `${scrollProgress}%` }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent animate-shimmer" />
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer" />
             </div>
           </div>
 
-          {/* Blur overlay for depth */}
-          <div className="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent opacity-20 pointer-events-none" />
-
-          <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-            <div className="flex items-center justify-between h-16">
-              {/* Logo - Premium */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16 sm:h-18">
+              {/* Logo Section */}
               <div 
-                className="flex items-center gap-3 group cursor-pointer transition-all duration-500"
+                className="flex items-center gap-2.5 sm:gap-3 group cursor-pointer transition-all duration-500"
                 onClick={() => {
                   window.scrollTo({ top: 0, behavior: "smooth" });
                   setIsMenuOpen(false);
@@ -141,21 +135,21 @@ const Navbar = () => {
                 onMouseLeave={() => setIsHoveringLogo(false)}
               >
                 <div className="relative">
-                  {/* Animated glow rings */}
-                  <div className={`absolute inset-0 bg-blue-500/30 blur-xl rounded-full transition-all duration-700 ${
-                    isHoveringLogo ? 'scale-150 bg-blue-400/50' : 'scale-100'
+                  {/* Glow Effects */}
+                  <div className={`absolute -inset-2 bg-blue-500/20 blur-xl rounded-full transition-all duration-700 ${
+                    isHoveringLogo ? 'scale-150 bg-blue-400/40' : 'scale-100'
                   }`} />
-                  <div className={`absolute inset-0 bg-cyan-500/20 blur-2xl rounded-full transition-all duration-1000 ${
-                    isHoveringLogo ? 'scale-[2] opacity-100' : 'scale-100 opacity-0'
+                  <div className={`absolute -inset-3 bg-cyan-500/10 blur-2xl rounded-full transition-all duration-1000 ${
+                    isHoveringLogo ? 'scale-[2.5] opacity-100' : 'scale-100 opacity-0'
                   }`} />
                   
-                  {/* Icon with rotation */}
-                  <div className="relative">
-                    <Code className={`w-8 h-8 text-blue-400 transition-all duration-700 ${
+                  {/* Icon Container */}
+                  <div className="relative bg-gradient-to-br from-blue-500/10 to-cyan-500/10 p-2 rounded-xl border border-white/10">
+                    <Code className={`w-6 h-6 sm:w-7 sm:h-7 text-blue-400 transition-all duration-700 ${
                       isHoveringLogo ? 'text-blue-300 rotate-180 scale-110' : 'rotate-0 scale-100'
                     }`} />
                     
-                    {/* Orbiting particles */}
+                    {/* Orbiting Particles */}
                     {isHoveringLogo && (
                       <>
                         <span className="absolute top-0 left-0 w-1.5 h-1.5 bg-blue-400 rounded-full animate-orbit-1" />
@@ -168,7 +162,7 @@ const Navbar = () => {
                 
                 <div className="relative">
                   <h1
-                    className={`text-lg md:text-xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent transition-all duration-500 ${
+                    className={`text-base sm:text-lg md:text-xl font-bold bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent transition-all duration-500 ${
                       isHoveringLogo ? 'from-blue-200 via-white to-blue-200' : ''
                     }`}
                     style={{ fontFamily: "var(--font-heading)" }}
@@ -176,33 +170,33 @@ const Navbar = () => {
                     UG Portfolio
                   </h1>
                   
-                  {/* Animated underline */}
-                  <span className={`absolute -bottom-1 left-0 h-[2px] bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-500 ${
+                  {/* Animated Underline */}
+                  <span className={`absolute -bottom-1 left-0 h-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 transition-all duration-500 ${
                     isHoveringLogo ? 'w-full opacity-100' : 'w-0 opacity-0'
                   }`} />
                 </div>
               </div>
 
-              {/* Desktop Navigation - Premium */}
+              {/* Desktop Navigation */}
               <div 
-                className="hidden lg:flex items-center gap-2"
+                className="hidden lg:flex items-center gap-1.5 xl:gap-2"
                 style={{ fontFamily: "var(--font-body)" }}
               >
                 {NAV_LINKS.map((link, index) => (
                   <button
                     key={link.id}
                     onClick={() => scrollToSection(link.id)}
-                    className={`relative px-4 py-2 text-sm font-semibold transition-all duration-500 rounded-xl group overflow-hidden ${
+                    className={`relative px-3 xl:px-4 py-2 text-sm font-semibold transition-all duration-500 rounded-xl group overflow-hidden ${
                       activeSection === link.id
                         ? "text-white"
                         : "text-white/60 hover:text-white"
                     }`}
                     style={{
-                      animationDelay: `${index * 75}ms`
+                      animationDelay: `${index * 50}ms`
                     }}
                   >
-                    {/* Background layers */}
-                    <span className={`absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 rounded-xl transition-all duration-500 ${
+                    {/* Background Layers */}
+                    <span className={`absolute inset-0 bg-gradient-to-br from-blue-600/15 to-cyan-600/15 rounded-xl transition-all duration-500 ${
                       activeSection === link.id ? 'opacity-100 scale-100' : 'opacity-0 scale-95 group-hover:opacity-100 group-hover:scale-100'
                     }`} />
                     
@@ -210,10 +204,10 @@ const Navbar = () => {
                       activeSection === link.id ? 'scale-100' : 'scale-0 group-hover:scale-100'
                     }`} />
                     
-                    {/* Shimmer effect on hover */}
-                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 rounded-xl" />
+                    {/* Shimmer Effect */}
+                    <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000 rounded-xl" />
                     
-                    {/* Text */}
+                    {/* Text with Indicator */}
                     <span className="relative z-10 flex items-center gap-1.5">
                       {link.label}
                       {activeSection === link.id && (
@@ -221,62 +215,61 @@ const Navbar = () => {
                       )}
                     </span>
                     
-                    {/* Bottom indicator */}
+                    {/* Bottom Indicator */}
                     <span 
-                      className={`absolute -bottom-1 left-1/2 -translate-x-1/2 h-[3px] rounded-full bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 shadow-lg shadow-blue-500/50 transition-all duration-500 ${
+                      className={`absolute -bottom-0.5 left-1/2 -translate-x-1/2 h-0.5 rounded-full bg-gradient-to-r from-blue-500 via-cyan-500 to-blue-500 shadow-lg shadow-blue-500/50 transition-all duration-500 ${
                         activeSection === link.id 
                           ? "w-full opacity-100" 
                           : "w-0 opacity-0 group-hover:w-3/4 group-hover:opacity-100"
                       }`}
                     />
                     
-                    {/* Glow effect */}
+                    {/* Active Glow */}
                     {activeSection === link.id && (
-                      <span className="absolute inset-0 bg-blue-500/10 blur-2xl rounded-xl animate-pulse" />
+                      <span className="absolute inset-0 bg-blue-500/10 blur-xl rounded-xl animate-pulse" />
                     )}
                   </button>
                 ))}
               </div>
 
-              {/* Desktop CTA - Ultra Premium */}
-              <div className="hidden lg:flex items-center gap-4">
+              {/* Desktop CTA Button */}
+              <div className="hidden lg:flex items-center">
                 <button
                   onClick={handleDownloadResume}
-                  className="group relative px-6 py-3 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-600 text-white font-bold text-sm rounded-2xl overflow-hidden shadow-2xl shadow-blue-500/40 hover:shadow-blue-500/60 transition-all duration-500 hover:scale-105 hover:-translate-y-0.5"
+                  className="group relative px-4 xl:px-6 py-2.5 xl:py-3 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-600 text-white font-bold text-xs xl:text-sm rounded-xl xl:rounded-2xl overflow-hidden shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-500 hover:scale-105"
                 >
-                  {/* Animated background */}
+                  {/* Animated Background */}
                   <span className="absolute inset-0 bg-gradient-to-r from-cyan-600 via-blue-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   
-                  {/* Shimmer effect */}
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+                  {/* Shimmer */}
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                   
-                  {/* Glow pulse */}
-                  <span className="absolute inset-0 bg-white/20 blur-2xl scale-0 group-hover:scale-100 transition-transform duration-500" />
+                  {/* Glow Pulse */}
+                  <span className="absolute inset-0 bg-white/20 blur-xl scale-0 group-hover:scale-100 transition-transform duration-500" />
                   
                   {/* Content */}
-                  <span className="relative flex items-center gap-2.5 z-10">
-                    <Download className="w-4 h-4 group-hover:animate-bounce" />
+                  <span className="relative flex items-center gap-2 z-10">
+                    <Download className="w-3.5 h-3.5 xl:w-4 xl:h-4 group-hover:animate-bounce" />
                     <span className="tracking-wide">Resumeni yuklab olish</span>
-                    <ChevronDown className="w-3.5 h-3.5 group-hover:translate-y-0.5 transition-transform duration-300" />
+                    <ChevronDown className="w-3 h-3 xl:w-3.5 xl:h-3.5 group-hover:translate-y-0.5 transition-transform duration-300" />
                   </span>
                   
-                  {/* Border glow */}
-                  <span className="absolute inset-0 rounded-2xl ring-2 ring-white/0 group-hover:ring-white/20 transition-all duration-500" />
+                  {/* Border Glow */}
+                  <span className="absolute inset-0 rounded-xl xl:rounded-2xl ring-1 ring-white/0 group-hover:ring-white/20 transition-all duration-500" />
                 </button>
               </div>
 
-              {/* Mobile Menu Button - Premium */}
+              {/* Mobile Menu Button */}
               <button
-                className={`lg:hidden relative p-2.5 text-white rounded-2xl transition-all duration-500 group overflow-hidden ${
-                  isMenuOpen ? 'bg-blue-600' : 'bg-white/5 hover:bg-white/10'
+                className={`lg:hidden relative p-2 sm:p-2.5 text-white rounded-xl transition-all duration-500 group overflow-hidden ${
+                  isMenuOpen ? 'bg-blue-600 shadow-lg shadow-blue-500/50' : 'bg-white/5 hover:bg-white/10'
                 }`}
                 onClick={() => setIsMenuOpen(!isMenuOpen)}
                 aria-label="Toggle menu"
                 aria-expanded={isMenuOpen}
               >
-                {/* Background effects */}
-                <span className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                <span className="absolute inset-0 bg-blue-500/0 group-hover:bg-blue-500/10 transition-colors duration-300" />
+                {/* Background Effects */}
+                <span className="absolute inset-0 bg-gradient-to-br from-blue-600/20 to-cyan-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl" />
                 
                 {/* Icon */}
                 <div className="relative">
@@ -287,115 +280,104 @@ const Navbar = () => {
                   )}
                 </div>
                 
-                {/* Glow on hover */}
+                {/* Hover Glow */}
                 <span className="absolute inset-0 bg-blue-500/30 blur-lg scale-0 group-hover:scale-150 transition-transform duration-500 rounded-full" />
               </button>
             </div>
           </div>
         </nav>
 
-        {/* Mobile Menu - Ultra Premium with enhanced blur */}
-        {/* O'ZGARTIRISH: top qiymati 64px dan 80px ga o'zgardi */}
+        {/* Mobile Menu */}
         <div
           className={`lg:hidden fixed left-0 right-0 transition-all duration-700 ease-out ${
             isMenuOpen 
-              ? "max-h-screen opacity-100 translate-y-0 visible" 
+              ? "max-h-[calc(100vh-5rem)] opacity-100 translate-y-0 visible" 
               : "max-h-0 opacity-0 -translate-y-8 invisible"
           }`}
           style={{ 
-            top: '80px', // ◄◄◄ ASOSIY O'ZGARTIRISH: 64px → 80px
-            backdropFilter: "blur(100px)",
-            WebkitBackdropFilter: "blur(100px)"
+            top: '5rem',
+            backdropFilter: "blur(40px)",
+            WebkitBackdropFilter: "blur(40px)"
           }}
         >
-          {/* Blur backdrop with glass effect */}
-          <div className={`absolute inset-0 backdrop-blur-4xl bg-gradient-to-b from-black/95 via-black/98 to-black transition-all duration-700 ${
+          {/* Backdrop */}
+          <div className={`absolute inset-0 bg-gradient-to-b from-black/98 via-black/99 to-black transition-all duration-700 ${
             isMenuOpen ? 'opacity-100' : 'opacity-0'
           }`} />
           
-          {/* Animated gradient background */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-950/30 via-transparent to-cyan-950/20 opacity-50" />
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-950/20 via-transparent to-cyan-950/10 opacity-50" />
           
-          {/* Glass effect border */}
-          <div className="absolute inset-0 border border-white/10 rounded-2xl m-2" />
-          
-          <div className="relative shadow-2xl">
-            {/* Qo'shimcha tuzatish: padding kamaytirildi */}
-            <div className="max-w-[1400px] mx-auto px-5 py-6 space-y-2">
+          {/* Content Container */}
+          <div className="relative shadow-2xl overflow-y-auto max-h-[calc(100vh-5rem)]">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-1.5 sm:space-y-2">
+              {/* Navigation Links */}
               {NAV_LINKS.map((link, index) => (
                 <button
                   key={link.id}
                   onClick={() => scrollToSection(link.id)}
-                  className={`group relative block w-full text-left px-6 py-3 rounded-2xl font-semibold transition-all duration-500 overflow-hidden ${
+                  className={`group relative block w-full text-left px-4 sm:px-6 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base transition-all duration-500 overflow-hidden ${
                     activeSection === link.id
-                      ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-2xl shadow-blue-500/40 scale-[1.02]"
-                      : "text-white/70 hover:text-white hover:bg-white/5 hover:translate-x-2"
+                      ? "bg-gradient-to-r from-blue-600 to-cyan-600 text-white shadow-xl shadow-blue-500/30 scale-[1.02]"
+                      : "text-white/70 hover:text-white hover:bg-white/5 hover:translate-x-1"
                   }`}
                   style={{
-                    animationDelay: `${index * 60}ms`,
+                    animationDelay: `${index * 50}ms`,
                     animation: isMenuOpen ? 'slideInMobile 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards' : 'none',
-                    backdropFilter: "blur(10px)",
                   }}
                 >
-                  {/* Background effects */}
+                  {/* Background Effects */}
                   {activeSection !== link.id && (
                     <>
-                      <span className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-cyan-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
-                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+                      <span className="absolute inset-0 bg-gradient-to-r from-blue-600/10 to-cyan-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-xl sm:rounded-2xl" />
+                      <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                     </>
                   )}
                   
-                  {/* Glass effect overlay */}
-                  <div className="absolute inset-0 bg-white/3 rounded-2xl" />
-                  
                   {/* Content */}
                   <span className="relative flex items-center justify-between">
-                    <span className="flex items-center gap-3">
+                    <span className="flex items-center gap-2.5 sm:gap-3">
                       {activeSection === link.id && (
-                        <Sparkles className="w-4 h-4 animate-pulse" />
+                        <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-pulse" />
                       )}
-                      <span className="text-sm">{link.label}</span>
+                      <span>{link.label}</span>
                     </span>
                     
                     {activeSection === link.id && (
-                      <span className="w-2 h-2 bg-white rounded-full animate-ping" />
+                      <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-white rounded-full animate-ping" />
                     )}
                   </span>
                   
-                  {/* Border glow */}
+                  {/* Active Border */}
                   {activeSection === link.id && (
-                    <span className="absolute inset-0 rounded-2xl ring-2 ring-white/20" />
+                    <span className="absolute inset-0 rounded-xl sm:rounded-2xl ring-1 ring-white/20" />
                   )}
                 </button>
               ))}
 
               {/* Mobile Resume Button */}
-              <div className="pt-6 border-t border-white/10 mt-6">
+              <div className="pt-4 sm:pt-6 border-t border-white/10 mt-4 sm:mt-6">
                 <button
                   onClick={handleDownloadResume}
-                  className="group relative w-full px-6 py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-600 text-white text-sm font-bold rounded-2xl overflow-hidden shadow-2xl shadow-blue-500/50 transition-all duration-500 hover:shadow-blue-500/70 hover:scale-[1.02]"
+                  className="group relative w-full px-4 sm:px-6 py-3.5 sm:py-4 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-600 text-white text-sm sm:text-base font-bold rounded-xl sm:rounded-2xl overflow-hidden shadow-xl shadow-blue-500/40 transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/60 hover:scale-[1.02]"
                   style={{
                     animation: isMenuOpen ? 'slideInMobile 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.3s forwards' : 'none',
                     opacity: 0,
-                    backdropFilter: "blur(20px)"
                   }}
                 >
-                  {/* Animated background */}
+                  {/* Animated Background */}
                   <span className="absolute inset-0 bg-gradient-to-r from-cyan-600 via-blue-500 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   
                   {/* Shimmer */}
-                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
-                  
-                  {/* Glass effect */}
-                  <span className="absolute inset-0 bg-white/10 rounded-2xl" />
+                  <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
                   
                   {/* Content */}
-                  <span className="relative flex items-center justify-center gap-3">
-                    <Download className="w-4 h-4 group-hover:animate-bounce" />
+                  <span className="relative flex items-center justify-center gap-2.5 sm:gap-3">
+                    <Download className="w-4 h-4 sm:w-4.5 sm:h-4.5 group-hover:animate-bounce" />
                     <span className="tracking-wide">Resumeni yuklab olish</span>
                   </span>
                   
-                  {/* Glow pulse */}
+                  {/* Glow Pulse */}
                   <span className="absolute inset-0 bg-white/10 blur-xl scale-0 group-hover:scale-100 transition-transform duration-500" />
                 </button>
               </div>
@@ -404,14 +386,14 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Spacer to prevent content from hiding under fixed navbar */}
-      <div className="h-20" />
+      {/* Spacer */}
+      <div className="h-20 sm:h-24" />
 
       <style>{`
         @keyframes slideInMobile {
           from {
             opacity: 0;
-            transform: translateX(-20px) translateY(-5px);
+            transform: translateX(-12px) translateY(-4px);
           }
           to {
             opacity: 1;
@@ -430,28 +412,28 @@ const Navbar = () => {
 
         @keyframes orbit-1 {
           0% {
-            transform: rotate(0deg) translateX(20px) rotate(0deg);
+            transform: rotate(0deg) translateX(18px) rotate(0deg);
           }
           100% {
-            transform: rotate(360deg) translateX(20px) rotate(-360deg);
+            transform: rotate(360deg) translateX(18px) rotate(-360deg);
           }
         }
 
         @keyframes orbit-2 {
           0% {
-            transform: rotate(120deg) translateX(18px) rotate(-120deg);
+            transform: rotate(120deg) translateX(16px) rotate(-120deg);
           }
           100% {
-            transform: rotate(480deg) translateX(18px) rotate(-480deg);
+            transform: rotate(480deg) translateX(16px) rotate(-480deg);
           }
         }
 
         @keyframes orbit-3 {
           0% {
-            transform: rotate(240deg) translateX(16px) rotate(-240deg);
+            transform: rotate(240deg) translateX(14px) rotate(-240deg);
           }
           100% {
-            transform: rotate(600deg) translateX(16px) rotate(-600deg);
+            transform: rotate(600deg) translateX(14px) rotate(-600deg);
           }
         }
 
@@ -485,34 +467,23 @@ const Navbar = () => {
           scroll-behavior: smooth;
         }
 
-        /* Gradient text animation for logo */
-        @keyframes gradient-shift {
-          0% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
-          100% {
-            background-position: 0% 50%;
-          }
+        /* Custom Scrollbar for Mobile Menu */
+        .overflow-y-auto::-webkit-scrollbar {
+          width: 4px;
         }
 
-        .gradient-text {
-          background: linear-gradient(90deg, #fff, #93c5fd, #fff, #93c5fd);
-          background-size: 300% 300%;
-          animation: gradient-shift 8s ease infinite;
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent;
-        }
-
-        /* Glass effect styles */
-        .glass-effect {
+        .overflow-y-auto::-webkit-scrollbar-track {
           background: rgba(255, 255, 255, 0.05);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 10px;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-thumb {
+          background: rgba(59, 130, 246, 0.5);
+          border-radius: 10px;
+        }
+
+        .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+          background: rgba(59, 130, 246, 0.7);
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -523,6 +494,11 @@ const Navbar = () => {
             animation-iteration-count: 1 !important;
             transition-duration: 0.01ms !important;
           }
+        }
+
+        /* Smooth transitions for all states */
+        * {
+          -webkit-tap-highlight-color: transparent;
         }
       `}</style>
     </>
