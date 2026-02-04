@@ -250,7 +250,7 @@ const SkillCard = React.memo(({ skill, index, months, skillColor, isHovered, onM
             {/* Label and Percentage */}
             <div className="flex items-center justify-between mb-2 sm:mb-2.5 md:mb-3">
               <span className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Foydalanish Darajasi
+                Tajriba
               </span>
               <span 
                 className="text-xs sm:text-sm font-bold tabular-nums"

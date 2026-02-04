@@ -4,6 +4,13 @@ import emailjs from '@emailjs/browser';
 import FadeIn from '../animations/FadeIn';
 import { PERSONAL_INFO, SOCIAL_LINKS } from '../../utils/constants';
 
+// EmailJS konfiguratsiyasi
+const EMAILJS_CONFIG = {
+  serviceId: 'ugportfolio',
+  templateId: 'template_i5kpekq',
+  publicKey: 'tX0l0WVq0Lj210y6K'
+};
+
 const Contact = () => {
   const [formData, setFormData] = useState({
     name: '',
@@ -32,28 +39,34 @@ const Contact = () => {
     setSubmitError(false);
     
     try {
-      await emailjs.send(
-        'ugportfolio',
-        'template_i5kpekq',
+      // EmailJS ga xabar yuborish
+      const result = await emailjs.send(
+        EMAILJS_CONFIG.serviceId,
+        EMAILJS_CONFIG.templateId,
         {
           from_name: formData.name,
           from_email: formData.email,
           message: formData.message,
+          to_name: 'Portfolio Owner', // EmailJS template uchun
         },
-        'K9FIW4k4QlagLrC4'
+        EMAILJS_CONFIG.publicKey
       );
+      
+      console.log('EmailJS Success:', result);
       
       setSubmitSuccess(true);
       setFormData({ name: '', email: '', message: '' });
       
+      // Success message ni 5 sekunddan keyin yashirish
       setTimeout(() => {
         setSubmitSuccess(false);
       }, 5000);
       
     } catch (error) {
-      console.error('Xabar yuborishda xatolik:', error);
+      console.error('EmailJS Error:', error);
       setSubmitError(true);
       
+      // Error message ni 5 sekunddan keyin yashirish
       setTimeout(() => {
         setSubmitError(false);
       }, 5000);
@@ -126,7 +139,10 @@ const Contact = () => {
       className="relative py-12 sm:py-16 lg:py-20 xl:py-24 overflow-hidden"
       aria-labelledby="contact-heading"
     >
-      {/* Background gradient for mobile */}
+      {/* Simple Radial Gradient Background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-radial from-slate-900 via-slate-950 to-black" />
+      </div>
       
       <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
         
@@ -212,6 +228,13 @@ const Contact = () => {
         </div>
 
       </div>
+
+      {/* Background gradient style */}
+      <style>{`
+        .bg-gradient-radial {
+          background: radial-gradient(ellipse at center, var(--tw-gradient-stops));
+        }
+      `}</style>
     </section>
   );
 };
@@ -248,7 +271,7 @@ const ContactForm = React.memo(({
 
           {/* Success Message */}
           {submitSuccess && (
-            <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-400/30 rounded-xl sm:rounded-2xl shadow-lg shadow-green-500/10">
+            <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-400/30 rounded-xl sm:rounded-2xl shadow-lg shadow-green-500/10 animate-fadeIn">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="p-1.5 sm:p-2 bg-green-500/20 rounded-lg sm:rounded-xl">
                   <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-green-400" />
@@ -263,7 +286,7 @@ const ContactForm = React.memo(({
 
           {/* Error Message */}
           {submitError && (
-            <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-gradient-to-r from-red-500/10 to-rose-500/10 border border-red-400/30 rounded-xl sm:rounded-2xl shadow-lg shadow-red-500/10">
+            <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-gradient-to-r from-red-500/10 to-rose-500/10 border border-red-400/30 rounded-xl sm:rounded-2xl shadow-lg shadow-red-500/10 animate-fadeIn">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="p-1.5 sm:p-2 bg-red-500/20 rounded-lg sm:rounded-xl">
                   <span className="text-lg sm:text-xl">⚠️</span>
@@ -361,6 +384,16 @@ const ContactForm = React.memo(({
           </form>
         </div>
       </div>
+
+      <style>{`
+        @keyframes fadeIn {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 });

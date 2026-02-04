@@ -10,14 +10,14 @@ const Projects = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const sectionRef = useRef(null);
 
-  // Filter projects based on active category
+  // Filter projects
   useEffect(() => {
     const filtered = activeCategory === 'All' 
       ? projects 
       : projects.filter(project => project.category === activeCategory);
     
     setFilteredProjects(filtered);
-    setCurrentPage(1); // Reset to first page when category changes
+    setCurrentPage(1);
   }, [activeCategory]);
 
   // Memoize pagination calculations
@@ -42,7 +42,7 @@ const Projects = () => {
 
   const scrollToSection = useCallback(() => {
     if (sectionRef.current) {
-      const yOffset = -100;
+      const yOffset = -80;
       const y = sectionRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
       window.scrollTo({ top: y, behavior: 'smooth' });
     }
@@ -71,57 +71,35 @@ const Projects = () => {
     <section 
       id="projects" 
       ref={sectionRef}
-      className="relative py-16 sm:py-20 lg:py-28 overflow-hidden"
+      className="relative py-12 sm:py-16 md:py-20 lg:py-28 overflow-hidden"
       aria-labelledby="projects-heading"
     >
-      {/* Premium Clean Background - No Grid Pattern */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none bg-transparent">
-        {/* Floating gradient orbs only */}
-        <div 
-          className="absolute top-1/4 left-1/4 w-72 h-72 rounded-full blur-[120px] opacity-20"
-          style={{
-            background: 'radial-gradient(circle, rgba(96, 165, 250, 0.5) 0%, transparent 70%)',
-            animation: 'float-slow 20s ease-in-out infinite'
-          }}
-          aria-hidden="true"
-        />
-        <div 
-          className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full blur-[140px] opacity-15"
-          style={{
-            background: 'radial-gradient(circle, rgba(147, 197, 253, 0.4) 0%, transparent 70%)',
-            animation: 'float-slow 25s ease-in-out infinite reverse'
-          }}
-          aria-hidden="true"
-        />
-        
-        {/* Soft ambient glow */}
-        <div 
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] rounded-full blur-[180px] opacity-5"
-          style={{
-            background: 'radial-gradient(circle, rgba(34, 211, 238, 0.3) 0%, transparent 70%)',
-          }}
-          aria-hidden="true"
-        />
+      {/* Simple Radial Gradient Background */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-radial from-slate-900 via-slate-950 to-black" />
       </div>
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Section */}
-        <header className="text-center mb-12 sm:mb-16 lg:mb-20">
+        
+        <header className="text-center mb-10 sm:mb-14 md:mb-16">
           <h2 
             id="projects-heading"
-            className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold mb-4 sm:mb-6 tracking-tight"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 tracking-tight"
           >
             <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent">
-              Loyihalarim
+              Mening Loyihalarim
             </span>
           </h2>
+          
           <div 
-            className="w-16 sm:w-20 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 mx-auto mb-4 sm:mb-6 rounded-full shadow-lg shadow-cyan-500/50"
+            className="w-16 sm:w-20 md:w-24 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 mx-auto mb-3 sm:mb-4 md:mb-6 rounded-full"
             aria-hidden="true"
           />
-          <p className="text-slate-400 text-base sm:text-lg max-w-2xl mx-auto">
-            Zamonaviy texnologiyalar yordamida yaratilgan loyihalarim
+          
+          <p className="text-slate-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-4">
+            Zamonaviy texnologiyalar va innovatsion yechimlar bilan yaratilgan professional loyihalar
           </p>
         </header>
 
@@ -135,7 +113,7 @@ const Projects = () => {
         {/* Projects Grid */}
         {currentProjects.length > 0 ? (
           <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 mb-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 md:gap-8 mb-12 sm:mb-16">
               {currentProjects.map((project, index) => (
                 <ProjectCard
                   key={project.id}
@@ -164,37 +142,26 @@ const Projects = () => {
         )}
       </div>
 
-      {/* Animations */}
+      {/* Minimal Animations */}
       <style>{`
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
         }
 
-        @keyframes float-slow {
-          0%, 100% {
-            transform: translate(0, 0);
-          }
-          50% {
-            transform: translate(30px, -30px);
-          }
+        .bg-gradient-radial {
+          background: radial-gradient(ellipse at center, var(--tw-gradient-stops));
         }
       `}</style>
     </section>
   );
 };
 
-// Separate FilterButtons component
+// FilterButtons component
 const FilterButtons = React.memo(({ categories, activeCategory, onCategoryChange }) => {
   return (
     <nav 
-      className="flex flex-wrap justify-center gap-3 sm:gap-4 mb-12 sm:mb-16"
+      className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-10 sm:mb-12 md:mb-14 px-4"
       aria-label="Loyiha filtrlari"
     >
       {categories.map((category) => (
@@ -203,30 +170,15 @@ const FilterButtons = React.memo(({ categories, activeCategory, onCategoryChange
           onClick={() => onCategoryChange(category)}
           aria-pressed={activeCategory === category}
           className={`
-            group relative px-5 sm:px-8 py-2.5 sm:py-3 rounded-full font-semibold text-sm sm:text-base
-            transition-all duration-300 overflow-hidden
+            relative px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-full font-semibold text-xs sm:text-sm md:text-base
+            transition-all duration-300
             ${activeCategory === category
-              ? 'text-white shadow-lg shadow-cyan-500/30'
-              : 'text-slate-300 hover:text-white'
+              ? 'bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 text-white shadow-lg shadow-cyan-500/30'
+              : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
             }
           `}
         >
-          {/* Background gradient effect */}
-          <span className={`
-            absolute inset-0 rounded-full transition-all duration-500
-            ${activeCategory === category
-              ? 'bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500'
-              : 'bg-slate-800 group-hover:bg-gradient-to-r group-hover:from-cyan-500 group-hover:via-blue-600 group-hover:to-cyan-500'
-            }
-          `} aria-hidden="true" />
-          
-          {/* Border effect */}
-          <span 
-            className="absolute inset-0 rounded-full border-2 border-transparent group-hover:border-cyan-400/30"
-            aria-hidden="true"
-          />
-          
-          <span className="relative z-10">{category}</span>
+          <span className="relative z-10 whitespace-nowrap">{category}</span>
         </button>
       ))}
     </nav>
@@ -235,99 +187,100 @@ const FilterButtons = React.memo(({ categories, activeCategory, onCategoryChange
 
 FilterButtons.displayName = 'FilterButtons';
 
-// Separate ProjectCard component
+// ProjectCard component
 const ProjectCard = React.memo(({ project, index }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   const handleImageError = (e) => {
     e.target.src = 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80';
+  };
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
   };
 
   return (
     <article
       className="group relative h-full flex flex-col"
-      style={{
-        animation: `fadeInUp 0.6s ease-out ${index * 0.1}s both`
-      }}
+      style={{ animation: `fadeIn 0.4s ease-out ${index * 0.05}s both` }}
     >
-      {/* Card Container */}
-      <div className="relative bg-slate-900/50 backdrop-blur-sm rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl hover:shadow-cyan-500/20 transition-all duration-500 hover:-translate-y-2 h-full flex flex-col border border-slate-800 hover:border-cyan-500/50">
+      <div className="relative h-full flex flex-col rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-1">
         
-        {/* Gradient border effect */}
-        <div 
-          className="absolute -inset-0.5 bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur"
-          aria-hidden="true"
-        />
-        
-        {/* Inner card */}
-        <div className="relative bg-slate-900/90 backdrop-blur-sm rounded-3xl overflow-hidden h-full flex flex-col">
+        {/* Card Content */}
+        <div className="relative bg-slate-900 rounded-2xl sm:rounded-3xl overflow-hidden h-full flex flex-col border border-slate-800 hover:border-cyan-500/50 transition-colors duration-300">
           
           {/* Image Container */}
-          <div className="relative h-48 sm:h-56 lg:h-64 overflow-hidden flex-shrink-0">
+          <div className="relative h-48 sm:h-52 md:h-56 overflow-hidden flex-shrink-0 bg-slate-800">
+            {!imageLoaded && (
+              <div className="absolute inset-0 bg-slate-800 animate-pulse" />
+            )}
+            
             <img
               src={project.image}
               alt={project.title}
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+              className={`w-full h-full object-cover transition-all duration-500 ${
+                imageLoaded ? 'opacity-100 group-hover:scale-105' : 'opacity-0'
+              }`}
               onError={handleImageError}
+              onLoad={handleImageLoad}
               loading="lazy"
             />
             
             {/* Gradient overlay */}
             <div 
-              className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/50 to-transparent opacity-60 group-hover:opacity-90 transition-opacity duration-300"
+              className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"
               aria-hidden="true"
             />
             
-            {/* Action buttons - Always visible */}
-            <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 flex items-center justify-between">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <ActionButton
-                  href={project.demoUrl}
-                  icon={<ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />}
-                  label="Live Demo"
-                  variant="primary"
-                />
-                
-                <ActionButton
-                  href={project.githubUrl}
-                  icon={<Github className="w-4 h-4 sm:w-5 sm:h-5" />}
-                  label="GitHub"
-                  variant="secondary"
-                />
-              </div>
+            {/* Action buttons */}
+            <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 flex items-center gap-2">
+              <ActionButton
+                href={project.demoUrl}
+                icon={<ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />}
+                label="Demo"
+                variant="primary"
+              />
+              
+              <ActionButton
+                href={project.githubUrl}
+                icon={<Github className="w-4 h-4 sm:w-5 sm:h-5" />}
+                label="Code"
+                variant="secondary"
+              />
             </div>
           </div>
 
-          {/* Content */}
-          <div className="p-5 sm:p-6 lg:p-7 flex flex-col flex-grow">
+          {/* Content Section */}
+          <div className="p-4 sm:p-5 md:p-6 flex flex-col flex-grow">
             {/* Category badge */}
-            <div className="mb-3 sm:mb-4">
-              <span className="inline-flex items-center px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 text-white text-xs sm:text-sm font-bold rounded-full tracking-wide uppercase shadow-lg shadow-cyan-500/30">
+            <div className="mb-3">
+              <span className="inline-flex items-center px-3 sm:px-4 py-1.5 bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 text-white text-xs sm:text-sm font-bold rounded-full uppercase tracking-wide">
                 {project.category}
               </span>
             </div>
 
             {/* Title */}
-            <h3 className="text-xl sm:text-2xl font-bold text-white mb-2 sm:mb-3 tracking-tight leading-tight group-hover:bg-gradient-to-r group-hover:from-cyan-400 group-hover:via-blue-500 group-hover:to-cyan-400 group-hover:bg-clip-text group-hover:text-transparent transition-all duration-300">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2 sm:mb-3 tracking-tight leading-tight group-hover:text-cyan-400 transition-colors duration-300 line-clamp-2">
               {project.title}
             </h3>
 
             {/* Description */}
-            <p className="text-sm sm:text-base text-slate-400 mb-4 sm:mb-5 leading-relaxed line-clamp-2 flex-grow">
+            <p className="text-xs sm:text-sm md:text-base text-slate-400 mb-4 leading-relaxed line-clamp-2 sm:line-clamp-3 flex-grow">
               {project.description}
             </p>
 
             {/* Technologies */}
-            <div className="flex flex-wrap gap-2 mt-auto">
-              {project.technologies.map((tech, techIndex) => (
+            <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-auto">
+              {project.technologies.slice(0, 4).map((tech, techIndex) => (
                 <TechBadge key={techIndex} tech={tech} />
               ))}
+              {project.technologies.length > 4 && (
+                <span className="px-2 sm:px-2.5 py-1 bg-slate-800 text-slate-400 rounded-lg text-xs font-medium">
+                  +{project.technologies.length - 4}
+                </span>
+              )}
             </div>
           </div>
-
-          {/* Bottom accent line */}
-          <div 
-            className="h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"
-            aria-hidden="true"
-          />
         </div>
       </div>
     </article>
@@ -338,11 +291,11 @@ ProjectCard.displayName = 'ProjectCard';
 
 // Action Button Component
 const ActionButton = ({ href, icon, label, variant }) => {
-  const baseClasses = "flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 rounded-full font-medium text-xs sm:text-sm shadow-md hover:shadow-lg transform hover:scale-105 transition-all duration-300";
+  const baseClasses = "flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-full font-medium text-xs sm:text-sm transition-all duration-300";
   
   const variantClasses = variant === 'primary'
-    ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:shadow-cyan-500/50 backdrop-blur-sm"
-    : "bg-slate-800/80 backdrop-blur-sm text-white border border-slate-700 hover:border-cyan-500 hover:bg-slate-800";
+    ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:shadow-lg hover:shadow-cyan-500/50"
+    : "bg-slate-800 text-white border border-slate-700 hover:border-cyan-500/50 hover:bg-slate-700";
 
   return (
     <a
@@ -361,7 +314,7 @@ const ActionButton = ({ href, icon, label, variant }) => {
 
 // Tech Badge Component
 const TechBadge = React.memo(({ tech }) => (
-  <span className="px-2.5 sm:px-3 py-1.5 bg-slate-800 text-slate-300 rounded-lg text-xs font-medium hover:bg-gradient-to-r hover:from-cyan-500/20 hover:to-blue-600/20 hover:text-cyan-400 transition-all duration-300 cursor-default border border-slate-700 hover:border-cyan-500/50">
+  <span className="px-2 sm:px-2.5 md:px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-xs font-medium hover:bg-slate-700 hover:text-cyan-400 transition-all duration-300 cursor-default border border-slate-700/50">
     {tech}
   </span>
 ));
@@ -379,74 +332,121 @@ const Pagination = React.memo(({
   indexOfLastProject,
   totalProjects
 }) => {
-  return (
-    <nav aria-label="Loyiha sahifalari">
-      <div className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-12">
-        {/* Previous Button */}
-        <button
-          onClick={onPrevPage}
-          disabled={currentPage === 1}
-          aria-label="Oldingi sahifa"
-          className={`
-            group flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-sm
-            transition-all duration-300 border-2
-            ${currentPage === 1
-              ? 'bg-slate-800 text-slate-600 border-slate-700 cursor-not-allowed'
-              : 'bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 text-white border-transparent hover:shadow-lg hover:shadow-cyan-500/50 hover:scale-105'
-            }
-          `}
-        >
-          <ChevronLeft className="w-4 h-4" aria-hidden="true" />
-          <span>Oldingi</span>
-        </button>
+  const getPageNumbers = () => {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
+    const maxVisible = isMobile ? 3 : 5;
+    const pages = [];
+    
+    if (totalPages <= maxVisible + 2) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
+    
+    pages.push(1);
+    
+    let start = Math.max(2, currentPage - Math.floor(maxVisible / 2));
+    let end = Math.min(totalPages - 1, start + maxVisible - 1);
+    
+    if (end - start < maxVisible - 1) {
+      start = Math.max(2, end - maxVisible + 1);
+    }
+    
+    if (start > 2) pages.push('...');
+    
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+    
+    if (end < totalPages - 1) pages.push('...');
+    pages.push(totalPages);
+    
+    return pages;
+  };
 
-        {/* Page Numbers */}
-        <div className="flex items-center gap-2">
-          {Array.from({ length: totalPages }, (_, index) => {
-            const pageNumber = index + 1;
-            return (
-              <button
-                key={pageNumber}
-                onClick={() => onPageChange(pageNumber)}
-                aria-label={`Sahifa ${pageNumber}`}
-                aria-current={currentPage === pageNumber ? 'page' : undefined}
-                className={`
-                  w-10 h-10 sm:w-12 sm:h-12 rounded-full font-bold text-sm sm:text-base
-                  transition-all duration-300 border-2
-                  ${currentPage === pageNumber
-                    ? 'bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 text-white border-transparent shadow-lg shadow-cyan-500/50 scale-110'
-                    : 'bg-slate-800 text-slate-300 border-slate-700 hover:border-cyan-500/50 hover:text-cyan-400 hover:scale-105'
-                  }
-                `}
-              >
-                {pageNumber}
-              </button>
-            );
-          })}
+  return (
+    <nav aria-label="Loyiha sahifalari" className="px-4">
+      <div className="flex flex-col items-center gap-6">
+        {/* Page Info */}
+        <div className="text-center text-slate-400 text-xs sm:text-sm order-1 sm:order-2" role="status">
+          <span className="font-medium text-cyan-400">{indexOfFirstProject + 1}-{Math.min(indexOfLastProject, totalProjects)}</span>
+          <span className="mx-2">/</span>
+          <span className="font-medium text-slate-300">{totalProjects}</span>
+          <span className="ml-2">loyiha</span>
         </div>
 
-        {/* Next Button */}
-        <button
-          onClick={onNextPage}
-          disabled={currentPage === totalPages}
-          aria-label="Keyingi sahifa"
-          className={`
-            group flex items-center gap-2 px-5 py-3 rounded-full font-semibold text-sm
-            transition-all duration-300 border-2
-            ${currentPage === totalPages
-              ? 'bg-slate-800 text-slate-600 border-slate-700 cursor-not-allowed'
-              : 'bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 text-white border-transparent hover:shadow-lg hover:shadow-cyan-500/50 hover:scale-105'
-            }
-          `}
-        >
-          <span>Keyingi</span>
-          <ChevronRight className="w-4 h-4" aria-hidden="true" />
-        </button>
-      </div>
+        {/* Pagination Controls */}
+        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 order-2 sm:order-1">
+          {/* Previous Button */}
+          <button
+            onClick={onPrevPage}
+            disabled={currentPage === 1}
+            aria-label="Oldingi sahifa"
+            className={`
+              flex items-center gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-full font-semibold text-xs sm:text-sm
+              transition-all duration-300
+              ${currentPage === 1
+                ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
+                : 'bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/50'
+              }
+            `}
+          >
+            <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+            <span className="hidden sm:inline">Oldingi</span>
+          </button>
 
-      {/* Page Info */}
-      <div className="text-center mt-6 text-slate-400 text-sm" role="status">
-        {indexOfFirstProject + 1}-{Math.min(indexOfLastProject, totalProjects)} / {totalProjects} loyiha
+          {/* Page Numbers */}
+          <div className="flex items-center gap-1 sm:gap-2">
+            {getPageNumbers().map((pageNumber, index) => {
+              if (pageNumber === '...') {
+                return (
+                  <span 
+                    key={`ellipsis-${index}`}
+                    className="px-2 text-slate-500 text-sm"
+                    aria-hidden="true"
+                  >
+                    ...
+                  </span>
+                );
+              }
+              
+              return (
+                <button
+                  key={pageNumber}
+                  onClick={() => onPageChange(pageNumber)}
+                  aria-label={`Sahifa ${pageNumber}`}
+                  aria-current={currentPage === pageNumber ? 'page' : undefined}
+                  className={`
+                    w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full font-bold text-xs sm:text-sm md:text-base
+                    transition-all duration-300
+                    ${currentPage === pageNumber
+                      ? 'bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 text-white shadow-lg shadow-cyan-500/50'
+                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-cyan-400'
+                    }
+                  `}
+                >
+                  {pageNumber}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Next Button */}
+          <button
+            onClick={onNextPage}
+            disabled={currentPage === totalPages}
+            aria-label="Keyingi sahifa"
+            className={`
+              flex items-center gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-full font-semibold text-xs sm:text-sm
+              transition-all duration-300
+              ${currentPage === totalPages
+                ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
+                : 'bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/50'
+              }
+            `}
+          >
+            <span className="hidden sm:inline">Keyingi</span>
+            <ChevronRight className="w-4 h-4" aria-hidden="true" />
+          </button>
+        </div>
       </div>
     </nav>
   );
@@ -456,13 +456,17 @@ Pagination.displayName = 'Pagination';
 
 // Empty State Component
 const EmptyState = () => (
-  <div className="text-center py-16 sm:py-20 lg:py-24" role="status">
-    <div className="text-6xl sm:text-7xl lg:text-8xl mb-4 sm:mb-6" aria-hidden="true">🔍</div>
-    <h3 className="text-2xl sm:text-3xl font-bold text-white mb-2 sm:mb-3">
+  <div className="text-center py-20 sm:py-24 md:py-32 px-4" role="status">
+    <div className="text-6xl sm:text-7xl md:text-8xl mb-6" aria-hidden="true">
+      🔍
+    </div>
+    
+    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4">
       Hech qanday loyiha topilmadi
     </h3>
-    <p className="text-base sm:text-lg text-slate-400">
-      Boshqa toifani tanlashga harakat qiling
+    
+    <p className="text-sm sm:text-base md:text-lg text-slate-400 max-w-md mx-auto">
+      Boshqa kategoriyani tanlang yoki barcha loyihalarni ko'rish uchun "All" tugmasini bosing
     </p>
   </div>
 );
