@@ -141,7 +141,7 @@ const Footer = () => {
                 <h4 className="font-bold text-white">Texnologiyalar</h4>
               </div>
               <p className="text-gray-300 text-sm">
-                React.js, Next.js, TypeScript, Tailwind CSS va boshqa zamonaviy texnologiyalar
+                React.js, Next.js, Tailwind CSS va boshqa zamonaviy texnologiyalar
               </p>
             </div>
           </div>
