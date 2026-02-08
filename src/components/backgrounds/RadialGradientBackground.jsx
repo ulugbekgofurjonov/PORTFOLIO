@@ -3,57 +3,36 @@ import React, { useEffect, useRef, useState } from "react";
 const RadialGradientBackground = () => {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isLowPerformance, setIsLowPerformance] = useState(false);
-
-  useEffect(() => {
-    // Device turini aniqlash
-    const checkDevice = () => {
-      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-      setIsMobile(mobile);
-      
-      // Performance check - CPU cores va memory
-      const cores = navigator.hardwareConcurrency || 2;
-      const memory = navigator.deviceMemory || 4;
-      const lowPerf = mobile || cores <= 4 || memory <= 4;
-      setIsLowPerformance(lowPerf);
-    };
-
-    checkDevice();
-  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const container = containerRef.current;
     if (!canvas || !container) return;
 
-    const ctx = canvas.getContext("2d", { 
-      alpha: false, // Alpha channel kerak emas - tezroq
-      desynchronized: true // Better performance
-    });
-    
+    const ctx = canvas.getContext("2d");
     let animationId;
     let particles = [];
-    let lastTime = 0;
-    const targetFPS = isLowPerformance ? 30 : 60; // Mobilda past FPS
-    const frameInterval = 1000 / targetFPS;
 
+    // To'g'ri resize funksiyasi
     const resizeCanvas = () => {
       const containerWidth = container.clientWidth;
       const containerHeight = container.clientHeight;
       
-      // Mobilda past resolution
-      const scale = isLowPerformance ? 0.75 : 1;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2); // Max 2x
+      // High DPI displaylar uchun
+      const dpr = window.devicePixelRatio || 1;
       
-      canvas.width = containerWidth * scale;
-      canvas.height = containerHeight * scale;
+      // Canvas actual size
+      canvas.width = containerWidth * dpr;
+      canvas.height = containerHeight * dpr;
       
+      // CSS size (ko'rinadigan o'lcham)
       canvas.style.width = `${containerWidth}px`;
       canvas.style.height = `${containerHeight}px`;
       
-      ctx.scale(scale, scale);
+      // Scale context for high DPI
+      ctx.scale(dpr, dpr);
       
+      // Particlelarni qayta yaratish
       initParticles();
     };
 
@@ -65,12 +44,8 @@ const RadialGradientBackground = () => {
         this.x = Math.random() * containerWidth;
         this.y = Math.random() * containerHeight;
         this.size = Math.random() * 2 + 1;
-        
-        // Mobilda sekinroq harakat
-        const speedMultiplier = isLowPerformance ? 0.5 : 1;
-        this.speedX = (Math.random() - 0.5) * 0.3 * speedMultiplier;
-        this.speedY = (Math.random() - 0.5) * 0.3 * speedMultiplier;
-        
+        this.speedX = (Math.random() - 0.5) * 0.3;
+        this.speedY = (Math.random() - 0.5) * 0.3;
         this.containerWidth = containerWidth;
         this.containerHeight = containerHeight;
       }
@@ -79,7 +54,9 @@ const RadialGradientBackground = () => {
         const containerWidth = container.clientWidth;
         const containerHeight = container.clientHeight;
         
+        // Container o'lchami o'zgarsa, particle'ni qayta joylashtirish
         if (this.containerWidth !== containerWidth || this.containerHeight !== containerHeight) {
+          // Relative position ni saqlab qolish
           const relX = this.x / this.containerWidth;
           const relY = this.y / this.containerHeight;
           this.x = relX * containerWidth;
@@ -91,6 +68,7 @@ const RadialGradientBackground = () => {
         this.x += this.speedX;
         this.y += this.speedY;
 
+        // Chekkalarni tekshirish
         if (this.x > containerWidth) this.x = 0;
         if (this.x < 0) this.x = containerWidth;
         if (this.y > containerHeight) this.y = 0;
@@ -107,18 +85,7 @@ const RadialGradientBackground = () => {
 
     const initParticles = () => {
       particles = [];
-      
-      // Device ga qarab particle soni
-      const area = container.clientWidth * container.clientHeight;
-      let particleCount;
-      
-      if (isLowPerformance) {
-        // Mobil: kam particle
-        particleCount = Math.min(40, Math.floor(area / 25000));
-      } else {
-        // Desktop: ko'proq particle
-        particleCount = Math.min(100, Math.floor(area / 15000));
-      }
+      const particleCount = Math.min(100, Math.floor((container.clientWidth * container.clientHeight) / 15000));
       
       for (let i = 0; i < particleCount; i++) {
         particles.push(new Particle());
@@ -126,16 +93,14 @@ const RadialGradientBackground = () => {
     };
 
     const connectParticles = () => {
-      const maxDistance = isLowPerformance ? 80 : 100; // Mobilda kam connection
-      
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
           const dy = particles[i].y - particles[j].y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          if (distance < maxDistance) {
-            ctx.strokeStyle = `rgba(0, 180, 255, ${1 - distance / maxDistance})`;
+          if (distance < 100) {
+            ctx.strokeStyle = `rgba(0, 180, 255, ${1 - distance / 100})`;
             ctx.lineWidth = 0.5;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
@@ -146,16 +111,14 @@ const RadialGradientBackground = () => {
       }
     };
 
-    // Gradient cache - har frame da yaratmaslik uchun
-    let cachedGradient = null;
-    let lastWidth = 0;
-    let lastHeight = 0;
-
-    const createGradient = (width, height) => {
-      if (cachedGradient && width === lastWidth && height === lastHeight) {
-        return cachedGradient;
-      }
+    const animate = () => {
+      const width = container.clientWidth;
+      const height = container.clientHeight;
       
+      // Clear canvas
+      ctx.clearRect(0, 0, width, height);
+      
+      // Background
       const gradient = ctx.createRadialGradient(
         width / 2, height / 2, 0,
         width / 2, height / 2, Math.max(width, height) / 1.5
@@ -163,50 +126,16 @@ const RadialGradientBackground = () => {
       gradient.addColorStop(0, '#0a1628');
       gradient.addColorStop(1, '#091220');
       
-      cachedGradient = gradient;
-      lastWidth = width;
-      lastHeight = height;
-      
-      return gradient;
-    };
-
-    const animate = (currentTime) => {
-      // FPS throttling
-      const deltaTime = currentTime - lastTime;
-      
-      if (deltaTime < frameInterval) {
-        animationId = requestAnimationFrame(animate);
-        return;
-      }
-      
-      lastTime = currentTime - (deltaTime % frameInterval);
-      
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-      
-      // Clear canvas
-      ctx.clearRect(0, 0, width, height);
-      
-      // Cached gradient
-      const gradient = createGradient(width, height);
       ctx.fillStyle = gradient;
       ctx.fillRect(0, 0, width, height);
 
-      // Batch operations
-      ctx.save();
-      
-      // Update va draw birgalikda
-      for (let i = 0; i < particles.length; i++) {
-        particles[i].update();
-        particles[i].draw();
-      }
-      
-      // Mobilda connectionlarni skip qilish mumkin
-      if (!isLowPerformance || particles.length < 50) {
-        connectParticles();
-      }
-      
-      ctx.restore();
+      // Update and draw particles
+      particles.forEach((particle) => {
+        particle.update();
+        particle.draw();
+      });
+
+      connectParticles();
 
       animationId = requestAnimationFrame(animate);
     };
@@ -214,52 +143,30 @@ const RadialGradientBackground = () => {
     // Initial setup
     resizeCanvas();
     initParticles();
-    
-    // Animation boshlanishi
-    requestAnimationFrame(animate);
+    animate();
 
-    // Optimized resize handling
-    let resizeTimeout;
+    // Resize observer - eng yaxshi usul
     const resizeObserver = new ResizeObserver(() => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        resizeCanvas();
-      }, 150); // Debounce
+      resizeCanvas();
     });
 
     resizeObserver.observe(container);
 
+    // Window resize uchun ham
     const handleResize = () => {
-      clearTimeout(resizeTimeout);
-      resizeTimeout = setTimeout(() => {
-        resizeCanvas();
-      }, 150);
+      resizeCanvas();
     };
 
-    window.addEventListener('resize', handleResize, { passive: true });
-
-    // Visibility API - tab inactive bo'lsa to'xtatish
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        cancelAnimationFrame(animationId);
-      } else {
-        lastTime = performance.now();
-        animationId = requestAnimationFrame(animate);
-      }
-    };
-
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('resize', handleResize);
 
     return () => {
       cancelAnimationFrame(animationId);
-      clearTimeout(resizeTimeout);
       if (resizeObserver) {
         resizeObserver.disconnect();
       }
       window.removeEventListener('resize', handleResize);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, [isMobile, isLowPerformance]);
+  }, []);
 
   return (
     <div 
@@ -267,16 +174,14 @@ const RadialGradientBackground = () => {
       className="fixed top-0 left-0 w-full h-full pointer-events-none"
       style={{ 
         zIndex: -1,
-        backgroundColor: '#0a1628',
-        willChange: 'auto' // GPU acceleration faqat kerak bo'lsa
+        backgroundColor: '#0a1628'
       }}
     >
       <canvas 
         ref={canvasRef} 
         className="w-full h-full"
         style={{
-          display: 'block',
-          imageRendering: isLowPerformance ? 'auto' : 'crisp-edges'
+          display: 'block'
         }}
       />
     </div>
