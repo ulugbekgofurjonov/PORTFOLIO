@@ -46,8 +46,7 @@ const Contact = () => {
         {
           from_name: formData.name,
           from_email: formData.email,
-          message: formData.message,
-          to_name: 'Portfolio Owner', // EmailJS template uchun
+          message: formData.message
         },
         EMAILJS_CONFIG.publicKey
       );
