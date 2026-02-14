@@ -3,8 +3,13 @@ import { FaGithub, FaTelegram, FaEnvelope, FaMapMarkerAlt, FaPhone, FaDownload, 
 import { Instagram } from "lucide-react";
 import { FiArrowRight, FiCoffee } from "react-icons/fi";
 import { PERSONAL_INFO, SOCIAL_LINKS, NAV_LINKS } from "../../utils/constants";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 const Footer = () => {
+  const { language } = useLanguage();
+  const personalInfo = PERSONAL_INFO[language];
+  const navLinks = NAV_LINKS[language];
+  
   // Ijtimoiy tarmoq ikonkalari
   const socialIcons = {
     github: <FaGithub size={20} />,
@@ -25,40 +30,40 @@ const Footer = () => {
           <div className="space-y-6">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                {PERSONAL_INFO.name}
+                {personalInfo.name}
               </h2>
               <p className="text-lg font-medium text-blue-200">
-                {PERSONAL_INFO.title}
+                {personalInfo.title}
               </p>
             </div>
             
             <p className="text-gray-300 leading-relaxed">
-              {PERSONAL_INFO.tagline}
+              {personalInfo.tagline}
             </p>
             
             {/* Contact Info */}
             <div className="space-y-4 pt-4">
               <a 
-                href={`mailto:${PERSONAL_INFO.email}`}
+                href={`mailto:${personalInfo.email}`}
                 className="flex items-center text-gray-300 hover:text-white transition-colors duration-300 group"
               >
                 <div className="mr-4 p-2 bg-blue-900/30 rounded-lg group-hover:bg-blue-500/30 transition-colors duration-300 border border-blue-700/30">
                   <FaEnvelope className="text-blue-300" />
                 </div>
                 <span className="group-hover:translate-x-1 transition-transform duration-300">
-                  {PERSONAL_INFO.email}
+                  {personalInfo.email}
                 </span>
               </a>
               
               <a 
-                href={`tel:${PERSONAL_INFO.phone.replace(/\s/g, '')}`}
+                href={`tel:${personalInfo.phone.replace(/\s/g, '')}`}
                 className="flex items-center text-gray-300 hover:text-white transition-colors duration-300 group"
               >
                 <div className="mr-4 p-2 bg-blue-900/30 rounded-lg group-hover:bg-green-500/30 transition-colors duration-300 border border-blue-700/30">
                   <FaPhone className="text-green-300" />
                 </div>
                 <span className="group-hover:translate-x-1 transition-transform duration-300">
-                  {PERSONAL_INFO.phone}
+                  {personalInfo.phone}
                 </span>
               </a>
               
@@ -66,7 +71,7 @@ const Footer = () => {
                 <div className="mr-4 p-2 bg-blue-900/30 rounded-lg border border-blue-700/30">
                   <FaMapMarkerAlt className="text-purple-300" />
                 </div>
-                <span>{PERSONAL_INFO.location}</span>
+                <span>{personalInfo.location}</span>
               </div>
             </div>
           </div>
@@ -74,10 +79,10 @@ const Footer = () => {
           {/* Navigation Links */}
           <div>
             <h3 className="text-xl font-bold mb-8 pb-2 border-b-2 border-blue-400/40 inline-block text-blue-100">
-              Tezkor Havolalar
+              {language === 'uz' ? 'Tezkor Havolalar' : 'Quick Links'}
             </h3>
             <ul className="space-y-4">
-              {NAV_LINKS.map((link) => (
+              {navLinks.map((link) => (
                 <li key={link.id}>
                   <a 
                     href={`#${link.id}`}
@@ -95,12 +100,12 @@ const Footer = () => {
             {/* Download CV Button */}
             <div className="mt-10 pt-6 border-t border-blue-800/30">
               <a 
-                href={PERSONAL_INFO.resume}
+                href={personalInfo.resume}
                 download
                 className="inline-flex items-center justify-center bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30 w-full md:w-auto"
               >
                 <FaDownload className="mr-3" />
-                Resumeni yuklab olish
+                {language === 'uz' ? 'Resumeni yuklab olish' : 'Download Resume'}
               </a>
             </div>
           </div>
@@ -108,11 +113,13 @@ const Footer = () => {
           {/* Social & Connect Section */}
           <div>
             <h3 className="text-xl font-bold mb-8 pb-2 border-b-2 border-cyan-400/40 inline-block text-blue-100">
-              Ijtimoiy Tarmoqlar
+              {language === 'uz' ? 'Ijtimoiy Tarmoqlar' : 'Social Media'}
             </h3>
             
             <p className="text-gray-300 mb-8">
-              Loyihalarim va yangilanishlarim bilan tanishish uchun ijtimoiy tarmoqlarda kuzatib boring
+              {language === 'uz' 
+                ? "Loyihalarim va yangilanishlarim bilan tanishish uchun ijtimoiy tarmoqlarda kuzatib boring"
+                : 'Follow me on social media to see my projects and updates'}
             </p>
             
             {/* Social Links */}
@@ -138,10 +145,14 @@ const Footer = () => {
             <div className="bg-gradient-to-r from-blue-900/40 to-cyan-900/40 border border-blue-700/40 rounded-xl p-5 backdrop-blur-sm">
               <div className="flex items-center mb-3">
                 <FaCode className="text-blue-300 mr-3" />
-                <h4 className="font-bold text-white">Texnologiyalar</h4>
+                <h4 className="font-bold text-white">
+                  {language === 'uz' ? 'Texnologiyalar' : 'Technologies'}
+                </h4>
               </div>
               <p className="text-gray-300 text-sm">
-                React.js, Next.js, Tailwind CSS va boshqa zamonaviy texnologiyalar
+                {language === 'uz' 
+                  ? 'React.js, Next.js, Tailwind CSS va boshqa zamonaviy texnologiyalar'
+                  : 'React.js, Next.js, Tailwind CSS and other modern technologies'}
               </p>
             </div>
           </div>
@@ -166,10 +177,10 @@ const Footer = () => {
           {/* Copyright */}
           <div className="mb-6 lg:mb-0 text-center lg:text-left">
             <p className="text-gray-300">
-              © {new Date().getFullYear()} {PERSONAL_INFO.name}. Barcha huquqlar himoyalangan.
+              © {new Date().getFullYear()} {personalInfo.name}. {language === 'uz' ? 'Barcha huquqlar himoyalangan' : 'All rights reserved'}.
             </p>
             <p className="text-gray-400 text-sm mt-1">
-              Frontend dasturchi
+              {language === 'uz' ? 'Frontend dasturchi' : 'Frontend Developer'}
             </p>
           </div>
           

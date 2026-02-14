@@ -1,23 +1,24 @@
 import React, { useState, useMemo, useCallback } from 'react';
 import { Code2, Sparkles, Calendar } from 'lucide-react';
 import { skills } from '../../data/skills';
+import { useLanguage } from '../../contexts/LanguageContext';
 import FadeIn from '../animations/FadeIn';
 
 const Skills = () => {
+  const { language } = useLanguage();
+  const skillsList = useMemo(() => skills[language] || [], [language]);
+  
   const [hoveredSkill, setHoveredSkill] = useState(null);
-
-  // Memoize skills data
-  const skillsList = useMemo(() => skills || [], []);
 
   // Calculate months from experience string
   const parseExperienceToMonths = useCallback((experienceStr) => {
     if (!experienceStr) return 3;
     
     const str = experienceStr.toLowerCase();
-    if (str.includes('oy')) {
+    if (str.includes('oy') || str.includes('month')) {
       const months = parseInt(str);
       return isNaN(months) ? 3 : months;
-    } else if (str.includes('yil')) {
+    } else if (str.includes('yil') || str.includes('year')) {
       const years = parseFloat(str);
       return isNaN(years) ? 12 : Math.round(years * 12);
     }
@@ -68,7 +69,7 @@ const Skills = () => {
             <div className="inline-flex items-center gap-2 sm:gap-2.5 md:gap-3 px-4 sm:px-4.5 md:px-5 py-2 sm:py-2.5 mb-5 sm:mb-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full">
               <Code2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400" aria-hidden="true" />
               <span className="text-xs sm:text-sm text-white/90 font-medium tracking-wider uppercase">
-                Ko'nikmalar
+                {language === 'uz' ? "Ko'nikmalar" : 'Skills'}
               </span>
               <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400" aria-hidden="true" />
             </div>
@@ -78,15 +79,19 @@ const Skills = () => {
               id="skills-heading"
               className="text-[28px] leading-tight sm:text-4xl sm:leading-tight md:text-5xl md:leading-tight lg:text-6xl lg:leading-tight font-bold text-white mb-4 sm:mb-5 md:mb-6 tracking-tight px-2 sm:px-4"
             >
-              <span className="text-white block sm:inline">Ishlatadigan </span>
+              <span className="text-white block sm:inline">
+                {language === 'uz' ? 'Ishlatadigan ' : 'Technologies '}
+              </span>
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 block sm:inline">
-                Texnologiyalarim
+                {language === 'uz' ? 'Texnologiyalarim' : 'I Use'}
               </span>
             </h1>
 
             {/* Description */}
             <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed px-4 sm:px-6">
-              Veb-ishlab chiqishda qo'llanadigan zamonaviy texnologiyalar va ular bilan ishlash tajribam
+              {language === 'uz' 
+                ? "Veb-ishlab chiqishda qo'llanadigan zamonaviy texnologiyalar va ular bilan ishlash tajribam"
+                : 'Modern technologies used in web development and my experience working with them'}
             </p>
           </header>
         </FadeIn>
@@ -99,7 +104,7 @@ const Skills = () => {
                 {skillsList.length}
               </div>
               <div className="text-[10px] sm:text-xs md:text-sm text-gray-400 font-medium">
-                Texnologiya
+                {language === 'uz' ? 'Texnologiya' : 'Technologies'}
               </div>
             </div>
             <div className="text-center p-3 sm:p-4 md:p-5 lg:p-6 bg-white/3 backdrop-blur-sm border border-white/10 rounded-xl sm:rounded-2xl">
@@ -110,7 +115,7 @@ const Skills = () => {
                 }
               </div>
               <div className="text-[10px] sm:text-xs md:text-sm text-gray-400 font-medium leading-tight">
-                Eng ko'p tajriba
+                {language === 'uz' ? "Eng ko'p tajriba" : 'Max Experience'}
               </div>
             </div>
             <div className="text-center p-3 sm:p-4 md:p-5 lg:p-6 bg-white/3 backdrop-blur-sm border border-white/10 rounded-xl sm:rounded-2xl">
@@ -118,7 +123,7 @@ const Skills = () => {
                 100%
               </div>
               <div className="text-[10px] sm:text-xs md:text-sm text-gray-400 font-medium">
-                O'rganish istagi
+                {language === 'uz' ? "O'rganish istagi" : 'Learning Desire'}
               </div>
             </div>
           </div>
@@ -141,6 +146,7 @@ const Skills = () => {
                   isHovered={hoveredSkill === index}
                   onMouseEnter={() => handleMouseEnter(index)}
                   onMouseLeave={handleMouseLeave}
+                  language={language}
                 />
               );
             })}
@@ -151,7 +157,9 @@ const Skills = () => {
             role="status"
             aria-live="polite"
           >
-            <p className="text-base sm:text-lg text-gray-400">Ko'nikmalar yuklanmoqda...</p>
+            <p className="text-base sm:text-lg text-gray-400">
+              {language === 'uz' ? "Ko'nikmalar yuklanmoqda..." : 'Loading skills...'}
+            </p>
           </div>
         )}
 
@@ -161,7 +169,7 @@ const Skills = () => {
 };
 
 // Optimized SkillCard component
-const SkillCard = React.memo(({ skill, index, months, skillColor, isHovered, onMouseEnter, onMouseLeave }) => {
+const SkillCard = React.memo(({ skill, index, months, skillColor, isHovered, onMouseEnter, onMouseLeave, language }) => {
   const Icon = skill.icon;
   
   // Calculate proficiency percentage based on usage experience
@@ -229,10 +237,7 @@ const SkillCard = React.memo(({ skill, index, months, skillColor, isHovered, onM
               <div className="flex items-center gap-1.5 sm:gap-2">
                 <Calendar className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-gray-500 flex-shrink-0" aria-hidden="true" />
                 <span className="text-xs sm:text-sm font-medium text-gray-400 truncate">
-                  {months >= 12 
-                    ? `${Math.floor(months / 12)} yil${months % 12 > 0 ? ` ${months % 12} oy` : ''}`
-                    : `${months} oy`
-                  }
+                  {skill.experience}
                 </span>
               </div>
             </div>
@@ -250,7 +255,7 @@ const SkillCard = React.memo(({ skill, index, months, skillColor, isHovered, onM
             {/* Label and Percentage */}
             <div className="flex items-center justify-between mb-2 sm:mb-2.5 md:mb-3">
               <span className="text-[10px] sm:text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Tajriba
+                {language === 'uz' ? 'Tajriba' : 'Experience'}
               </span>
               <span 
                 className="text-xs sm:text-sm font-bold tabular-nums"
@@ -275,7 +280,7 @@ const SkillCard = React.memo(({ skill, index, months, skillColor, isHovered, onM
                   aria-valuenow={proficiency}
                   aria-valuemin="0"
                   aria-valuemax="100"
-                  aria-label={`${skill.name} foydalanish darajasi: ${proficiency}%`}
+                  aria-label={`${skill.name} ${language === 'uz' ? 'foydalanish darajasi' : 'proficiency level'}: ${proficiency}%`}
                 />
               </div>
               

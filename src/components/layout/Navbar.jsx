@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Code, Menu, X, Download, Sparkles, ChevronDown } from "lucide-react";
+import { Code, Menu, X, Download, Sparkles, ChevronDown, Globe } from "lucide-react";
 import { NAV_LINKS, PERSONAL_INFO } from "../../utils/constants";
 import { useScrollSpy } from "../../hooks/useScrollSpy";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -10,7 +11,13 @@ const Navbar = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHoveringLogo, setIsHoveringLogo] = useState(false);
   const navRef = useRef(null);
-  const activeSection = useScrollSpy(NAV_LINKS.map((link) => link.id));
+  
+  // Language hook
+  const { language, toggleLanguage } = useLanguage();
+  
+  // Get language-specific data
+  const navLinks = NAV_LINKS[language];
+  const activeSection = useScrollSpy(navLinks.map((link) => link.id));
 
   useEffect(() => {
     const handleScroll = () => {
@@ -182,7 +189,7 @@ const Navbar = () => {
                 className="hidden lg:flex items-center gap-1.5 xl:gap-2"
                 style={{ fontFamily: "var(--font-body)" }}
               >
-                {NAV_LINKS.map((link, index) => (
+                {navLinks.map((link, index) => (
                   <button
                     key={link.id}
                     onClick={() => scrollToSection(link.id)}
@@ -232,8 +239,24 @@ const Navbar = () => {
                 ))}
               </div>
 
-              {/* Desktop CTA Button */}
-              <div className="hidden lg:flex items-center">
+              {/* Desktop Actions */}
+              <div className="hidden lg:flex items-center gap-3">
+                {/* Language Switcher Button */}
+                <button
+                  onClick={toggleLanguage}
+                  className="group relative px-3 py-2 bg-white/5 hover:bg-white/10 text-white font-bold text-sm rounded-xl overflow-hidden transition-all duration-300 hover:scale-105 border border-white/10 hover:border-blue-400/30"
+                  aria-label="Change language"
+                >
+                  <span className="relative flex items-center gap-2 z-10">
+                    <Globe className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" />
+                    <span className="tracking-wide uppercase">{language}</span>
+                  </span>
+                  
+                  {/* Hover Background */}
+                  <span className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-cyan-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </button>
+
+                {/* Download Resume Button */}
                 <button
                   onClick={handleDownloadResume}
                   className="group relative px-4 xl:px-6 py-2.5 xl:py-3 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-600 text-white font-bold text-xs xl:text-sm rounded-xl xl:rounded-2xl overflow-hidden shadow-xl shadow-blue-500/30 hover:shadow-2xl hover:shadow-blue-500/50 transition-all duration-500 hover:scale-105"
@@ -250,7 +273,7 @@ const Navbar = () => {
                   {/* Content */}
                   <span className="relative flex items-center gap-2 z-10">
                     <Download className="w-3.5 h-3.5 xl:w-4 xl:h-4 group-hover:animate-bounce" />
-                    <span className="tracking-wide">Resumeni yuklab olish</span>
+                    <span className="tracking-wide">{language === 'uz' ? 'Resumeni yuklab olish' : 'Download Resume'}</span>
                     <ChevronDown className="w-3 h-3 xl:w-3.5 xl:h-3.5 group-hover:translate-y-0.5 transition-transform duration-300" />
                   </span>
                   
@@ -311,8 +334,22 @@ const Navbar = () => {
           {/* Content Container */}
           <div className="relative shadow-2xl overflow-y-auto max-h-[calc(100vh-5rem)]">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-1.5 sm:space-y-2">
+              {/* Language Switcher for Mobile */}
+              <button
+                onClick={toggleLanguage}
+                className="group relative block w-full text-left px-4 sm:px-6 py-3 sm:py-3.5 rounded-xl sm:rounded-2xl font-semibold text-sm sm:text-base transition-all duration-500 overflow-hidden bg-white/5 hover:bg-white/10 text-white/70 hover:text-white mb-2"
+              >
+                <span className="relative flex items-center justify-between">
+                  <span className="flex items-center gap-2.5 sm:gap-3">
+                    <Globe className="w-4 h-4 sm:w-5 sm:h-5" />
+                    <span>Language: {language === 'uz' ? 'O\'zbekcha' : 'English'}</span>
+                  </span>
+                  <span className="uppercase text-blue-400 font-bold">{language}</span>
+                </span>
+              </button>
+
               {/* Navigation Links */}
-              {NAV_LINKS.map((link, index) => (
+              {navLinks.map((link, index) => (
                 <button
                   key={link.id}
                   onClick={() => scrollToSection(link.id)}
@@ -374,7 +411,7 @@ const Navbar = () => {
                   {/* Content */}
                   <span className="relative flex items-center justify-center gap-2.5 sm:gap-3">
                     <Download className="w-4 h-4 sm:w-4.5 sm:h-4.5 group-hover:animate-bounce" />
-                    <span className="tracking-wide">Resumeni yuklab olish</span>
+                    <span className="tracking-wide">{language === 'uz' ? 'Resumeni yuklab olish' : 'Download Resume'}</span>
                   </span>
                   
                   {/* Glow Pulse */}
@@ -467,7 +504,7 @@ const Navbar = () => {
           scroll-behavior: smooth;
         }
 
-        /* Custom Scrollbar for Mobile Menu */
+        /* Custom Scrollbar for Mobile Menu */}
         .overflow-y-auto::-webkit-scrollbar {
           width: 4px;
         }

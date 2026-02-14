@@ -14,14 +14,18 @@ import {
   Check,
 } from "lucide-react";
 import { PERSONAL_INFO } from "../../utils/constants";
+import { useLanguage } from "../../contexts/LanguageContext";
 import FadeIn from "../animations/FadeIn";
 import RadialGradientBackground from "../backgrounds/RadialGradientBackground";
 
 const About = () => {
+  const { language } = useLanguage();
+  const personalInfo = PERSONAL_INFO[language];
+  
   const [copiedPhone, setCopiedPhone] = useState(false);
 
   // Professional journey
-  const journey = [
+  const journey = language === 'uz' ? [
     {
       year: "2025",
       title: "Frontend Development ni Boshlash",
@@ -40,10 +44,29 @@ const About = () => {
       description:
         "Next.js orqali SSR va SEO-friendly ilovalar yaratishni o'rgandim. Hozir 10+ loyihaga ega",
     },
+  ] : [
+    {
+      year: "2025",
+      title: "Starting Frontend Development",
+      description:
+        "Got interested in web development and started learning HTML, CSS, JavaScript",
+    },
+    {
+      year: "2026",
+      title: "Transition to React.js",
+      description:
+        "Learned React.js framework and started creating modern SPAs (Single Page Applications)",
+    },
+    {
+      year: "2026",
+      title: "Next.js and Professional Growth",
+      description:
+        "Learned to create SSR and SEO-friendly applications with Next.js. Currently have 10+ projects",
+    },
   ];
 
   // Core values
-  const values = [
+  const values = language === 'uz' ? [
     {
       icon: Code,
       title: "Clean Code",
@@ -72,10 +95,39 @@ const About = () => {
         "Best practices, responsive design va web standartlariga doim rioya qilaman",
       color: "from-purple-500 to-blue-500",
     },
+  ] : [
+    {
+      icon: Code,
+      title: "Clean Code",
+      description:
+        "I always strive to write readable, understandable and maintainable code",
+      color: "from-blue-500 to-cyan-500",
+    },
+    {
+      icon: Lightbulb,
+      title: "Continuous Learning",
+      description:
+        "Technologies evolve rapidly, so I strive to learn new things every day",
+      color: "from-cyan-500 to-sky-500",
+    },
+    {
+      icon: Target,
+      title: "User Experience",
+      description:
+        "User experience comes first. I pay great attention to UX/UI in every project",
+      color: "from-sky-500 to-blue-500",
+    },
+    {
+      icon: Award,
+      title: "Quality and Standards",
+      description:
+        "I always adhere to best practices, responsive design and web standards",
+      color: "from-purple-500 to-blue-500",
+    },
   ];
 
   // What I do
-  const expertise = [
+  const expertise = language === 'uz' ? [
     {
       title: "Frontend Development",
       description:
@@ -94,11 +146,30 @@ const About = () => {
         "Veb-saytlarni tezlashtirish, SEO optimizatsiya va eng yaxshi amaliyotlarni qo'llash",
       skills: ["SEO", "Core Web Vitals", "Code Splitting"],
     },
+  ] : [
+    {
+      title: "Frontend Development",
+      description:
+        "Creating modern, fast and responsive web applications using React.js and Next.js",
+      skills: ["React.js", "Next.js", "JavaScript ES6+"],
+    },
+    {
+      title: "UI/UX Implementation",
+      description:
+        "From design to code - pixel-perfect interface and excellent user experience",
+      skills: ["Tailwind CSS", "Responsive Design", "Animations"],
+    },
+    {
+      title: "Performance Optimization",
+      description:
+        "Speeding up websites, SEO optimization and applying best practices",
+      skills: ["SEO", "Core Web Vitals", "Code Splitting"],
+    },
   ];
 
   const handleCopyPhone = async () => {
     try {
-      await navigator.clipboard.writeText(PERSONAL_INFO.phone);
+      await navigator.clipboard.writeText(personalInfo.phone);
       setCopiedPhone(true);
       setTimeout(() => setCopiedPhone(false), 2000);
     } catch (error) {
@@ -120,19 +191,19 @@ const About = () => {
             <div className="inline-flex items-center gap-2 sm:gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 mb-5 sm:mb-6 backdrop-blur-2xl bg-white/5 border border-white/10 rounded-full shadow-xl hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500 group">
               <User className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform duration-300" />
               <span className="text-xs sm:text-sm text-white/90 font-semibold tracking-wider uppercase">
-                Men Haqimda
+                {language === 'uz' ? 'Men Haqimda' : 'About Me'}
               </span>
             </div>
 
             <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6 px-4">
-              Salom, Men{" "}
+              {language === 'uz' ? 'Salom, Men' : 'Hello, I\'m'}{" "}
               <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-sky-400 bg-clip-text text-transparent">
-                {PERSONAL_INFO.name}
+                {personalInfo.name}
               </span>
             </h2>
 
             <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-gray-300 max-w-3xl mx-auto font-medium px-4">
-              {PERSONAL_INFO.title}
+              {personalInfo.title}
             </p>
           </div>
         </FadeIn>
@@ -152,12 +223,12 @@ const About = () => {
                     <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
                   </div>
                   <h3 className="text-xl sm:text-2xl font-bold text-white">
-                    Mening Hikoyam
+                    {language === 'uz' ? 'Mening Hikoyam' : 'My Story'}
                   </h3>
                 </div>
 
                 <div className="space-y-3 sm:space-y-4 text-gray-300 leading-relaxed relative z-10">
-                  {PERSONAL_INFO.bio.map((paragraph, index) => (
+                  {personalInfo.bio.map((paragraph, index) => (
                     <p key={index} className="text-sm sm:text-base">
                       {paragraph}
                     </p>
@@ -179,7 +250,9 @@ const About = () => {
                   <div className="p-2 sm:p-2.5 bg-cyan-500/20 rounded-lg sm:rounded-xl group-hover:bg-cyan-500/30 transition-colors duration-300">
                     <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white">Bog'lanish</h3>
+                  <h3 className="text-xl sm:text-2xl font-bold text-white">
+                    {language === 'uz' ? "Bog'lanish" : 'Contact'}
+                  </h3>
                 </div>
 
                 <div className="space-y-4 sm:space-y-5 relative z-10">
@@ -191,10 +264,10 @@ const About = () => {
                     <div className="flex-1 min-w-0">
                       <p className="text-xs sm:text-sm text-gray-400 mb-1">Email</p>
                       <a
-                        href={`mailto:${PERSONAL_INFO.email}`}
+                        href={`mailto:${personalInfo.email}`}
                         className="text-sm sm:text-base text-white hover:text-blue-400 transition-colors font-medium break-all"
                       >
-                        {PERSONAL_INFO.email}
+                        {personalInfo.email}
                       </a>
                     </div>
                   </div>
@@ -206,19 +279,19 @@ const About = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-xs sm:text-sm text-gray-400 mb-1">
-                        Telefon raqam
+                        {language === 'uz' ? 'Telefon raqam' : 'Phone Number'}
                       </p>
                       <div className="flex items-center gap-2">
                         <a
-                          href={`tel:${PERSONAL_INFO.phone}`}
+                          href={`tel:${personalInfo.phone}`}
                           className="text-sm sm:text-base text-white hover:text-blue-400 transition-colors font-medium"
                         >
-                          {PERSONAL_INFO.phone}
+                          {personalInfo.phone}
                         </a>
                         <button
                           onClick={handleCopyPhone}
                           className="p-1.5 hover:bg-blue-500/10 rounded-lg transition-all duration-300 group/copy relative"
-                          title="Nusxalash"
+                          title={language === 'uz' ? 'Nusxalash' : 'Copy'}
                           aria-label="Copy phone number"
                         >
                           {copiedPhone ? (
@@ -237,9 +310,11 @@ const About = () => {
                       <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs sm:text-sm text-gray-400 mb-1">Joylashuv</p>
+                      <p className="text-xs sm:text-sm text-gray-400 mb-1">
+                        {language === 'uz' ? 'Joylashuv' : 'Location'}
+                      </p>
                       <p className="text-sm sm:text-base text-white font-medium">
-                        {PERSONAL_INFO.location}
+                        {personalInfo.location}
                       </p>
                     </div>
                   </div>
@@ -261,7 +336,7 @@ const About = () => {
                     <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
                   </div>
                   <h3 className="text-xl sm:text-2xl font-bold text-white">
-                    Mening Yo'lim
+                    {language === 'uz' ? "Mening Yo'lim" : 'My Journey'}
                   </h3>
                 </div>
 
@@ -315,10 +390,12 @@ const About = () => {
           <div className="mb-12 sm:mb-16 lg:mb-20">
             <div className="text-center mb-8 sm:mb-12">
               <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 px-4">
-                Qadriyatlarim
+                {language === 'uz' ? 'Qadriyatlarim' : 'My Values'}
               </h3>
               <p className="text-sm sm:text-base text-gray-400 max-w-2xl mx-auto px-4">
-                Men ishlash jarayonimda quyidagi printsiplarga amal qilaman
+                {language === 'uz' 
+                  ? 'Men ishlash jarayonimda quyidagi printsiplarga amal qilaman' 
+                  : 'The principles I follow in my work process'}
               </p>
             </div>
 
@@ -359,10 +436,12 @@ const About = () => {
           <div>
             <div className="text-center mb-8 sm:mb-12">
               <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 px-4">
-                Nima Qilaman
+                {language === 'uz' ? 'Nima Qilaman' : 'What I Do'}
               </h3>
               <p className="text-sm sm:text-base text-gray-400 max-w-2xl mx-auto px-4">
-                Mening asosiy yo'nalishlarim va tajribalarim
+                {language === 'uz' 
+                  ? 'Mening asosiy yo\'nalishlarim va tajribalarim' 
+                  : 'My main directions and experiences'}
               </p>
             </div>
 

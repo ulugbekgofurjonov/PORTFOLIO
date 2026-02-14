@@ -3,6 +3,7 @@ import { Mail, MapPin, Phone, Send, Github, MessageSquare, CheckCircle2, Instagr
 import emailjs from '@emailjs/browser';
 import FadeIn from '../animations/FadeIn';
 import { PERSONAL_INFO, SOCIAL_LINKS } from '../../utils/constants';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 // EmailJS konfiguratsiyasi
 const EMAILJS_CONFIG = {
@@ -12,6 +13,9 @@ const EMAILJS_CONFIG = {
 };
 
 const Contact = () => {
+  const { language } = useLanguage();
+  const personalInfo = PERSONAL_INFO[language];
+  
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -39,7 +43,6 @@ const Contact = () => {
     setSubmitError(false);
     
     try {
-      // EmailJS ga xabar yuborish
       const result = await emailjs.send(
         EMAILJS_CONFIG.serviceId,
         EMAILJS_CONFIG.templateId,
@@ -56,7 +59,6 @@ const Contact = () => {
       setSubmitSuccess(true);
       setFormData({ name: '', email: '', message: '' });
       
-      // Success message ni 5 sekunddan keyin yashirish
       setTimeout(() => {
         setSubmitSuccess(false);
       }, 5000);
@@ -65,7 +67,6 @@ const Contact = () => {
       console.error('EmailJS Error:', error);
       setSubmitError(true);
       
-      // Error message ni 5 sekunddan keyin yashirish
       setTimeout(() => {
         setSubmitError(false);
       }, 5000);
@@ -75,37 +76,37 @@ const Contact = () => {
   }, [formData]);
 
   const copyPhoneNumber = useCallback(() => {
-    navigator.clipboard.writeText(PERSONAL_INFO.phone);
+    navigator.clipboard.writeText(personalInfo.phone);
     setCopiedPhone(true);
     setTimeout(() => setCopiedPhone(false), 2000);
-  }, []);
+  }, [personalInfo.phone]);
 
   // Memoized contact info
   const contactInfo = useMemo(() => [
     {
       icon: Mail,
       label: 'Email',
-      value: PERSONAL_INFO.email,
-      href: `mailto:${PERSONAL_INFO.email}`,
+      value: personalInfo.email,
+      href: `mailto:${personalInfo.email}`,
       gradient: 'from-blue-500 via-cyan-500 to-blue-500',
       iconColor: 'text-cyan-400'
     },
     {
       icon: Phone,
-      label: 'Telefon',
-      value: PERSONAL_INFO.phone,
+      label: language === 'uz' ? 'Telefon' : 'Phone',
+      value: personalInfo.phone,
       onClick: copyPhoneNumber,
       gradient: 'from-green-500 via-emerald-500 to-green-500',
       iconColor: 'text-green-400'
     },
     {
       icon: MapPin,
-      label: 'Manzil',
-      value: PERSONAL_INFO.location,
+      label: language === 'uz' ? 'Manzil' : 'Location',
+      value: personalInfo.location,
       gradient: 'from-purple-500 via-pink-500 to-purple-500',
       iconColor: 'text-purple-400'
     }
-  ], [copyPhoneNumber]);
+  ], [personalInfo, copyPhoneNumber, language]);
 
   // Memoized social links
   const socialLinks = useMemo(() => [
@@ -152,7 +153,7 @@ const Contact = () => {
             <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 mb-6 sm:mb-8 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-cyan-500/10 border border-cyan-500/20 rounded-full shadow-lg shadow-cyan-500/10">
               <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
               <span className="text-xs sm:text-sm text-cyan-300 font-bold tracking-wider uppercase">
-                Bog'laning
+                {language === 'uz' ? "Bog'laning" : 'Get in Touch'}
               </span>
               <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-400" />
             </div>
@@ -163,7 +164,7 @@ const Contact = () => {
               className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 tracking-tight"
             >
               <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent">
-                Aloqaga Chiqing
+                {language === 'uz' ? 'Aloqaga Chiqing' : 'Contact Me'}
               </span>
             </h2>
 
@@ -176,10 +177,21 @@ const Contact = () => {
 
             {/* Subtitle */}
             <p className="text-base sm:text-lg lg:text-xl text-gray-300 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed px-4">
-              Loyiha g'oyangiz bormi? 
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 font-semibold sm:font-bold"> Keling, birga </span>
-              muhokama qilaylik va g'oyalaringizni 
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500 font-semibold sm:font-bold"> hayotga tatbiq etaylik</span>
+              {language === 'uz' ? (
+                <>
+                  Loyiha g'oyangiz bormi? 
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 font-semibold sm:font-bold"> Keling, birga </span>
+                  muhokama qilaylik va g'oyalaringizni 
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500 font-semibold sm:font-bold"> hayotga tatbiq etaylik</span>
+                </>
+              ) : (
+                <>
+                  Have a project idea? 
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 font-semibold sm:font-bold"> Let's </span>
+                  discuss it together and 
+                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500 font-semibold sm:font-bold"> bring your ideas to life</span>
+                </>
+              )}
             </p>
           </header>
         </FadeIn>
@@ -198,6 +210,7 @@ const Contact = () => {
                 onChange={handleChange}
                 focusedField={focusedField}
                 setFocusedField={setFocusedField}
+                language={language}
               />
             </FadeIn>
 
@@ -209,15 +222,16 @@ const Contact = () => {
                 <ContactInfoCard
                   contactInfo={contactInfo}
                   copiedPhone={copiedPhone}
+                  language={language}
                 />
 
                 {/* Social Links Card */}
-                <SocialLinksCard socialLinks={socialLinks} />
+                <SocialLinksCard socialLinks={socialLinks} language={language} />
 
                 {/* Quick Info Cards Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  <QuickResponseCard />
-                  <AvailabilityCard />
+                  <QuickResponseCard language={language} />
+                  <AvailabilityCard language={language} />
                 </div>
 
               </div>
@@ -247,7 +261,8 @@ const ContactForm = React.memo(({
   onSubmit, 
   onChange,
   focusedField,
-  setFocusedField
+  setFocusedField,
+  language
 }) => {
   return (
     <div className="relative h-full">
@@ -260,11 +275,13 @@ const ContactForm = React.memo(({
                 <Send className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-cyan-400" />
               </div>
               <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
-                Xabar Yuborish
+                {language === 'uz' ? 'Xabar Yuborish' : 'Send Message'}
               </h3>
             </div>
             <p className="text-sm sm:text-base text-gray-400 leading-relaxed">
-              Quyidagi formani to'ldiring va men sizga tez orada javob beraman
+              {language === 'uz' 
+                ? "Quyidagi formani to'ldiring va men sizga tez orada javob beraman"
+                : "Fill out the form below and I'll get back to you soon"}
             </p>
           </div>
 
@@ -276,8 +293,12 @@ const ContactForm = React.memo(({
                   <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-green-400" />
                 </div>
                 <div>
-                  <p className="text-green-400 font-semibold text-sm sm:text-base lg:text-lg">✅ Muvaffaqiyatli yuborildi!</p>
-                  <p className="text-green-300 text-xs sm:text-sm">Tez orada javob beraman</p>
+                  <p className="text-green-400 font-semibold text-sm sm:text-base lg:text-lg">
+                    {language === 'uz' ? '✅ Muvaffaqiyatli yuborildi!' : '✅ Successfully sent!'}
+                  </p>
+                  <p className="text-green-300 text-xs sm:text-sm">
+                    {language === 'uz' ? 'Tez orada javob beraman' : "I'll reply soon"}
+                  </p>
                 </div>
               </div>
             </div>
@@ -291,8 +312,12 @@ const ContactForm = React.memo(({
                   <span className="text-lg sm:text-xl">⚠️</span>
                 </div>
                 <div>
-                  <p className="text-red-400 font-semibold text-sm sm:text-base lg:text-lg">Xatolik yuz berdi</p>
-                  <p className="text-red-300 text-xs sm:text-sm">Iltimos, qaytadan urinib ko'ring</p>
+                  <p className="text-red-400 font-semibold text-sm sm:text-base lg:text-lg">
+                    {language === 'uz' ? 'Xatolik yuz berdi' : 'An error occurred'}
+                  </p>
+                  <p className="text-red-300 text-xs sm:text-sm">
+                    {language === 'uz' ? "Iltimos, qaytadan urinib ko'ring" : 'Please try again'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -302,7 +327,7 @@ const ContactForm = React.memo(({
           <form onSubmit={onSubmit} className="space-y-4 sm:space-y-6 flex-grow flex flex-col">
             <div className="space-y-2">
               <label htmlFor="name" className="block text-xs sm:text-sm font-bold text-gray-400">
-                Ismingiz *
+                {language === 'uz' ? 'Ismingiz *' : 'Your Name *'}
               </label>
               <input
                 type="text"
@@ -311,7 +336,7 @@ const ContactForm = React.memo(({
                 value={formData.name}
                 onChange={onChange}
                 required
-                placeholder="Ismingizni kiriting"
+                placeholder={language === 'uz' ? 'Ismingizni kiriting' : 'Enter your name'}
                 className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-slate-800/50 border-2 border-slate-700 rounded-lg sm:rounded-xl text-white placeholder-gray-500 text-sm sm:text-base
                   focus:outline-none focus:border-cyan-500 transition-colors duration-200"
                 onFocus={() => setFocusedField('name')}
@@ -321,7 +346,7 @@ const ContactForm = React.memo(({
 
             <div className="space-y-2">
               <label htmlFor="email" className="block text-xs sm:text-sm font-bold text-gray-400">
-                Email Manzilingiz *
+                {language === 'uz' ? 'Email Manzilingiz *' : 'Your Email *'}
               </label>
               <input
                 type="email"
@@ -340,7 +365,7 @@ const ContactForm = React.memo(({
 
             <div className="space-y-2 flex-grow flex flex-col">
               <label htmlFor="message" className="block text-xs sm:text-sm font-bold text-gray-400">
-                Xabaringiz *
+                {language === 'uz' ? 'Xabaringiz *' : 'Your Message *'}
               </label>
               <textarea
                 id="message"
@@ -349,7 +374,9 @@ const ContactForm = React.memo(({
                 onChange={onChange}
                 required
                 rows="4"
-                placeholder="Loyihangiz yoki taklifingiz haqida batafsil yozing..."
+                placeholder={language === 'uz' 
+                  ? "Loyihangiz yoki taklifingiz haqida batafsil yozing..."
+                  : "Write in detail about your project or suggestion..."}
                 className="w-full flex-grow px-4 sm:px-5 py-3 sm:py-4 bg-slate-800/50 border-2 border-slate-700 rounded-lg sm:rounded-xl text-white placeholder-gray-500 text-sm sm:text-base
                   focus:outline-none focus:border-cyan-500 resize-none transition-colors duration-200"
                 onFocus={() => setFocusedField('message')}
@@ -370,12 +397,16 @@ const ContactForm = React.memo(({
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  <span className="text-sm sm:text-base">Yuborilmoqda...</span>
+                  <span className="text-sm sm:text-base">
+                    {language === 'uz' ? 'Yuborilmoqda...' : 'Sending...'}
+                  </span>
                 </span>
               ) : (
                 <span className="flex items-center justify-center gap-2">
                   <Zap className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
-                  <span className="text-sm sm:text-base">Xabar Yuborish</span>
+                  <span className="text-sm sm:text-base">
+                    {language === 'uz' ? 'Xabar Yuborish' : 'Send Message'}
+                  </span>
                   <Send className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
                 </span>
               )}
@@ -400,7 +431,7 @@ const ContactForm = React.memo(({
 ContactForm.displayName = 'ContactForm';
 
 // Contact Info Card Component
-const ContactInfoCard = React.memo(({ contactInfo, copiedPhone }) => (
+const ContactInfoCard = React.memo(({ contactInfo, copiedPhone, language }) => (
   <div className="bg-slate-900/80 border border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300">
     <div>
       {/* Header */}
@@ -409,12 +440,14 @@ const ContactInfoCard = React.memo(({ contactInfo, copiedPhone }) => (
           <Phone className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-400" />
         </div>
         <h3 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-white">
-          Aloqa Ma'lumotlari
+          {language === 'uz' ? "Aloqa Ma'lumotlari" : 'Contact Information'}
         </h3>
       </div>
 
       <p className="text-sm sm:text-base text-gray-400 mb-6 sm:mb-8 leading-relaxed">
-        Yangi loyihalar, ijodiy g'oyalar yoki hamkorlik haqida gaplashishga tayyorman
+        {language === 'uz' 
+          ? "Yangi loyihalar, ijodiy g'oyalar yoki hamkorlik haqida gaplashishga tayyorman"
+          : 'Ready to talk about new projects, creative ideas or collaboration'}
       </p>
 
       {/* Contact items */}
@@ -424,6 +457,7 @@ const ContactInfoCard = React.memo(({ contactInfo, copiedPhone }) => (
             key={index} 
             item={item} 
             copiedPhone={copiedPhone}
+            language={language}
           />
         ))}
       </div>
@@ -434,7 +468,7 @@ const ContactInfoCard = React.memo(({ contactInfo, copiedPhone }) => (
 ContactInfoCard.displayName = 'ContactInfoCard';
 
 // Contact Info Item Component
-const ContactInfoItem = React.memo(({ item, copiedPhone }) => {
+const ContactInfoItem = React.memo(({ item, copiedPhone, language }) => {
   const Icon = item.icon;
   
   return (
@@ -472,7 +506,9 @@ const ContactInfoItem = React.memo(({ item, copiedPhone }) => {
                     ? 'bg-green-500/20 text-green-400 border border-green-400/30' 
                     : 'bg-cyan-500/10 text-cyan-400 border border-cyan-400/20'
                 }`}>
-                  {copiedPhone ? '✓ Nusxalandi' : 'Nusxalash'}
+                  {copiedPhone 
+                    ? (language === 'uz' ? '✓ Nusxalandi' : '✓ Copied') 
+                    : (language === 'uz' ? 'Nusxalash' : 'Copy')}
                 </span>
               )}
             </div>
@@ -493,7 +529,7 @@ const ContactInfoItem = React.memo(({ item, copiedPhone }) => {
 ContactInfoItem.displayName = 'ContactInfoItem';
 
 // Social Links Card Component
-const SocialLinksCard = React.memo(({ socialLinks }) => (
+const SocialLinksCard = React.memo(({ socialLinks, language }) => (
   <div className="bg-slate-900/80 border border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300">
     <div>
       {/* Header */}
@@ -502,14 +538,14 @@ const SocialLinksCard = React.memo(({ socialLinks }) => (
           <Globe className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-purple-400" />
         </div>
         <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
-          Ijtimoiy Tarmoqlar
+          {language === 'uz' ? 'Ijtimoiy Tarmoqlar' : 'Social Media'}
         </h3>
       </div>
 
       {/* Social links grid */}
       <div className="grid grid-cols-1 gap-3 sm:gap-4">
         {socialLinks.map((social, index) => (
-          <SocialLink key={index} social={social} />
+          <SocialLink key={index} social={social} language={language} />
         ))}
       </div>
     </div>
@@ -519,7 +555,7 @@ const SocialLinksCard = React.memo(({ socialLinks }) => (
 SocialLinksCard.displayName = 'SocialLinksCard';
 
 // Social Link Component
-const SocialLink = React.memo(({ social }) => {
+const SocialLink = React.memo(({ social, language }) => {
   const Icon = social.icon;
   
   return (
@@ -540,7 +576,9 @@ const SocialLink = React.memo(({ social }) => {
         {/* Content */}
         <div className="flex-1">
           <p className="text-base sm:text-lg font-bold text-white">{social.label}</p>
-          <p className="text-white/70 text-xs sm:text-sm">Kuzatib boring</p>
+          <p className="text-white/70 text-xs sm:text-sm">
+            {language === 'uz' ? 'Kuzatib boring' : 'Follow'}
+          </p>
         </div>
 
         {/* Arrow */}
@@ -555,17 +593,19 @@ const SocialLink = React.memo(({ social }) => {
 SocialLink.displayName = 'SocialLink';
 
 // Quick Response Card Component
-const QuickResponseCard = React.memo(() => (
+const QuickResponseCard = React.memo(({ language }) => (
   <div className="bg-slate-900/80 border border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
     <div className="relative z-10">
       <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
         <div className="p-1.5 sm:p-2 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-lg sm:rounded-xl">
           <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
         </div>
-        <h4 className="text-base sm:text-lg font-bold text-white">Tez Javob</h4>
+        <h4 className="text-base sm:text-lg font-bold text-white">
+          {language === 'uz' ? 'Tez Javob' : 'Quick Response'}
+        </h4>
       </div>
       <p className="text-xs sm:text-sm text-gray-400">
-        24 soat ichida javob beraman
+        {language === 'uz' ? '24 soat ichida javob beraman' : 'Reply within 24 hours'}
       </p>
     </div>
   </div>
@@ -574,17 +614,19 @@ const QuickResponseCard = React.memo(() => (
 QuickResponseCard.displayName = 'QuickResponseCard';
 
 // Availability Card Component
-const AvailabilityCard = React.memo(() => (
+const AvailabilityCard = React.memo(({ language }) => (
   <div className="bg-slate-900/80 border border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
     <div className="relative z-10">
       <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
         <div className="p-1.5 sm:p-2 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-lg sm:rounded-xl">
           <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
         </div>
-        <h4 className="text-base sm:text-lg font-bold text-white">Mavjud</h4>
+        <h4 className="text-base sm:text-lg font-bold text-white">
+          {language === 'uz' ? 'Mavjud' : 'Available'}
+        </h4>
       </div>
       <p className="text-xs sm:text-sm text-gray-400">
-        Yangi loyihalar uchun ochiq
+        {language === 'uz' ? 'Yangi loyihalar uchun ochiq' : 'Open for new projects'}
       </p>
     </div>
   </div>

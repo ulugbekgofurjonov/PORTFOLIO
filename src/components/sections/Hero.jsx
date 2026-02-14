@@ -1,17 +1,21 @@
+import { useState, useEffect } from "react";
 import { ChevronDown, Star, Sparkles, Code2, Rocket, Zap, ArrowRight } from "lucide-react";
 import { PERSONAL_INFO, STATS } from "../../utils/constants";
 import { scrollToSection } from "../../hooks/useScrollSpy";
 import FadeIn from "../animations/FadeIn";
-import { useState, useEffect, useRef } from "react";
 import RadialGradientBackground from "../backgrounds/RadialGradientBackground";
+import { useLanguage } from "../../contexts/LanguageContext";
 
 const Hero = () => {
+  const { language } = useLanguage();
+  const personalInfo = PERSONAL_INFO[language];
+  const stats = STATS[language];
+  
   const [displayedText, setDisplayedText] = useState("");
   const [isTypingComplete, setIsTypingComplete] = useState(false);
   const [cursorVisible, setCursorVisible] = useState(true);
 
-  const fullText = PERSONAL_INFO.name;
-  const subtitle = "FRONTEND DEVELOPER PORTFOLIO";
+  const fullText = personalInfo.name;
 
   // Typing animation with cursor blink
   useEffect(() => {
@@ -27,7 +31,7 @@ const Hero = () => {
     }, 100);
 
     return () => clearInterval(typingInterval);
-  }, []);
+  }, [fullText]);
 
   // Cursor blink effect
   useEffect(() => {
@@ -63,7 +67,7 @@ const Hero = () => {
               className="text-xs sm:text-sm lg:text-base text-white tracking-widest font-semibold uppercase bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text group-hover:text-transparent transition-all duration-500 relative"
               style={{ fontFamily: "var(--font-display), sans-serif" }}
             >
-              {PERSONAL_INFO.title}
+              {personalInfo.title}
             </span>
             
             <Code2 className="w-3.5 sm:w-4 lg:w-4.5 h-3.5 sm:h-4 lg:h-4.5 text-blue-400/70 group-hover:rotate-12 group-hover:scale-110 transition-transform duration-500" />
@@ -140,7 +144,7 @@ const Hero = () => {
                 letterSpacing: "0.1em",
               }}
             >
-              {subtitle}
+              FRONTEND DEVELOPER PORTFOLIO
             </p>
             
             <div className="flex items-center justify-center gap-2">
@@ -183,8 +187,7 @@ const Hero = () => {
                 className="text-sm sm:text-base lg:text-base text-white/90 leading-relaxed group-hover:text-white transition-colors duration-300 relative z-10"
                 style={{ fontFamily: "var(--font-body), sans-serif" }}
               >
-                Men frontend dasturchiman. Zamonaviy veb-texnologiyalar orqali
-                foydalanuvchilar uchun qulay va tezkor interfeyslar yarataman!
+                {personalInfo.tagline}
               </p>
               
               {/* Corner glow accents */}
@@ -223,7 +226,7 @@ const Hero = () => {
               <Zap className="w-4 sm:w-4.5 lg:w-5 h-4 sm:h-4.5 lg:h-5 text-blue-600 group-hover:scale-110 transition-transform duration-300 relative z-10" />
               
               <span className="bg-gradient-to-r from-blue-700 via-blue-600 to-sky-600 bg-clip-text text-transparent group-hover:from-blue-800 group-hover:to-sky-700 transition-all duration-300 relative z-10 font-black">
-                Bog'lanish
+                {language === 'uz' ? "Bog'lanish" : "Contact Me"}
               </span>
               
               <ArrowRight className="w-4 sm:w-4.5 lg:w-5 h-4 sm:h-4.5 lg:h-5 text-blue-600 group-hover:translate-x-1 transition-transform duration-300 relative z-10" />
@@ -245,7 +248,7 @@ const Hero = () => {
         {/* Premium Stats with cards */}
         <FadeIn delay={400}>
           <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-4 xl:gap-5 max-w-4xl mx-auto px-2">
-            {STATS.map((stat, index) => (
+            {stats.map((stat, index) => (
               <div
                 key={index}
                 className="group relative backdrop-blur-2xl bg-gradient-to-br from-white/5 via-white/8 to-white/5 border border-white/15 rounded-lg sm:rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-5 xl:p-6 hover:bg-white/12 hover:border-blue-200/40 transition-all duration-500 hover:scale-105 hover:-translate-y-1 overflow-hidden"
@@ -321,7 +324,7 @@ const Hero = () => {
         <FadeIn delay={500}>
           <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col items-center gap-2 sm:gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300 cursor-pointer group" onClick={() => scrollToSection("about")}>
             <p className="text-xs sm:text-sm text-white/60 uppercase tracking-widest font-semibold group-hover:text-white/80 transition-colors duration-300">
-              Pastga suring
+              {language === 'uz' ? 'Pastga suring' : 'Scroll down'}
             </p>
             <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-blue-300 animate-bounce-slow group-hover:text-blue-200 transition-colors duration-300" />
           </div>

@@ -1,24 +1,30 @@
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { projects, categories } from '../../data/projects';
 import { ChevronLeft, ChevronRight, ExternalLink, Github } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const PROJECTS_PER_PAGE = 6;
 
 const Projects = () => {
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [filteredProjects, setFilteredProjects] = useState(projects);
+  const { language } = useLanguage();
+  const projectsList = projects[language];
+  const categoriesList = categories[language];
+  
+  const [activeCategory, setActiveCategory] = useState(categoriesList[0]);
+  const [filteredProjects, setFilteredProjects] = useState(projectsList);
   const [currentPage, setCurrentPage] = useState(1);
   const sectionRef = useRef(null);
 
   // Filter projects
   useEffect(() => {
-    const filtered = activeCategory === 'All' 
-      ? projects 
-      : projects.filter(project => project.category === activeCategory);
+    const allCategory = categoriesList[0]; // "Barchasi" or "All"
+    const filtered = activeCategory === allCategory
+      ? projectsList 
+      : projectsList.filter(project => project.category === activeCategory);
     
     setFilteredProjects(filtered);
     setCurrentPage(1);
-  }, [activeCategory]);
+  }, [activeCategory, projectsList, categoriesList]);
 
   // Memoize pagination calculations
   const paginationData = useMemo(() => {
@@ -82,14 +88,13 @@ const Projects = () => {
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Section */}
-        
         <header className="text-center mb-10 sm:mb-14 md:mb-16">
           <h2 
             id="projects-heading"
             className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 tracking-tight"
           >
             <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent">
-              Mening Loyihalarim
+              {language === 'uz' ? 'Mening Loyihalarim' : 'My Projects'}
             </span>
           </h2>
           
@@ -99,13 +104,15 @@ const Projects = () => {
           />
           
           <p className="text-slate-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-4">
-            Zamonaviy texnologiyalar va innovatsion yechimlar bilan yaratilgan professional loyihalar
+            {language === 'uz' 
+              ? 'Zamonaviy texnologiyalar va innovatsion yechimlar bilan yaratilgan professional loyihalar'
+              : 'Professional projects created with modern technologies and innovative solutions'}
           </p>
         </header>
 
         {/* Filter Buttons */}
         <FilterButtons 
-          categories={categories}
+          categories={categoriesList}
           activeCategory={activeCategory}
           onCategoryChange={handleCategoryChange}
         />
@@ -119,6 +126,7 @@ const Projects = () => {
                   key={project.id}
                   project={project}
                   index={index}
+                  language={language}
                 />
               ))}
             </div>
@@ -134,11 +142,12 @@ const Projects = () => {
                 indexOfFirstProject={indexOfFirstProject}
                 indexOfLastProject={indexOfLastProject}
                 totalProjects={filteredProjects.length}
+                language={language}
               />
             )}
           </>
         ) : (
-          <EmptyState />
+          <EmptyState language={language} allCategory={categoriesList[0]} />
         )}
       </div>
 
@@ -188,7 +197,7 @@ const FilterButtons = React.memo(({ categories, activeCategory, onCategoryChange
 FilterButtons.displayName = 'FilterButtons';
 
 // ProjectCard component
-const ProjectCard = React.memo(({ project, index }) => {
+const ProjectCard = React.memo(({ project, index, language }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
 
   const handleImageError = (e) => {
@@ -330,7 +339,8 @@ const Pagination = React.memo(({
   onNextPage,
   indexOfFirstProject,
   indexOfLastProject,
-  totalProjects
+  totalProjects,
+  language
 }) => {
   const getPageNumbers = () => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
@@ -370,7 +380,7 @@ const Pagination = React.memo(({
           <span className="font-medium text-cyan-400">{indexOfFirstProject + 1}-{Math.min(indexOfLastProject, totalProjects)}</span>
           <span className="mx-2">/</span>
           <span className="font-medium text-slate-300">{totalProjects}</span>
-          <span className="ml-2">loyiha</span>
+          <span className="ml-2">{language === 'uz' ? 'loyiha' : 'projects'}</span>
         </div>
 
         {/* Pagination Controls */}
@@ -379,7 +389,7 @@ const Pagination = React.memo(({
           <button
             onClick={onPrevPage}
             disabled={currentPage === 1}
-            aria-label="Oldingi sahifa"
+            aria-label={language === 'uz' ? 'Oldingi sahifa' : 'Previous page'}
             className={`
               flex items-center gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-full font-semibold text-xs sm:text-sm
               transition-all duration-300
@@ -390,7 +400,7 @@ const Pagination = React.memo(({
             `}
           >
             <ChevronLeft className="w-4 h-4" aria-hidden="true" />
-            <span className="hidden sm:inline">Oldingi</span>
+            <span className="hidden sm:inline">{language === 'uz' ? 'Oldingi' : 'Previous'}</span>
           </button>
 
           {/* Page Numbers */}
@@ -412,7 +422,7 @@ const Pagination = React.memo(({
                 <button
                   key={pageNumber}
                   onClick={() => onPageChange(pageNumber)}
-                  aria-label={`Sahifa ${pageNumber}`}
+                  aria-label={`${language === 'uz' ? 'Sahifa' : 'Page'} ${pageNumber}`}
                   aria-current={currentPage === pageNumber ? 'page' : undefined}
                   className={`
                     w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full font-bold text-xs sm:text-sm md:text-base
@@ -433,7 +443,7 @@ const Pagination = React.memo(({
           <button
             onClick={onNextPage}
             disabled={currentPage === totalPages}
-            aria-label="Keyingi sahifa"
+            aria-label={language === 'uz' ? 'Keyingi sahifa' : 'Next page'}
             className={`
               flex items-center gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-full font-semibold text-xs sm:text-sm
               transition-all duration-300
@@ -443,7 +453,7 @@ const Pagination = React.memo(({
               }
             `}
           >
-            <span className="hidden sm:inline">Keyingi</span>
+            <span className="hidden sm:inline">{language === 'uz' ? 'Keyingi' : 'Next'}</span>
             <ChevronRight className="w-4 h-4" aria-hidden="true" />
           </button>
         </div>
@@ -455,18 +465,20 @@ const Pagination = React.memo(({
 Pagination.displayName = 'Pagination';
 
 // Empty State Component
-const EmptyState = () => (
+const EmptyState = ({ language, allCategory }) => (
   <div className="text-center py-20 sm:py-24 md:py-32 px-4" role="status">
     <div className="text-6xl sm:text-7xl md:text-8xl mb-6" aria-hidden="true">
       🔍
     </div>
     
     <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4">
-      Hech qanday loyiha topilmadi
+      {language === 'uz' ? 'Hech qanday loyiha topilmadi' : 'No projects found'}
     </h3>
     
     <p className="text-sm sm:text-base md:text-lg text-slate-400 max-w-md mx-auto">
-      Boshqa kategoriyani tanlang yoki barcha loyihalarni ko'rish uchun "All" tugmasini bosing
+      {language === 'uz' 
+        ? `Boshqa kategoriyani tanlang yoki barcha loyihalarni ko'rish uchun "${allCategory}" tugmasini bosing`
+        : `Select another category or click "${allCategory}" to view all projects`}
     </p>
   </div>
 );
