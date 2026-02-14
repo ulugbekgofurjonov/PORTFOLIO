@@ -40,7 +40,7 @@ export const STATS = {
         { label: "Texnologiya", value: "6+" },
     ],
     en: [
-        { label: "Experience", value: "5 Mon" },
+        { label: "Experience", value: "5 M" },
         { label: "Projects", value: "10+" },
         { label: "Technologies", value: "6+" },
     ]
