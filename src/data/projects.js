@@ -29,6 +29,16 @@ export const projects = {
             technologies: ["JavaScript", "HTML", "CSS"],
             demoUrl: "https://to-do-app-navy-five.vercel.app/",
             githubUrl: "https://github.com/ulugbekgofurjonov/to-do-app.git"
+        },
+        {
+            id: 4,
+            title: "Notes App",
+            description: "Eslatmalarni yozib boruvchi dastur",
+            image: "./images/noteapp.jpg",
+            category: "Web Development",
+            technologies: ["JavaScript", "HTML", "CSS"],
+            demoUrl: "https://notes-app-project-ug.vercel.app/",
+            githubUrl: "https://github.com/ulugbekgofurjonov/Notes-App.git"
         }
     ],
     en: [
@@ -61,7 +71,18 @@ export const projects = {
             technologies: ["JavaScript", "HTML", "CSS"],
             demoUrl: "https://to-do-app-navy-five.vercel.app/",
             githubUrl: "https://github.com/ulugbekgofurjonov/to-do-app.git"
+        },
+        {
+            id: 4,
+            title: "Notes App",
+            description: "Note-taking program",
+            image: "./images/noteapp.jpg",
+            category: "Web Development",
+            technologies: ["JavaScript", "HTML", "CSS"],
+            demoUrl: "https://notes-app-project-ug.vercel.app/",
+            githubUrl: "https://github.com/ulugbekgofurjonov/Notes-App.git"
         }
+
     ]
 };
 
