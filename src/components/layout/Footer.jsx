@@ -1,204 +1,372 @@
-import React from "react";
-import { FaGithub, FaTelegram, FaEnvelope, FaMapMarkerAlt, FaPhone, FaDownload, FaCode, FaRocket } from "react-icons/fa";
-import { Instagram } from "lucide-react";
-import { FiArrowRight, FiCoffee } from "react-icons/fi";
+import React, { useState, memo } from "react";
+import { Github, Instagram, Send, Mail, MapPin, Phone, Download, ArrowUpRight, Code2, ChevronRight } from "lucide-react";
 import { PERSONAL_INFO, SOCIAL_LINKS, NAV_LINKS } from "../../utils/constants";
 import { useLanguage } from "../../contexts/LanguageContext";
 
 const Footer = () => {
   const { language } = useLanguage();
   const personalInfo = PERSONAL_INFO[language];
-  const navLinks = NAV_LINKS[language];
-  
-  // Ijtimoiy tarmoq ikonkalari
-  const socialIcons = {
-    github: <FaGithub size={20} />,
-    telegram: <FaTelegram size={20} />,
-    instagram: <Instagram size={20} />,
-  };
+  const navLinks     = NAV_LINKS[language];
+  const t = (u, e)   => language === "uz" ? u : e;
+
+  const socialLinks = [
+    { Icon: Github,    href: SOCIAL_LINKS.github,    label: "GitHub",    color: "#c8a96e" },
+    { Icon: Send,      href: SOCIAL_LINKS.telegram,  label: "Telegram",  color: "#39a3d4" },
+    { Icon: Instagram, href: SOCIAL_LINKS.instagram, label: "Instagram", color: "#e4405f" },
+  ];
+
+  const techStack = ["React.js", "Next.js", "Tailwind CSS", "TypeScript"];
 
   return (
-    <footer className="relative bg-gradient-to-br from-slate-900 via-blue-950 to-slate-900 text-white pt-16 pb-8 px-4 md:px-8 lg:px-16 mt-20 border-t border-blue-800/30">
-      {/* Decorative elements */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/20 via-transparent to-transparent pointer-events-none"></div>
-      
-      <div className="max-w-7xl mx-auto relative z-10">
-        {/* Top Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 lg:gap-16 mb-14">
-          
-          {/* Brand & Contact Section */}
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-                {personalInfo.name}
+    <footer
+      className="relative w-full overflow-hidden"
+      style={{ background: "#faf9f6", color: "#0f0f0f" }}
+    >
+      {/* ── Decorative top border ── */}
+      <div
+        className="absolute top-0 left-0 right-0 h-[1px]"
+        style={{ background: "linear-gradient(90deg, transparent 0%, rgba(200,169,110,0.5) 30%, rgba(200,169,110,0.85) 50%, rgba(200,169,110,0.5) 70%, transparent 100%)" }}
+      />
+
+      {/* ── Ambient glow ── */}
+      <div
+        className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[400px] w-[700px] rounded-full"
+        style={{ background: "radial-gradient(ellipse, rgba(200,169,110,0.09) 0%, transparent 70%)" }}
+      />
+      <div
+        className="pointer-events-none absolute bottom-0 right-0 h-[300px] w-[400px]"
+        style={{ background: "radial-gradient(ellipse, rgba(200,169,110,0.06) 0%, transparent 70%)" }}
+      />
+
+      {/* ── Dot grid ── */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.022]"
+        style={{
+          backgroundImage: "radial-gradient(circle, #c8a96e 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+        }}
+      />
+
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-10">
+
+        {/* ══════════════════════════════
+            TOP BAND — CTA
+        ══════════════════════════════ */}
+        <div
+          className="relative overflow-hidden rounded-2xl px-6 py-8 sm:px-10 sm:py-10 lg:py-12"
+          style={{
+            background: "linear-gradient(135deg, rgba(200,169,110,0.1) 0%, rgba(168,130,74,0.05) 50%, rgba(200,169,110,0.08) 100%)",
+            border: "1px solid rgba(200,169,110,0.22)",
+            marginTop: "60px",
+          }}
+        >
+          {/* Inner glow */}
+          <div
+            className="pointer-events-none absolute -top-10 -right-10 h-[220px] w-[220px] rounded-full"
+            style={{ background: "radial-gradient(circle, rgba(200,169,110,0.1) 0%, transparent 70%)" }}
+          />
+
+          <div className="relative flex flex-col items-center justify-between gap-6 text-center sm:gap-8 lg:flex-row lg:text-left">
+            <div className="max-w-xl">
+              <p className="ft-mono mb-2 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c8a96e]">
+                {t("Hamkorlik", "Collaboration")}
+              </p>
+              <h2
+                className="ft-sans mb-2 text-2xl font-bold sm:text-3xl lg:text-4xl text-[#0f0f0f]"
+                style={{ letterSpacing: "-0.035em", lineHeight: 1.1 }}
+              >
+                {t("Loyiha g'oyangiz bormi?", "Do you have a project idea?")}
               </h2>
-              <p className="text-lg font-medium text-blue-200">
-                {personalInfo.title}
+              <p className="ft-sans text-sm leading-relaxed sm:text-base text-[#6b6b6b]">
+                {t(
+                  "G'oyangizni haqiqatga aylantirish uchun men bilan bog'laning! Tez orada sizga javob beraman.",
+                  "Contact me to turn your idea into reality! I will get back to you soon.",
+                )}
               </p>
             </div>
-            
-            <p className="text-gray-300 leading-relaxed">
+
+            <div className="flex flex-col items-center gap-3 sm:flex-row lg:flex-shrink-0">
+              {/* Primary CTA — gold gradient */}
+              <a
+                href="#contact"
+                className="ft-sans group relative flex items-center gap-2 overflow-hidden rounded-xl px-6 py-3.5 text-sm font-bold text-white transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
+                style={{
+                  background: "linear-gradient(135deg,#c8a96e,#d4b478,#a8824a)",
+                  boxShadow: "0 4px 20px rgba(200,169,110,0.4), inset 0 1px 0 rgba(255,255,255,0.2)",
+                }}
+              >
+                <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                <Mail size={15} strokeWidth={2.5} />
+                <span>{t("Bog'lanish", "Get in Touch")}</span>
+                <ArrowUpRight size={14} strokeWidth={2.5} className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+              </a>
+
+              {/* Secondary — ghost dark */}
+              <a
+                href={personalInfo.resume}
+                download
+                className="ft-sans group flex items-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold transition-all duration-300 hover:scale-[1.03] active:scale-[0.97]"
+                style={{
+                  background: "rgba(15,15,15,0.06)",
+                  border: "1px solid rgba(15,15,15,0.15)",
+                  color: "rgba(15,15,15,0.7)",
+                }}
+              >
+                <Download size={14} strokeWidth={2} />
+                <span>{t("Resume", "Resume")}</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* ══════════════════════════════
+            MAIN 3-COL GRID
+        ══════════════════════════════ */}
+        <div className="mt-14 sm:mt-18 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-3 lg:gap-14 xl:gap-20 pb-14 sm:pb-18 lg:pb-20">
+
+          {/* ── COL 1: Brand ── */}
+          <div className="sm:col-span-2 lg:col-span-1">
+            <div className="mb-4 flex items-center gap-3">
+              <div
+                className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl"
+                style={{
+                  background: "linear-gradient(135deg,rgba(200,169,110,0.15),rgba(168,130,74,0.08))",
+                  border: "1px solid rgba(200,169,110,0.28)",
+                }}
+              >
+                <Code2 size={17} strokeWidth={1.8} style={{ color: "#c8a96e" }} />
+              </div>
+              <div>
+                <h3
+                  className="ft-sans text-lg font-bold leading-tight text-[#0f0f0f]"
+                  style={{ letterSpacing: "-0.025em" }}
+                >
+                  {personalInfo.name}
+                </h3>
+                <p className="ft-mono text-[10px] font-medium tracking-[0.1em]" style={{ color: "#c8a96e" }}>
+                  {personalInfo.title}
+                </p>
+              </div>
+            </div>
+
+            <p className="ft-sans mb-7 text-sm leading-relaxed text-[#6b6b6b]">
               {personalInfo.tagline}
             </p>
-            
-            {/* Contact Info */}
-            <div className="space-y-4 pt-4">
-              <a 
-                href={`mailto:${personalInfo.email}`}
-                className="flex items-center text-gray-300 hover:text-white transition-colors duration-300 group"
-              >
-                <div className="mr-4 p-2 bg-blue-900/30 rounded-lg group-hover:bg-blue-500/30 transition-colors duration-300 border border-blue-700/30">
-                  <FaEnvelope className="text-blue-300" />
-                </div>
-                <span className="group-hover:translate-x-1 transition-transform duration-300">
-                  {personalInfo.email}
-                </span>
-              </a>
-              
-              <a 
-                href={`tel:${personalInfo.phone.replace(/\s/g, '')}`}
-                className="flex items-center text-gray-300 hover:text-white transition-colors duration-300 group"
-              >
-                <div className="mr-4 p-2 bg-blue-900/30 rounded-lg group-hover:bg-green-500/30 transition-colors duration-300 border border-blue-700/30">
-                  <FaPhone className="text-green-300" />
-                </div>
-                <span className="group-hover:translate-x-1 transition-transform duration-300">
-                  {personalInfo.phone}
-                </span>
-              </a>
-              
-              <div className="flex items-center text-gray-300 group">
-                <div className="mr-4 p-2 bg-blue-900/30 rounded-lg border border-blue-700/30">
-                  <FaMapMarkerAlt className="text-purple-300" />
-                </div>
-                <span>{personalInfo.location}</span>
-              </div>
+
+            <div className="flex flex-col gap-2.5">
+              <ContactItem Icon={Mail}  href={`mailto:${personalInfo.email}`}  value={personalInfo.email} />
+              <ContactItem Icon={Phone} href={`tel:${personalInfo.phone.replace(/\s/g, "")}`} value={personalInfo.phone} />
+              <ContactItem Icon={MapPin} value={personalInfo.location} />
             </div>
           </div>
 
-          {/* Navigation Links */}
+          {/* ── COL 2: Nav + Stack ── */}
           <div>
-            <h3 className="text-xl font-bold mb-8 pb-2 border-b-2 border-blue-400/40 inline-block text-blue-100">
-              {language === 'uz' ? 'Tezkor Havolalar' : 'Quick Links'}
-            </h3>
-            <ul className="space-y-4">
-              {navLinks.map((link) => (
+            <SectionLabel>{t("Sahifalar", "Pages")}</SectionLabel>
+            <ul className="mt-5 flex flex-col gap-1">
+              {navLinks.map(link => (
                 <li key={link.id}>
-                  <a 
+                  <a
                     href={`#${link.id}`}
-                    className="flex items-center text-gray-300 hover:text-blue-300 transition-all duration-300 group py-2"
+                    className="ft-sans group flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium text-[#6b6b6b] transition-all duration-200 hover:bg-[rgba(200,169,110,0.08)] hover:text-[#0f0f0f]"
                   >
-                    <FiArrowRight className="mr-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform -translate-x-2 group-hover:translate-x-0" />
-                    <span className="group-hover:translate-x-2 transition-transform duration-300">
-                      {link.label}
-                    </span>
+                    <ChevronRight
+                      size={13}
+                      strokeWidth={2.5}
+                      className="flex-shrink-0 transition-transform duration-200 group-hover:translate-x-0.5"
+                      style={{ color: "#c8a96e" }}
+                    />
+                    {link.label}
                   </a>
                 </li>
               ))}
             </ul>
-            
-            {/* Download CV Button */}
-            <div className="mt-10 pt-6 border-t border-blue-800/30">
-              <a 
-                href={personalInfo.resume}
-                download
-                className="inline-flex items-center justify-center bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 hover:shadow-lg hover:shadow-blue-500/30 w-full md:w-auto"
-              >
-                <FaDownload className="mr-3" />
-                {language === 'uz' ? 'Resumeni yuklab olish' : 'Download Resume'}
-              </a>
+
+            <div className="mt-8">
+              <SectionLabel>{t("Stack", "Stack")}</SectionLabel>
+              <div className="mt-4 flex flex-wrap gap-2">
+                {techStack.map(tech => (
+                  <TechBadge key={tech}>{tech}</TechBadge>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Social & Connect Section */}
+          {/* ── COL 3: Social ── */}
           <div>
-            <h3 className="text-xl font-bold mb-8 pb-2 border-b-2 border-cyan-400/40 inline-block text-blue-100">
-              {language === 'uz' ? 'Ijtimoiy Tarmoqlar' : 'Social Media'}
-            </h3>
-            
-            <p className="text-gray-300 mb-8">
-              {language === 'uz' 
-                ? "Loyihalarim va yangilanishlarim bilan tanishish uchun ijtimoiy tarmoqlarda kuzatib boring"
-                : 'Follow me on social media to see my projects and updates'}
+            <SectionLabel>{t("Ijtimoiy Tarmoqlar", "Social Media")}</SectionLabel>
+            <p className="ft-sans mt-3 mb-6 text-sm leading-relaxed text-[#888]">
+              {t(
+                "Loyihalarim va yangilanishlarni kuzatib boring.",
+                "Follow my projects and updates.",
+              )}
             </p>
-            
-            {/* Social Links */}
-            <div className="flex flex-wrap gap-4 mb-10">
-              {Object.entries(SOCIAL_LINKS).map(([platform, url]) => (
-                <a 
-                  key={platform}
-                  href={url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`flex items-center justify-center w-14 h-14 rounded-xl transition-all duration-300 transform hover:scale-110 hover:shadow-xl border
-                    ${platform === 'github' ? 'bg-gray-800/50 hover:bg-gray-700/50 border-gray-600' : 
-                      platform === 'telegram' ? 'bg-blue-600/50 hover:bg-blue-600 border-blue-500' : 
-                      'bg-gradient-to-r from-pink-600/50 to-purple-600/50 hover:from-pink-600 hover:to-purple-600 border-pink-500'}`}
-                  aria-label={platform}
-                >
-                  {socialIcons[platform]}
-                </a>
+            <div className="flex flex-col gap-2.5">
+              {socialLinks.map(({ Icon, href, label, color }) => (
+                <SocialCard key={label} Icon={Icon} href={href} label={label} color={color} />
               ))}
             </div>
-            
-            {/* Tech Badge */}
-            <div className="bg-gradient-to-r from-blue-900/40 to-cyan-900/40 border border-blue-700/40 rounded-xl p-5 backdrop-blur-sm">
-              <div className="flex items-center mb-3">
-                <FaCode className="text-blue-300 mr-3" />
-                <h4 className="font-bold text-white">
-                  {language === 'uz' ? 'Texnologiyalar' : 'Technologies'}
-                </h4>
-              </div>
-              <p className="text-gray-300 text-sm">
-                {language === 'uz' 
-                  ? 'React.js, Next.js, Tailwind CSS va boshqa zamonaviy texnologiyalar'
-                  : 'React.js, Next.js, Tailwind CSS and other modern technologies'}
-              </p>
-            </div>
           </div>
+
         </div>
 
-        {/* Divider with Design */}
-        <div className="relative mb-10">
-          <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-blue-700/40"></div>
-          </div>
-          <div className="relative flex justify-center">
-            <div className="px-6 bg-slate-900 flex items-center space-x-2">
-              <FaRocket className="text-blue-400 animate-pulse" />
-              <span className="text-blue-500 text-sm">•</span>
-              <FiCoffee className="text-amber-400" />
-            </div>
-          </div>
+        {/* ══ BOTTOM THIN LINE + copyright only ══ */}
+        <div
+          className="flex items-center justify-center border-t py-6"
+          style={{ borderColor: "rgba(200,169,110,0.15)" }}
+        >
+          <p className="ft-sans text-xs text-[#aaa]">
+            © {new Date().getFullYear()}{" "}
+            <span className="text-[#6b6b6b] font-medium">{personalInfo.name}</span>
+          </p>
         </div>
 
-        {/* Bottom Section */}
-        <div className="flex flex-col lg:flex-row justify-between items-center">
-          {/* Copyright */}
-          <div className="mb-6 lg:mb-0 text-center lg:text-left">
-            <p className="text-gray-300">
-              © {new Date().getFullYear()} {personalInfo.name}. {language === 'uz' ? 'Barcha huquqlar himoyalangan' : 'All rights reserved'}.
-            </p>
-            <p className="text-gray-400 text-sm mt-1">
-              {language === 'uz' ? 'Frontend dasturchi' : 'Frontend Developer'}
-            </p>
-          </div>
-          
-          {/* Tech Stack Badges */}
-          <div className="flex flex-wrap gap-2 justify-center">
-            <span className="px-3 py-1.5 bg-blue-900/40 hover:bg-blue-800/50 rounded-full text-xs font-medium text-gray-200 transition-colors duration-300 border border-blue-700/40">
-              React.js
-            </span>
-            <span className="px-3 py-1.5 bg-blue-900/40 hover:bg-blue-800/50 rounded-full text-xs font-medium text-gray-200 transition-colors duration-300 border border-blue-700/40">
-              Next.js
-            </span>
-            <span className="px-3 py-1.5 bg-blue-900/40 hover:bg-blue-800/50 rounded-full text-xs font-medium text-gray-200 transition-colors duration-300 border border-blue-700/40">
-              Tailwind CSS
-            </span>
-          </div>
-        </div>
       </div>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+        .ft-sans { font-family: 'DM Sans', system-ui, sans-serif; }
+        .ft-mono { font-family: 'DM Mono', monospace; }
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after { animation-duration:.01ms!important; transition-duration:.01ms!important; }
+        }
+      `}</style>
     </footer>
+  );
+};
+
+/* ── Contact item ── */
+const ContactItem = memo(({ Icon, href, value }) => {
+  const [hov, setHov] = useState(false);
+  const inner = (
+    <div
+      className="flex items-center gap-3 rounded-xl px-3.5 py-2.5 transition-all duration-200"
+      style={{
+        background: hov ? "rgba(200,169,110,0.08)" : "rgba(15,15,15,0.03)",
+        border: `1px solid ${hov ? "rgba(200,169,110,0.3)" : "rgba(15,15,15,0.08)"}`,
+        transform: hov ? "translateX(3px)" : "none",
+      }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+    >
+      <div
+        className="flex-shrink-0 flex h-7 w-7 items-center justify-center rounded-lg transition-all duration-200"
+        style={{
+          background: hov ? "linear-gradient(135deg,#c8a96e,#a8824a)" : "rgba(200,169,110,0.1)",
+          border: "1px solid rgba(200,169,110,0.22)",
+        }}
+      >
+        <Icon size={12} strokeWidth={2} style={{ color: hov ? "#fff" : "#c8a96e" }} />
+      </div>
+      <span
+        className="ft-sans min-w-0 truncate text-xs sm:text-[13px] transition-colors duration-200"
+        style={{ color: hov ? "#0f0f0f" : "#6b6b6b" }}
+      >
+        {value}
+      </span>
+      {href && (
+        <ArrowUpRight
+          size={12} strokeWidth={2}
+          className="ml-auto flex-shrink-0 transition-all duration-200"
+          style={{
+            color: hov ? "#c8a96e" : "transparent",
+            transform: hov ? "translate(1px,-1px)" : "none",
+          }}
+        />
+      )}
+    </div>
+  );
+
+  if (href) {
+    return (
+      <a href={href} onMouseEnter={() => setHov(true)} onMouseLeave={() => setHov(false)} className="block">
+        {inner}
+      </a>
+    );
+  }
+  return inner;
+});
+ContactItem.displayName = "ContactItem";
+
+/* ── Social card ── */
+const SocialCard = memo(({ Icon, href, label, color }) => {
+  const [hov, setHov] = useState(false);
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      className="group flex items-center gap-4 rounded-xl px-4 py-3 transition-all duration-200"
+      style={{
+        background: hov ? "rgba(200,169,110,0.08)" : "rgba(15,15,15,0.03)",
+        border: `1px solid ${hov ? "rgba(200,169,110,0.28)" : "rgba(15,15,15,0.08)"}`,
+        transform: hov ? "translateX(4px)" : "none",
+        boxShadow: hov ? "0 3px 14px rgba(200,169,110,0.1)" : "none",
+      }}
+    >
+      <div
+        className="flex-shrink-0 flex h-9 w-9 items-center justify-center rounded-xl transition-all duration-200"
+        style={{
+          background: hov ? "linear-gradient(135deg,#c8a96e,#a8824a)" : "rgba(200,169,110,0.1)",
+          border: "1px solid rgba(200,169,110,0.2)",
+          boxShadow: hov ? "0 4px 12px rgba(200,169,110,0.25)" : "none",
+        }}
+      >
+        <Icon size={15} strokeWidth={1.8} style={{ color: hov ? "#fff" : "#c8a96e" }} className="transition-transform duration-200 group-hover:scale-110" />
+      </div>
+
+      <span
+        className="ft-sans text-sm font-semibold flex-1 transition-colors duration-200"
+        style={{ color: hov ? "#0f0f0f" : "#6b6b6b" }}
+      >
+        {label}
+      </span>
+
+      <ArrowUpRight
+        size={14} strokeWidth={2}
+        className="flex-shrink-0 transition-all duration-200"
+        style={{
+          color: hov ? "#c8a96e" : "transparent",
+          transform: hov ? "translate(1px,-1px)" : "none",
+        }}
+      />
+    </a>
+  );
+});
+SocialCard.displayName = "SocialCard";
+
+/* ── Section label ── */
+const SectionLabel = ({ children }) => (
+  <div className="flex items-center gap-2.5">
+    <div className="h-px max-w-[20px] flex-1" style={{ background: "rgba(200,169,110,0.5)" }} />
+    <span
+      className="ft-mono text-[10px] font-semibold uppercase tracking-[0.18em]"
+      style={{ color: "#c8a96e" }}
+    >
+      {children}
+    </span>
+    <div className="h-px flex-1" style={{ background: "rgba(200,169,110,0.2)" }} />
+  </div>
+);
+
+/* ── Tech badge ── */
+const TechBadge = ({ children }) => {
+  const [hov, setHov] = useState(false);
+  return (
+    <span
+      className="ft-mono cursor-default rounded-lg px-2.5 py-1 text-[10px] font-medium transition-all duration-200"
+      style={{
+        background: hov ? "rgba(200,169,110,0.14)" : "rgba(200,169,110,0.07)",
+        border: `1px solid ${hov ? "rgba(200,169,110,0.4)" : "rgba(200,169,110,0.18)"}`,
+        color: hov ? "#8a6220" : "#9a9a9a",
+      }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+    >
+      {children}
+    </span>
   );
 };
 

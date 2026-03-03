@@ -1,637 +1,682 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { Mail, MapPin, Phone, Send, Github, MessageSquare, CheckCircle2, Instagram, SendHorizontal, Sparkles, Zap, Clock, Globe } from 'lucide-react';
+import React, { useState, useCallback, useMemo, useRef, useEffect, memo } from 'react';
+import {
+  Mail, MapPin, Phone, Send,
+  CheckCircle2, Instagram, SendHorizontal,
+  ArrowUpRight, Copy, Check, Github,
+  Zap, Sparkles,
+} from 'lucide-react';
 import emailjs from '@emailjs/browser';
-import FadeIn from '../animations/FadeIn';
 import { PERSONAL_INFO, SOCIAL_LINKS } from '../../utils/constants';
 import { useLanguage } from '../../contexts/LanguageContext';
 
-// EmailJS konfiguratsiyasi
 const EMAILJS_CONFIG = {
-  serviceId: 'ugportfolio',
+  serviceId:  'ugportfolio',
   templateId: 'template_i5kpekq',
-  publicKey: 'tX0l0WVq0Lj210y6K'
+  publicKey:  'tX0l0WVq0Lj210y6K',
 };
 
-const Contact = () => {
-  const { language } = useLanguage();
-  const personalInfo = PERSONAL_INFO[language];
-  
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
-  });
-  
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(false);
-  const [submitError, setSubmitError] = useState(false);
-  const [copiedPhone, setCopiedPhone] = useState(false);
-  const [focusedField, setFocusedField] = useState(null);
+/* ─────────────────────────────────────
+   Scroll Reveal hook
+───────────────────────────────────── */
+const useReveal = () => {
+  const ref = useRef(null);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setOn(true); io.disconnect(); } },
+      { threshold: 0.01 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return [ref, on];
+};
 
-  // Handlers
+const Reveal = memo(({ children, delay = 0, className = '' }) => {
+  const [ref, on] = useReveal();
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: 1,
+        transform: on ? 'translateY(0)' : 'translateY(28px)',
+        transition: `transform .72s cubic-bezier(.16,1,.3,1) ${delay}ms`,
+      }}
+    >
+      {children}
+    </div>
+  );
+});
+Reveal.displayName = 'Reveal';
+
+/* ═════════════════════════════════════════════
+   MAIN EXPORT
+═════════════════════════════════════════════ */
+const Contact = () => {
+  const { language }   = useLanguage();
+  const personalInfo   = PERSONAL_INFO[language];
+  const t = (u, e)     => language === 'uz' ? u : e;
+
+  const [formData, setFormData]           = useState({ name: '', email: '', message: '' });
+  const [isSubmitting, setIsSubmitting]   = useState(false);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [submitError, setSubmitError]     = useState(false);
+  const [copiedPhone, setCopiedPhone]     = useState(false);
+  const [focusedField, setFocusedField]   = useState(null);
+
   const handleChange = useCallback((e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+    setFormData(prev => ({ ...prev, [name]: value }));
   }, []);
 
   const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSubmitError(false);
-    
     try {
-      const result = await emailjs.send(
+      await emailjs.send(
         EMAILJS_CONFIG.serviceId,
         EMAILJS_CONFIG.templateId,
-        {
-          from_name: formData.name,
-          from_email: formData.email,
-          message: formData.message
-        },
-        EMAILJS_CONFIG.publicKey
+        { from_name: formData.name, from_email: formData.email, message: formData.message },
+        EMAILJS_CONFIG.publicKey,
       );
-      
-      console.log('EmailJS Success:', result);
-      
       setSubmitSuccess(true);
       setFormData({ name: '', email: '', message: '' });
-      
-      setTimeout(() => {
-        setSubmitSuccess(false);
-      }, 5000);
-      
-    } catch (error) {
-      console.error('EmailJS Error:', error);
+      setTimeout(() => setSubmitSuccess(false), 5000);
+    } catch {
       setSubmitError(true);
-      
-      setTimeout(() => {
-        setSubmitError(false);
-      }, 5000);
+      setTimeout(() => setSubmitError(false), 5000);
     } finally {
       setIsSubmitting(false);
     }
   }, [formData]);
 
-  const copyPhoneNumber = useCallback(() => {
+  const copyPhone = useCallback(() => {
     navigator.clipboard.writeText(personalInfo.phone);
     setCopiedPhone(true);
     setTimeout(() => setCopiedPhone(false), 2000);
   }, [personalInfo.phone]);
 
-  // Memoized contact info
-  const contactInfo = useMemo(() => [
-    {
-      icon: Mail,
-      label: 'Email',
-      value: personalInfo.email,
-      href: `mailto:${personalInfo.email}`,
-      gradient: 'from-blue-500 via-cyan-500 to-blue-500',
-      iconColor: 'text-cyan-400'
-    },
-    {
-      icon: Phone,
-      label: language === 'uz' ? 'Telefon' : 'Phone',
-      value: personalInfo.phone,
-      onClick: copyPhoneNumber,
-      gradient: 'from-green-500 via-emerald-500 to-green-500',
-      iconColor: 'text-green-400'
-    },
-    {
-      icon: MapPin,
-      label: language === 'uz' ? 'Manzil' : 'Location',
-      value: personalInfo.location,
-      gradient: 'from-purple-500 via-pink-500 to-purple-500',
-      iconColor: 'text-purple-400'
-    }
-  ], [personalInfo, copyPhoneNumber, language]);
+  const contactItems = useMemo(() => [
+    { Icon: Mail,   label: 'Email',               value: personalInfo.email,    href: `mailto:${personalInfo.email}` },
+    { Icon: Phone,  label: t('Telefon', 'Phone'),  value: personalInfo.phone,   onClick: copyPhone, copied: copiedPhone },
+    { Icon: MapPin, label: t('Manzil', 'Location'),value: personalInfo.location },
+  ], [personalInfo, copyPhone, copiedPhone, language]);
 
-  // Memoized social links
-  const socialLinks = useMemo(() => [
-    {
-      icon: Github,
-      href: SOCIAL_LINKS.github,
-      label: 'GitHub',
-      gradient: 'from-gray-700 to-gray-900',
-      hoverGradient: 'group-hover:from-gray-600 group-hover:to-gray-800'
-    },
-    {
-      icon: SendHorizontal,
-      href: SOCIAL_LINKS.telegram,
-      label: 'Telegram',
-      gradient: 'from-blue-500 to-blue-600',
-      hoverGradient: 'group-hover:from-blue-400 group-hover:to-blue-500'
-    },
-    {
-      icon: Instagram,
-      href: SOCIAL_LINKS.instagram,
-      label: 'Instagram',
-      gradient: 'from-pink-500 via-purple-500 to-pink-500',
-      hoverGradient: 'group-hover:from-pink-400 group-hover:via-purple-400 group-hover:to-pink-400'
-    }
-  ], []);
+  const socialItems = useMemo(() => [
+    { Icon: Github,         href: SOCIAL_LINKS.github,    label: 'GitHub',    sub: t("Loyihalar", 'Projects') },
+    { Icon: SendHorizontal, href: SOCIAL_LINKS.telegram,  label: 'Telegram',  sub: t("Yozing", 'Message') },
+    { Icon: Instagram,      href: SOCIAL_LINKS.instagram, label: 'Instagram', sub: t("Kuzating", 'Follow') },
+  ], [language]);
 
   return (
-    <section 
-      id="contact" 
-      className="relative py-12 sm:py-16 lg:py-20 xl:py-24 overflow-hidden"
+    <section
+      id="contact"
+      className="relative w-full overflow-hidden bg-[#faf9f6]"
       aria-labelledby="contact-heading"
     >
-      {/* Simple Radial Gradient Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-radial from-slate-900 via-slate-950 to-black" />
-      </div>
-      
-      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Header */}
-        <FadeIn delay={0}>
-          <header className="text-center mb-12 sm:mb-16 lg:mb-20">
-            {/* Badge */}
-            <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 mb-6 sm:mb-8 bg-gradient-to-r from-cyan-500/10 via-blue-500/10 to-cyan-500/10 border border-cyan-500/20 rounded-full shadow-lg shadow-cyan-500/10">
-              <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
-              <span className="text-xs sm:text-sm text-cyan-300 font-bold tracking-wider uppercase">
-                {language === 'uz' ? "Bog'laning" : 'Get in Touch'}
-              </span>
-              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-cyan-400" />
-            </div>
+      {/* ── Ambient glows ── */}
+      <div
+        className="pointer-events-none absolute -top-40 -right-40 h-[600px] w-[600px] rounded-full"
+        style={{ background: 'radial-gradient(circle, rgba(200,169,110,0.14) 0%, transparent 65%)' }}
+      />
+      <div
+        className="pointer-events-none absolute -bottom-40 -left-40 h-[500px] w-[500px] rounded-full"
+        style={{ background: 'radial-gradient(circle, rgba(200,169,110,0.09) 0%, transparent 65%)' }}
+      />
+      {/* ── Dot grid ── */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.022]"
+        style={{ backgroundImage: 'radial-gradient(circle, #c8a96e 1px, transparent 1px)', backgroundSize: '30px 30px' }}
+      />
 
-            {/* Main Title */}
-            <h2 
-              id="contact-heading"
-              className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold mb-4 sm:mb-6 tracking-tight"
+      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-10 lg:py-32">
+
+        {/* ═══ HEADER ═══ */}
+        <Reveal className="mb-12 sm:mb-16 lg:mb-20 text-center">
+          <div className="mb-4 sm:mb-5 flex items-center justify-center gap-3">
+            <div className="h-px w-8 bg-gradient-to-r from-transparent to-[#c8a96e]" />
+            <span
+              className="ct-mono inline-flex items-center gap-2 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.2em] text-[#c8a96e]"
             >
-              <span className="bg-gradient-to-r from-blue-400 via-blue-500 to-blue-600 bg-clip-text text-transparent">
-                {language === 'uz' ? 'Aloqaga Chiqing' : 'Contact Me'}
-              </span>
-            </h2>
+              <span className="h-1.5 w-1.5 rounded-full bg-[#c8a96e] ct-pulse" />
+              {t("Bog'lanish", 'Contact')}
+            </span>
+            <div className="h-px w-8 bg-gradient-to-l from-transparent to-[#c8a96e]" />
+          </div>
 
-            {/* Decorative line */}
-            <div className="flex items-center justify-center gap-3 sm:gap-4 mb-6 sm:mb-8">
-              <div className="h-px w-12 sm:w-16 lg:w-20 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
-              <Zap className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-cyan-400" />
-              <div className="h-px w-12 sm:w-16 lg:w-20 bg-gradient-to-r from-transparent via-cyan-500 to-transparent" />
-            </div>
+          <h2
+            id="contact-heading"
+            className="ct-sans mb-4 sm:mb-5"
+            style={{
+              fontSize: 'clamp(1.9rem, 5vw, 4.8rem)',
+              fontWeight: 800,
+              letterSpacing: '-0.04em',
+              lineHeight: 1.0,
+              color: '#0f0f0f',
+            }}
+          >
+            {language === 'en' ? (
+              <>{"Let's "}<GoldText>Connect</GoldText></>
+            ) : (
+              <>{"Aloqaga "}<GoldText>Chiqing</GoldText></>
+            )}
+          </h2>
 
-            {/* Subtitle */}
-            <p className="text-base sm:text-lg lg:text-xl text-gray-300 max-w-2xl lg:max-w-3xl mx-auto leading-relaxed px-4">
-              {language === 'uz' ? (
-                <>
-                  Loyiha g'oyangiz bormi? 
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 font-semibold sm:font-bold"> Keling, birga </span>
-                  muhokama qilaylik va g'oyalaringizni 
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500 font-semibold sm:font-bold"> hayotga tatbiq etaylik</span>
-                </>
-              ) : (
-                <>
-                  Have a project idea? 
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500 font-semibold sm:font-bold"> Let's </span>
-                  discuss it together and 
-                  <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-purple-500 font-semibold sm:font-bold"> bring your ideas to life</span>
-                </>
-              )}
-            </p>
-          </header>
-        </FadeIn>
+          <p className="ct-sans mx-auto max-w-xl text-sm sm:text-base leading-relaxed text-[#6b6b6b]">
+            {t(
+              "Loyiha g'oyangiz bormi? Keling, birga muhokama qilaylik va g'oyalaringizni hayotga tatbiq etaylik.",
+              "Have a project idea? Let's discuss it together and bring your ideas to life.",
+            )}
+          </p>
+        </Reveal>
 
-        <div className="max-w-6xl lg:max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-10 xl:gap-12">
-            
-            {/* Contact Form */}
-            <FadeIn delay={100}>
-              <ContactForm
-                formData={formData}
-                isSubmitting={isSubmitting}
-                submitSuccess={submitSuccess}
-                submitError={submitError}
-                onSubmit={handleSubmit}
-                onChange={handleChange}
-                focusedField={focusedField}
-                setFocusedField={setFocusedField}
-                language={language}
-              />
-            </FadeIn>
+        {/* ═══ MAIN GRID ═══
+            mobile  : single column (form → info)
+            tablet  : single column, wider padding
+            desktop : 2 col [form | info]
+        */}
+        <div className="grid grid-cols-1 gap-5 sm:gap-6 lg:grid-cols-[1.08fr_0.92fr] lg:gap-8 xl:gap-12">
 
-            {/* Contact Info */}
-            <FadeIn delay={200}>
-              <div className="space-y-6 sm:space-y-8">
-                
-                {/* Contact Information Card */}
-                <ContactInfoCard
-                  contactInfo={contactInfo}
-                  copiedPhone={copiedPhone}
-                  language={language}
+          {/* ── FORM ── */}
+          <Reveal delay={80} className="w-full min-w-0">
+            <ContactForm
+              formData={formData}
+              isSubmitting={isSubmitting}
+              submitSuccess={submitSuccess}
+              submitError={submitError}
+              onSubmit={handleSubmit}
+              onChange={handleChange}
+              focusedField={focusedField}
+              setFocusedField={setFocusedField}
+              language={language}
+            />
+          </Reveal>
+
+          {/* ── RIGHT STACK ── */}
+          <div className="flex flex-col gap-4 sm:gap-5 w-full min-w-0">
+
+            {/* Contact info */}
+            <Reveal delay={130} className="w-full min-w-0">
+              <ContactInfoCard items={contactItems} language={language} />
+            </Reveal>
+
+            {/* Social */}
+            <Reveal delay={190} className="w-full min-w-0">
+              <SocialLinksCard items={socialItems} language={language} />
+            </Reveal>
+
+            {/* Quick stats */}
+            <Reveal delay={250} className="w-full min-w-0">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                <QuickCard
+                  label={t('Tez Javob', 'Quick Reply')}
+                  sub={t('24 soat ichida', 'Within 24 hours')}
+                  Icon={Zap}
                 />
-
-                {/* Social Links Card */}
-                <SocialLinksCard socialLinks={socialLinks} language={language} />
-
-                {/* Quick Info Cards Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                  <QuickResponseCard language={language} />
-                  <AvailabilityCard language={language} />
-                </div>
-
+                <QuickCard
+                  label={t('Mavjud', 'Available')}
+                  sub={t('Yangi loyihalar', 'New projects')}
+                  Icon={Sparkles}
+                  gold
+                />
               </div>
-            </FadeIn>
+            </Reveal>
 
           </div>
         </div>
-
       </div>
 
-      {/* Background gradient style */}
+      {/* ── Global styles ── */}
       <style>{`
-        .bg-gradient-radial {
-          background: radial-gradient(ellipse at center, var(--tw-gradient-stops));
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+        .ct-sans { font-family: 'DM Sans', system-ui, sans-serif; }
+        .ct-mono { font-family: 'DM Mono', monospace; }
+
+        @keyframes ct-fadein {
+          from { opacity:0; transform:translateY(8px); }
+          to   { opacity:1; transform:translateY(0); }
+        }
+        .ct-fadein { animation: ct-fadein .35s ease-out forwards; }
+
+        @keyframes ct-spin { to { transform: rotate(360deg); } }
+        .ct-spin { animation: ct-spin .75s linear infinite; }
+
+        @keyframes ct-pulse {
+          0%,100% { opacity:1; transform:scale(1); }
+          50%      { opacity:.5; transform:scale(.75); }
+        }
+        .ct-pulse { animation: ct-pulse 2s ease-in-out infinite; }
+
+        /* Shimmer sweep on submit button */
+        .ct-shimmer::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,.22) 50%, transparent 100%);
+          transform: translateX(-100%);
+          transition: none;
+        }
+        .ct-shimmer:hover::after {
+          transform: translateX(100%);
+          transition: transform .65s ease;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after { animation-duration:.01ms!important; transition-duration:.01ms!important; }
         }
       `}</style>
     </section>
   );
 };
 
-// Contact Form Component
-const ContactForm = React.memo(({ 
-  formData, 
-  isSubmitting, 
-  submitSuccess, 
-  submitError, 
-  onSubmit, 
-  onChange,
-  focusedField,
-  setFocusedField,
-  language
+/* ── Tiny helper ── */
+const GoldText = ({ children }) => (
+  <span style={{ background: 'linear-gradient(135deg,#c8a96e,#e8c880,#a8824a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
+    {children}
+  </span>
+);
+
+/* ═════════════════════════════════════════════
+   CONTACT FORM
+═════════════════════════════════════════════ */
+const ContactForm = memo(({
+  formData, isSubmitting, submitSuccess, submitError,
+  onSubmit, onChange, focusedField, setFocusedField, language,
 }) => {
-  return (
-    <div className="relative h-full">
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 xl:p-10 h-full flex flex-col shadow-xl hover:shadow-2xl transition-shadow duration-300">
-        <div className="relative z-10 flex flex-col h-full">
-          {/* Header */}
-          <div className="mb-6 sm:mb-8">
-            <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <div className="p-2 sm:p-3 bg-gradient-to-br from-cyan-500/20 to-blue-500/20 rounded-xl sm:rounded-2xl">
-                <Send className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-cyan-400" />
-              </div>
-              <h3 className="text-xl sm:text-2xl lg:text-3xl font-bold text-white">
-                {language === 'uz' ? 'Xabar Yuborish' : 'Send Message'}
-              </h3>
-            </div>
-            <p className="text-sm sm:text-base text-gray-400 leading-relaxed">
-              {language === 'uz' 
-                ? "Quyidagi formani to'ldiring va men sizga tez orada javob beraman"
-                : "Fill out the form below and I'll get back to you soon"}
-            </p>
-          </div>
+  const t = (u, e) => language === 'uz' ? u : e;
 
-          {/* Success Message */}
-          {submitSuccess && (
-            <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-gradient-to-r from-green-500/10 to-emerald-500/10 border border-green-400/30 rounded-xl sm:rounded-2xl shadow-lg shadow-green-500/10 animate-fadeIn">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-green-500/20 rounded-lg sm:rounded-xl">
-                  <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-green-400" />
-                </div>
-                <div>
-                  <p className="text-green-400 font-semibold text-sm sm:text-base lg:text-lg">
-                    {language === 'uz' ? '✅ Muvaffaqiyatli yuborildi!' : '✅ Successfully sent!'}
-                  </p>
-                  <p className="text-green-300 text-xs sm:text-sm">
-                    {language === 'uz' ? 'Tez orada javob beraman' : "I'll reply soon"}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Error Message */}
-          {submitError && (
-            <div className="mb-4 sm:mb-6 p-4 sm:p-5 bg-gradient-to-r from-red-500/10 to-rose-500/10 border border-red-400/30 rounded-xl sm:rounded-2xl shadow-lg shadow-red-500/10 animate-fadeIn">
-              <div className="flex items-center gap-2 sm:gap-3">
-                <div className="p-1.5 sm:p-2 bg-red-500/20 rounded-lg sm:rounded-xl">
-                  <span className="text-lg sm:text-xl">⚠️</span>
-                </div>
-                <div>
-                  <p className="text-red-400 font-semibold text-sm sm:text-base lg:text-lg">
-                    {language === 'uz' ? 'Xatolik yuz berdi' : 'An error occurred'}
-                  </p>
-                  <p className="text-red-300 text-xs sm:text-sm">
-                    {language === 'uz' ? "Iltimos, qaytadan urinib ko'ring" : 'Please try again'}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Form */}
-          <form onSubmit={onSubmit} className="space-y-4 sm:space-y-6 flex-grow flex flex-col">
-            <div className="space-y-2">
-              <label htmlFor="name" className="block text-xs sm:text-sm font-bold text-gray-400">
-                {language === 'uz' ? 'Ismingiz *' : 'Your Name *'}
-              </label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={onChange}
-                required
-                placeholder={language === 'uz' ? 'Ismingizni kiriting' : 'Enter your name'}
-                className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-slate-800/50 border-2 border-slate-700 rounded-lg sm:rounded-xl text-white placeholder-gray-500 text-sm sm:text-base
-                  focus:outline-none focus:border-cyan-500 transition-colors duration-200"
-                onFocus={() => setFocusedField('name')}
-                onBlur={() => setFocusedField(null)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-xs sm:text-sm font-bold text-gray-400">
-                {language === 'uz' ? 'Email Manzilingiz *' : 'Your Email *'}
-              </label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={onChange}
-                required
-                placeholder="your.email@example.com"
-                className="w-full px-4 sm:px-5 py-3 sm:py-4 bg-slate-800/50 border-2 border-slate-700 rounded-lg sm:rounded-xl text-white placeholder-gray-500 text-sm sm:text-base
-                  focus:outline-none focus:border-cyan-500 transition-colors duration-200"
-                onFocus={() => setFocusedField('email')}
-                onBlur={() => setFocusedField(null)}
-              />
-            </div>
-
-            <div className="space-y-2 flex-grow flex flex-col">
-              <label htmlFor="message" className="block text-xs sm:text-sm font-bold text-gray-400">
-                {language === 'uz' ? 'Xabaringiz *' : 'Your Message *'}
-              </label>
-              <textarea
-                id="message"
-                name="message"
-                value={formData.message}
-                onChange={onChange}
-                required
-                rows="4"
-                placeholder={language === 'uz' 
-                  ? "Loyihangiz yoki taklifingiz haqida batafsil yozing..."
-                  : "Write in detail about your project or suggestion..."}
-                className="w-full flex-grow px-4 sm:px-5 py-3 sm:py-4 bg-slate-800/50 border-2 border-slate-700 rounded-lg sm:rounded-xl text-white placeholder-gray-500 text-sm sm:text-base
-                  focus:outline-none focus:border-cyan-500 resize-none transition-colors duration-200"
-                onFocus={() => setFocusedField('message')}
-                onBlur={() => setFocusedField(null)}
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full px-6 sm:px-8 py-3 sm:py-4 lg:py-5 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-bold text-base sm:text-lg rounded-lg sm:rounded-xl 
-                transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed 
-                hover:shadow-lg hover:shadow-cyan-500/30 hover:scale-[1.02] active:scale-[0.98]"
-            >
-              {isSubmitting ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-4 w-4 sm:h-5 sm:w-5 lg:h-6 lg:w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  <span className="text-sm sm:text-base">
-                    {language === 'uz' ? 'Yuborilmoqda...' : 'Sending...'}
-                  </span>
-                </span>
-              ) : (
-                <span className="flex items-center justify-center gap-2">
-                  <Zap className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
-                  <span className="text-sm sm:text-base">
-                    {language === 'uz' ? 'Xabar Yuborish' : 'Send Message'}
-                  </span>
-                  <Send className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />
-                </span>
-              )}
-            </button>
-          </form>
-        </div>
-      </div>
-
-      <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fadeIn {
-          animation: fadeIn 0.3s ease-out;
-        }
-      `}</style>
-    </div>
-  );
-});
-
-ContactForm.displayName = 'ContactForm';
-
-// Contact Info Card Component
-const ContactInfoCard = React.memo(({ contactInfo, copiedPhone, language }) => (
-  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-    <div>
-      {/* Header */}
-      <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-        <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-xl sm:rounded-2xl">
-          <Phone className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-blue-400" />
-        </div>
-        <h3 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-white">
-          {language === 'uz' ? "Aloqa Ma'lumotlari" : 'Contact Information'}
-        </h3>
-      </div>
-
-      <p className="text-sm sm:text-base text-gray-400 mb-6 sm:mb-8 leading-relaxed">
-        {language === 'uz' 
-          ? "Yangi loyihalar, ijodiy g'oyalar yoki hamkorlik haqida gaplashishga tayyorman"
-          : 'Ready to talk about new projects, creative ideas or collaboration'}
-      </p>
-
-      {/* Contact items */}
-      <div className="space-y-3 sm:space-y-4">
-        {contactInfo.map((item, index) => (
-          <ContactInfoItem 
-            key={index} 
-            item={item} 
-            copiedPhone={copiedPhone}
-            language={language}
-          />
-        ))}
-      </div>
-    </div>
-  </div>
-));
-
-ContactInfoCard.displayName = 'ContactInfoCard';
-
-// Contact Info Item Component
-const ContactInfoItem = React.memo(({ item, copiedPhone, language }) => {
-  const Icon = item.icon;
-  
   return (
     <div
-      onClick={item.onClick}
-      className={`group/item ${item.onClick ? 'cursor-pointer' : ''}`}
+      className="flex h-full flex-col overflow-hidden rounded-2xl bg-white"
+      style={{
+        border: '1px solid rgba(220,214,203,0.9)',
+        boxShadow: '0 4px 30px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,1)',
+      }}
     >
-      <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 bg-slate-800/50 border border-slate-700 rounded-xl sm:rounded-2xl transition-all duration-300 hover:bg-slate-800/70 hover:border-slate-600">
-        
-        {/* Icon */}
-        <div className={`p-2 sm:p-3 lg:p-4 bg-slate-700/50 rounded-lg sm:rounded-xl flex-shrink-0`}>
-          <Icon className={`w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 ${item.iconColor}`} />
-        </div>
-        
-        {/* Content */}
-        <div className="flex-1 min-w-0">
-          <p className="text-xs sm:text-sm font-bold text-gray-500 mb-1 uppercase tracking-wider truncate">
-            {item.label}
-          </p>
-          {item.href ? (
-            <a
-              href={item.href}
-              className="text-sm sm:text-base text-white hover:text-cyan-300 transition-colors duration-300 font-semibold break-all hover:underline line-clamp-1"
+      {/* Gold top bar */}
+      <div
+        className="h-[3px] w-full flex-shrink-0"
+        style={{ background: 'linear-gradient(90deg,#c8a96e 0%,#e8c880 40%,#a8824a 75%,rgba(200,169,110,.15) 100%)' }}
+      />
+
+      <div className="flex flex-1 flex-col p-5 sm:p-7 lg:p-8">
+
+        {/* ── Header ── */}
+        <div className="mb-6 flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <h3
+              className="ct-sans mb-1 text-lg sm:text-xl lg:text-2xl font-bold text-[#0f0f0f] leading-tight"
+              style={{ letterSpacing: '-0.025em' }}
             >
-              {item.value}
-            </a>
-          ) : (
-            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-              <p className="text-sm sm:text-base text-white font-semibold truncate">
-                {item.value}
-              </p>
-              {item.onClick && (
-                <span className={`text-xs font-bold px-2 py-1 rounded-full transition-all duration-300 inline-flex items-center justify-center w-fit ${
-                  copiedPhone 
-                    ? 'bg-green-500/20 text-green-400 border border-green-400/30' 
-                    : 'bg-cyan-500/10 text-cyan-400 border border-cyan-400/20'
-                }`}>
-                  {copiedPhone 
-                    ? (language === 'uz' ? '✓ Nusxalandi' : '✓ Copied') 
-                    : (language === 'uz' ? 'Nusxalash' : 'Copy')}
-                </span>
-              )}
-            </div>
-          )}
+              {t('Xabar Yuborish', 'Send a Message')}
+            </h3>
+            <p className="ct-sans text-xs sm:text-sm text-[#888]">
+              {t("Formani to'ldiring — tez orada javob beraman", "Fill out the form — I'll reply soon")}
+            </p>
+          </div>
+          <div
+            className="flex-shrink-0 flex h-10 w-10 sm:h-11 sm:w-11 items-center justify-center rounded-xl"
+            style={{
+              background: 'linear-gradient(135deg,rgba(200,169,110,.12),rgba(168,130,74,.07))',
+              border: '1px solid rgba(200,169,110,.22)',
+            }}
+          >
+            <Send size={16} strokeWidth={1.8} style={{ color: '#c8a96e' }} />
+          </div>
         </div>
 
-        {/* Arrow indicator */}
-        {item.href && (
-          <div className="text-gray-600 group-hover/item:text-cyan-400 transition-colors duration-300 flex-shrink-0">
-            →
+        {/* ── Alerts ── */}
+        {submitSuccess && (
+          <div
+            className="ct-fadein mb-5 flex items-start gap-3 rounded-xl p-3.5 sm:p-4"
+            style={{ background:'rgba(34,197,94,.06)', border:'1.5px solid rgba(34,197,94,.25)' }}
+          >
+            <div className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-lg" style={{ background:'rgba(34,197,94,.1)' }}>
+              <CheckCircle2 size={15} style={{ color:'#16a34a' }} />
+            </div>
+            <div>
+              <p className="ct-sans text-sm font-semibold" style={{ color:'#15803d' }}>{t('Muvaffaqiyatli yuborildi!','Successfully sent!')}</p>
+              <p className="ct-sans text-xs mt-0.5" style={{ color:'#4ade80' }}>{t("Tez orada javob beraman","I'll reply soon")}</p>
+            </div>
           </div>
         )}
+        {submitError && (
+          <div
+            className="ct-fadein mb-5 flex items-start gap-3 rounded-xl p-3.5 sm:p-4"
+            style={{ background:'rgba(239,68,68,.06)', border:'1.5px solid rgba(239,68,68,.25)' }}
+          >
+            <div className="flex-shrink-0 flex h-8 w-8 items-center justify-center rounded-lg text-sm" style={{ background:'rgba(239,68,68,.1)' }}>⚠️</div>
+            <div>
+              <p className="ct-sans text-sm font-semibold text-red-700">{t('Xatolik yuz berdi','An error occurred')}</p>
+              <p className="ct-sans text-xs mt-0.5 text-red-500">{t("Qaytadan urinib ko'ring","Please try again")}</p>
+            </div>
+          </div>
+        )}
+
+        {/* ── Form fields ── */}
+        <form onSubmit={onSubmit} className="flex flex-1 flex-col gap-4 sm:gap-5">
+
+          {/* Name + Email — side by side on sm+ */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-4">
+            <FormField
+              id="name" name="name" type="text"
+              label={t('Ismingiz','Your Name')}
+              placeholder={t('Ismingizni kiriting','Enter your name')}
+              value={formData.name} onChange={onChange}
+              focused={focusedField === 'name'}
+              onFocus={() => setFocusedField('name')}
+              onBlur={() => setFocusedField(null)}
+            />
+            <FormField
+              id="email" name="email" type="email"
+              label="Email"
+              placeholder="your@email.com"
+              value={formData.email} onChange={onChange}
+              focused={focusedField === 'email'}
+              onFocus={() => setFocusedField('email')}
+              onBlur={() => setFocusedField(null)}
+            />
+          </div>
+
+          {/* Message */}
+          <div className="flex flex-1 flex-col gap-1.5">
+            <label htmlFor="message" className="ct-mono flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9a9a9a]">
+              {t('Xabar','Message')} <span style={{ color:'#c8a96e' }}>*</span>
+            </label>
+            <textarea
+              id="message" name="message" required
+              rows={5}
+              value={formData.message}
+              onChange={onChange}
+              placeholder={t("Loyihangiz haqida batafsil yozing...","Write in detail about your project...")}
+              onFocus={() => setFocusedField('message')}
+              onBlur={() => setFocusedField(null)}
+              className="ct-sans flex-1 resize-none rounded-xl px-4 py-3 text-sm text-[#0f0f0f] placeholder-[#bbb] outline-none transition-all duration-200"
+              style={{
+                background: focusedField === 'message' ? '#fff' : '#f9f7f4',
+                border: `1.5px solid ${focusedField === 'message' ? '#c8a96e' : 'rgba(220,214,203,.9)'}`,
+                boxShadow: focusedField === 'message' ? '0 0 0 3.5px rgba(200,169,110,.11),0 2px 8px rgba(0,0,0,.04)' : '0 1px 3px rgba(0,0,0,.02)',
+              }}
+            />
+          </div>
+
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="ct-sans ct-shimmer group relative mt-1 flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl px-5 py-3.5 sm:py-4 text-sm font-bold text-white transition-all duration-300 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-[1.012] active:scale-[0.988]"
+            style={{
+              background: 'linear-gradient(135deg,#c8a96e 0%,#d4b478 35%,#a8824a 70%,#b8924e 100%)',
+              boxShadow: '0 4px 22px rgba(200,169,110,.4), 0 1px 0 rgba(255,255,255,.15) inset',
+            }}
+          >
+            {isSubmitting ? (
+              <>
+                <svg className="ct-spin h-4 w-4 flex-shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+                <span>{t('Yuborilmoqda...','Sending...')}</span>
+              </>
+            ) : (
+              <>
+                <Send size={15} strokeWidth={2.5} className="flex-shrink-0" />
+                <span>{t('Xabar Yuborish','Send Message')}</span>
+                <ArrowUpRight
+                  size={15} strokeWidth={2.5}
+                  className="flex-shrink-0 transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                />
+              </>
+            )}
+          </button>
+        </form>
       </div>
     </div>
   );
 });
+ContactForm.displayName = 'ContactForm';
 
-ContactInfoItem.displayName = 'ContactInfoItem';
-
-// Social Links Card Component
-const SocialLinksCard = React.memo(({ socialLinks, language }) => (
-  <div className="bg-slate-900/80 border border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 lg:p-8 shadow-xl hover:shadow-2xl transition-shadow duration-300">
-    <div>
-      {/* Header */}
-      <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-        <div className="p-2 sm:p-3 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-xl sm:rounded-2xl">
-          <Globe className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-purple-400" />
-        </div>
-        <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
-          {language === 'uz' ? 'Ijtimoiy Tarmoqlar' : 'Social Media'}
-        </h3>
-      </div>
-
-      {/* Social links grid */}
-      <div className="grid grid-cols-1 gap-3 sm:gap-4">
-        {socialLinks.map((social, index) => (
-          <SocialLink key={index} social={social} language={language} />
-        ))}
-      </div>
-    </div>
+/* ── Single form field ── */
+const FormField = memo(({ id, name, type, label, placeholder, value, onChange, focused, onFocus, onBlur }) => (
+  <div className="flex flex-col gap-1.5 min-w-0">
+    <label htmlFor={id} className="ct-mono flex items-center gap-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9a9a9a]">
+      {label} <span style={{ color:'#c8a96e' }}>*</span>
+    </label>
+    <input
+      type={type} id={id} name={name} required
+      value={value} onChange={onChange}
+      placeholder={placeholder}
+      onFocus={onFocus} onBlur={onBlur}
+      className="ct-sans w-full min-w-0 rounded-xl px-4 py-3 text-sm text-[#0f0f0f] placeholder-[#bbb] outline-none transition-all duration-200"
+      style={{
+        background: focused ? '#fff' : '#f9f7f4',
+        border: `1.5px solid ${focused ? '#c8a96e' : 'rgba(220,214,203,.9)'}`,
+        boxShadow: focused ? '0 0 0 3.5px rgba(200,169,110,.11),0 2px 8px rgba(0,0,0,.04)' : '0 1px 3px rgba(0,0,0,.02)',
+      }}
+    />
   </div>
 ));
+FormField.displayName = 'FormField';
 
-SocialLinksCard.displayName = 'SocialLinksCard';
-
-// Social Link Component
-const SocialLink = React.memo(({ social, language }) => {
-  const Icon = social.icon;
-  
+/* ═════════════════════════════════════════════
+   CONTACT INFO CARD
+═════════════════════════════════════════════ */
+const ContactInfoCard = memo(({ items, language }) => {
+  const t = (u, e) => language === 'uz' ? u : e;
   return (
-    <a
-      href={social.href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block group/social"
-      aria-label={social.label}
+    <div
+      className="w-full overflow-hidden rounded-2xl bg-white"
+      style={{ border:'1px solid rgba(220,214,203,.9)', boxShadow:'0 2px 20px rgba(0,0,0,.05)' }}
     >
-      <div className={`flex items-center gap-3 sm:gap-4 p-3 sm:p-4 lg:p-5 bg-gradient-to-r ${social.gradient} rounded-xl sm:rounded-2xl transition-all duration-300 hover:shadow-lg`}>
-        
-        {/* Icon */}
-        <div className="p-2 sm:p-3 bg-white/10 rounded-lg sm:rounded-xl group-hover/social:bg-white/15 transition-all duration-300 flex-shrink-0">
-          <Icon className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6 text-white group-hover/social:scale-110 transition-transform duration-300" />
+      <div className="p-5 sm:p-6">
+        <div className="mb-4 flex items-center justify-between gap-2">
+          <div className="min-w-0">
+            <h3 className="ct-sans text-base sm:text-lg font-bold text-[#0f0f0f] leading-tight" style={{ letterSpacing:'-0.02em' }}>
+              {t("Aloqa Ma'lumotlari",'Contact Info')}
+            </h3>
+            <p className="ct-sans mt-0.5 text-xs text-[#888]">
+              {t('Yangi loyihalar uchun tayyorman','Ready for new projects')}
+            </p>
+          </div>
+          <div
+            className="flex-shrink-0 flex h-9 w-9 items-center justify-center rounded-xl"
+            style={{ background:'linear-gradient(135deg,rgba(200,169,110,.12),rgba(168,130,74,.07))', border:'1px solid rgba(200,169,110,.2)' }}
+          >
+            <Mail size={14} strokeWidth={1.8} style={{ color:'#c8a96e' }} />
+          </div>
         </div>
-        
-        {/* Content */}
-        <div className="flex-1">
-          <p className="text-base sm:text-lg font-bold text-white">{social.label}</p>
-          <p className="text-white/70 text-xs sm:text-sm">
-            {language === 'uz' ? 'Kuzatib boring' : 'Follow'}
+        <div className="flex flex-col gap-2.5">
+          {items.map((item, i) => <ContactInfoItem key={i} item={item} />)}
+        </div>
+      </div>
+    </div>
+  );
+});
+ContactInfoCard.displayName = 'ContactInfoCard';
+
+const ContactInfoItem = memo(({ item }) => {
+  const { Icon, label, value, href, onClick, copied } = item;
+  const [hov, setHov] = useState(false);
+
+  const inner = (
+    <div
+      className="flex items-center gap-3 sm:gap-3.5 rounded-xl p-3 sm:p-3.5 transition-all duration-200"
+      style={{
+        background: hov ? 'linear-gradient(135deg,#f7f3ec,#f4efe5)' : '#f9f7f4',
+        border: `1.5px solid ${hov ? 'rgba(200,169,110,.38)' : 'rgba(220,214,203,.6)'}`,
+        boxShadow: hov ? '0 3px 14px rgba(200,169,110,.1)' : 'none',
+        transform: hov ? 'translateX(3px)' : 'none',
+      }}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      onClick={onClick}
+    >
+      {/* Icon */}
+      <div
+        className="flex-shrink-0 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl transition-all duration-200"
+        style={{
+          background: hov
+            ? 'linear-gradient(135deg,#c8a96e,#a8824a)'
+            : 'linear-gradient(135deg,rgba(200,169,110,.14),rgba(168,130,74,.09))',
+          border: '1px solid rgba(200,169,110,.22)',
+          boxShadow: hov ? '0 3px 12px rgba(200,169,110,.3)' : 'none',
+        }}
+      >
+        <Icon size={14} strokeWidth={2} style={{ color: hov ? '#fff' : '#c8a96e' }} />
+      </div>
+
+      {/* Text */}
+      <div className="min-w-0 flex-1 overflow-hidden">
+        <p className="ct-mono mb-0.5 text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.13em] text-[#aaa]">{label}</p>
+        <p className="ct-sans truncate text-xs sm:text-[13px] font-semibold text-[#0f0f0f]">{value}</p>
+      </div>
+
+      {/* Trailing icon */}
+      {href && (
+        <ArrowUpRight
+          size={13} strokeWidth={2}
+          className="flex-shrink-0 transition-all duration-200"
+          style={{ color: hov ? '#c8a96e' : '#ccc', transform: hov ? 'translate(2px,-2px)' : 'none' }}
+        />
+      )}
+      {onClick && (
+        <div
+          className="flex-shrink-0 flex items-center justify-center h-6 w-6 sm:h-7 sm:w-7 rounded-lg transition-all duration-200"
+          style={{
+            background: copied ? 'rgba(34,197,94,.12)' : 'rgba(200,169,110,.1)',
+            border: `1px solid ${copied ? 'rgba(34,197,94,.3)' : 'rgba(200,169,110,.25)'}`,
+          }}
+        >
+          {copied
+            ? <Check size={11} strokeWidth={2.5} style={{ color:'#16a34a' }} />
+            : <Copy size={11} strokeWidth={2} style={{ color:'#c8a96e' }} />}
+        </div>
+      )}
+    </div>
+  );
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        target={href.startsWith('mailto') ? undefined : '_blank'}
+        rel="noopener noreferrer"
+        onMouseEnter={() => setHov(true)}
+        onMouseLeave={() => setHov(false)}
+        className="block"
+      >
+        {inner}
+      </a>
+    );
+  }
+  return <div className={onClick ? 'cursor-pointer' : ''}>{inner}</div>;
+});
+ContactInfoItem.displayName = 'ContactInfoItem';
+
+/* ═════════════════════════════════════════════
+   SOCIAL LINKS CARD
+═════════════════════════════════════════════ */
+const SocialLinksCard = memo(({ items, language }) => {
+  const t = (u, e) => language === 'uz' ? u : e;
+  return (
+    <div
+      className="w-full overflow-hidden rounded-2xl bg-white"
+      style={{ border:'1px solid rgba(220,214,203,.9)', boxShadow:'0 2px 20px rgba(0,0,0,.05)' }}
+    >
+      <div className="p-5 sm:p-6">
+        <div className="mb-4">
+          <h3 className="ct-sans text-base sm:text-lg font-bold text-[#0f0f0f] leading-tight" style={{ letterSpacing:'-0.02em' }}>
+            {t('Ijtimoiy Tarmoqlar','Social Media')}
+          </h3>
+          <p className="ct-sans mt-0.5 text-xs text-[#888]">
+            {t('Meni kuzatib boring','Follow me online')}
           </p>
         </div>
 
-        {/* Arrow */}
-        <div className="text-white/70 group-hover/social:text-white transition-colors duration-300 flex-shrink-0">
-          →
+        {/* 3-col grid — always */}
+        <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+          {items.map((item, i) => <SocialBtn key={i} item={item} />)}
         </div>
+      </div>
+    </div>
+  );
+});
+SocialLinksCard.displayName = 'SocialLinksCard';
+
+const SocialBtn = memo(({ item }) => {
+  const { Icon, href, label, sub } = item;
+  const [hov, setHov] = useState(false);
+
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      className="group flex flex-col items-center gap-1.5 sm:gap-2 rounded-xl p-3 sm:p-3.5 text-center transition-all duration-250"
+      style={{
+        background: hov ? 'linear-gradient(135deg,rgba(200,169,110,.12),rgba(168,130,74,.07))' : '#f9f7f4',
+        border: `1.5px solid ${hov ? 'rgba(200,169,110,.4)' : 'rgba(220,214,203,.65)'}`,
+        boxShadow: hov ? '0 5px 18px rgba(200,169,110,.14)' : 'none',
+        transform: hov ? 'translateY(-3px)' : 'none',
+      }}
+    >
+      <div
+        className="flex h-9 w-9 sm:h-10 sm:w-10 items-center justify-center rounded-xl transition-all duration-200"
+        style={{
+          background: hov ? 'linear-gradient(135deg,#c8a96e,#a8824a)' : 'linear-gradient(135deg,rgba(200,169,110,.1),rgba(168,130,74,.06))',
+          border: '1px solid rgba(200,169,110,.2)',
+          boxShadow: hov ? '0 4px 14px rgba(200,169,110,.32)' : 'none',
+        }}
+      >
+        <Icon size={15} strokeWidth={1.8} style={{ color: hov ? '#fff' : '#c8a96e' }} className="transition-transform duration-200 group-hover:scale-110" />
+      </div>
+      <div>
+        <p className="ct-sans text-[11px] sm:text-xs font-bold text-[#0f0f0f] leading-tight">{label}</p>
+        <p className="ct-mono text-[8px] sm:text-[9px] text-[#aaa] mt-0.5">{sub}</p>
       </div>
     </a>
   );
 });
+SocialBtn.displayName = 'SocialBtn';
 
-SocialLink.displayName = 'SocialLink';
-
-// Quick Response Card Component
-const QuickResponseCard = React.memo(({ language }) => (
-  <div className="bg-slate-900/80 border border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
-    <div className="relative z-10">
-      <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-        <div className="p-1.5 sm:p-2 bg-gradient-to-br from-green-500/20 to-emerald-500/20 rounded-lg sm:rounded-xl">
-          <Clock className="w-4 h-4 sm:w-5 sm:h-5 text-green-400" />
-        </div>
-        <h4 className="text-base sm:text-lg font-bold text-white">
-          {language === 'uz' ? 'Tez Javob' : 'Quick Response'}
-        </h4>
+/* ═════════════════════════════════════════════
+   QUICK CARDS
+═════════════════════════════════════════════ */
+const QuickCard = memo(({ label, sub, Icon, gold }) => {
+  const [hov, setHov] = useState(false);
+  return (
+    <div
+      className="flex flex-col justify-between rounded-xl p-4 sm:p-5 transition-all duration-200 cursor-default"
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        background: gold
+          ? (hov ? 'linear-gradient(135deg,rgba(200,169,110,.18),rgba(168,130,74,.11))' : 'linear-gradient(135deg,rgba(200,169,110,.1),rgba(168,130,74,.06))')
+          : (hov ? '#f7f3ec' : '#f9f7f4'),
+        border: `1.5px solid ${hov ? 'rgba(200,169,110,.42)' : 'rgba(220,214,203,.75)'}`,
+        boxShadow: hov ? '0 4px 16px rgba(200,169,110,.1)' : 'none',
+        transform: hov ? 'translateY(-2px)' : 'none',
+      }}
+    >
+      <div
+        className="mb-2.5 sm:mb-3 flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-xl"
+        style={{ background:'rgba(200,169,110,.1)', border:'1px solid rgba(200,169,110,.2)' }}
+      >
+        <Icon size={15} strokeWidth={2} style={{ color:'#c8a96e' }} />
       </div>
-      <p className="text-xs sm:text-sm text-gray-400">
-        {language === 'uz' ? '24 soat ichida javob beraman' : 'Reply within 24 hours'}
-      </p>
-    </div>
-  </div>
-));
-
-QuickResponseCard.displayName = 'QuickResponseCard';
-
-// Availability Card Component
-const AvailabilityCard = React.memo(({ language }) => (
-  <div className="bg-slate-900/80 border border-slate-800 rounded-xl sm:rounded-2xl p-4 sm:p-5 lg:p-6 shadow-lg hover:shadow-xl transition-shadow duration-300">
-    <div className="relative z-10">
-      <div className="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
-        <div className="p-1.5 sm:p-2 bg-gradient-to-br from-blue-500/20 to-cyan-500/20 rounded-lg sm:rounded-xl">
-          <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
-        </div>
-        <h4 className="text-base sm:text-lg font-bold text-white">
-          {language === 'uz' ? 'Mavjud' : 'Available'}
-        </h4>
+      <div>
+        <p className="ct-sans text-xs sm:text-sm font-bold text-[#0f0f0f] leading-tight" style={{ letterSpacing:'-0.01em' }}>{label}</p>
+        <p className="ct-sans mt-0.5 text-[11px] sm:text-xs text-[#888]">{sub}</p>
       </div>
-      <p className="text-xs sm:text-sm text-gray-400">
-        {language === 'uz' ? 'Yangi loyihalar uchun ochiq' : 'Open for new projects'}
-      </p>
     </div>
-  </div>
-));
-
-AvailabilityCard.displayName = 'AvailabilityCard';
+  );
+});
+QuickCard.displayName = 'QuickCard';
 
 export default Contact;

@@ -1,486 +1,379 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
-import { projects, categories } from '../../data/projects';
-import { ChevronLeft, ChevronRight, ExternalLink, Github } from 'lucide-react';
-import { useLanguage } from '../../contexts/LanguageContext';
+import React, { useState, useMemo, useRef, useEffect, memo } from "react";
+import { ArrowUpRight, Github } from "lucide-react";
+import { projects, categories } from "../../data/projects";
+import { useLanguage } from "../../contexts/LanguageContext";
 
-const PROJECTS_PER_PAGE = 6;
-
-const Projects = () => {
-  const { language } = useLanguage();
-  const projectsList = projects[language];
-  const categoriesList = categories[language];
-  
-  const [activeCategory, setActiveCategory] = useState(categoriesList[0]);
-  const [filteredProjects, setFilteredProjects] = useState(projectsList);
-  const [currentPage, setCurrentPage] = useState(1);
-  const sectionRef = useRef(null);
-
-  // Filter projects
+/* ─────────────────────────────────────
+   Scroll Reveal hook
+───────────────────────────────────── */
+const useReveal = () => {
+  const ref = useRef(null);
+  const [on, setOn] = useState(false);
   useEffect(() => {
-    const allCategory = categoriesList[0]; // "Barchasi" or "All"
-    const filtered = activeCategory === allCategory
-      ? projectsList 
-      : projectsList.filter(project => project.category === activeCategory);
-    
-    setFilteredProjects(filtered);
-    setCurrentPage(1);
-  }, [activeCategory, projectsList, categoriesList]);
-
-  // Memoize pagination calculations
-  const paginationData = useMemo(() => {
-    const indexOfLastProject = currentPage * PROJECTS_PER_PAGE;
-    const indexOfFirstProject = indexOfLastProject - PROJECTS_PER_PAGE;
-    const currentProjects = filteredProjects.slice(indexOfFirstProject, indexOfLastProject);
-    const totalPages = Math.ceil(filteredProjects.length / PROJECTS_PER_PAGE);
-
-    return {
-      currentProjects,
-      totalPages,
-      indexOfFirstProject,
-      indexOfLastProject
-    };
-  }, [currentPage, filteredProjects]);
-
-  // Handlers
-  const handleCategoryChange = useCallback((category) => {
-    setActiveCategory(category);
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setOn(true); io.disconnect(); } },
+      { threshold: 0.01 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
+  return [ref, on];
+};
 
-  const scrollToSection = useCallback(() => {
-    if (sectionRef.current) {
-      const yOffset = -80;
-      const y = sectionRef.current.getBoundingClientRect().top + window.pageYOffset + yOffset;
-      window.scrollTo({ top: y, behavior: 'smooth' });
-    }
-  }, []);
+const Reveal = memo(({ children, delay = 0, className = "" }) => {
+  const [ref, on] = useReveal();
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity: 1,
+        transform: on ? "translateY(0)" : "translateY(22px)",
+        transition: `transform .65s cubic-bezier(.16,1,.3,1) ${delay}ms`,
+      }}
+    >
+      {children}
+    </div>
+  );
+});
+Reveal.displayName = "Reveal";
 
-  const paginate = useCallback((pageNumber) => {
-    setCurrentPage(pageNumber);
-    scrollToSection();
-  }, [scrollToSection]);
+/* ══════════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════════ */
+export default function Projects() {
+  const { language }        = useLanguage();
+  const projectsList        = useMemo(() => projects[language] || [], [language]);
+  const categoriesList      = useMemo(() => categories[language] || [], [language]);
+  const [active, setActive] = useState(categoriesList[0]);
+  const t = (u, e) => language === "uz" ? u : e;
 
-  const nextPage = useCallback(() => {
-    if (currentPage < paginationData.totalPages) {
-      paginate(currentPage + 1);
-    }
-  }, [currentPage, paginationData.totalPages, paginate]);
+  useEffect(() => { setActive(categoriesList[0]); }, [language]);
 
-  const prevPage = useCallback(() => {
-    if (currentPage > 1) {
-      paginate(currentPage - 1);
-    }
-  }, [currentPage, paginate]);
-
-  const { currentProjects, totalPages, indexOfFirstProject, indexOfLastProject } = paginationData;
+  const filtered = useMemo(() => {
+    const all = categoriesList[0];
+    return active === all
+      ? projectsList
+      : projectsList.filter(p => p.category === active);
+  }, [active, projectsList, categoriesList]);
 
   return (
-    <section 
-      id="projects" 
-      ref={sectionRef}
-      className="relative py-12 sm:py-16 md:py-20 lg:py-28 overflow-hidden"
-      aria-labelledby="projects-heading"
-    >
-      {/* Simple Radial Gradient Background */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-radial from-slate-900 via-slate-950 to-black" />
-      </div>
+    <section id="projects" className="relative w-full overflow-hidden bg-[#faf9f6]">
+      {/* ── Ambient glow ── */}
+      <div
+        className="pointer-events-none absolute -top-32 right-0 h-[500px] w-[500px] rounded-full opacity-30"
+        style={{ background: "radial-gradient(circle, rgba(200,169,110,0.14) 0%, transparent 70%)" }}
+      />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Header Section */}
-        <header className="text-center mb-10 sm:mb-14 md:mb-16">
-          <h2 
-            id="projects-heading"
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 sm:mb-4 md:mb-6 tracking-tight"
+      <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-24 lg:px-10 lg:py-32">
+
+        {/* ════ HEADER ════ */}
+        <Reveal className="mb-10 sm:mb-14 text-center">
+          {/* Label */}
+          <div className="mb-4 flex items-center justify-center gap-3">
+            <div className="h-px w-8 bg-gradient-to-r from-transparent to-[#c8a96e]" />
+            <span
+              className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.18em] text-[#c8a96e]"
+              style={{ fontFamily: "'DM Mono', monospace" }}
+            >
+              {t("Loyihalar", "Projects")}
+            </span>
+            <div className="h-px w-8 bg-gradient-to-l from-transparent to-[#c8a96e]" />
+          </div>
+
+          {/* Title */}
+          <h2
+            className="mb-3 sm:mb-4"
+            style={{
+              fontFamily: "'DM Sans', system-ui, sans-serif",
+              fontSize: "clamp(1.9rem, 5.5vw, 4.5rem)",
+              fontWeight: 800,
+              letterSpacing: "-0.04em",
+              lineHeight: 1.05,
+              color: "#0f0f0f",
+            }}
           >
-            <span className="bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 bg-clip-text text-transparent">
-              {language === 'uz' ? 'Mening Loyihalarim' : 'My Projects'}
+            {t("Mening ", "My ")}
+            <span
+              style={{
+                background: "linear-gradient(135deg,#c8a96e,#e8c880,#a8824a)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+              }}
+            >
+              {t("Loyihalarim", "Projects")}
             </span>
           </h2>
-          
-          <div 
-            className="w-16 sm:w-20 md:w-24 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400 mx-auto mb-3 sm:mb-4 md:mb-6 rounded-full"
-            aria-hidden="true"
-          />
-          
-          <p className="text-slate-400 text-sm sm:text-base md:text-lg max-w-2xl mx-auto px-4">
-            {language === 'uz' 
-              ? 'Zamonaviy texnologiyalar va innovatsion yechimlar bilan yaratilgan professional loyihalar'
-              : 'Professional projects created with modern technologies and innovative solutions'}
+
+          {/* Subtitle */}
+          <p
+            className="mx-auto max-w-xl text-sm sm:text-base leading-relaxed text-[#6b6b6b]"
+            style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
+          >
+            {t(
+              "Zamonaviy texnologiyalar bilan yaratilgan professional loyihalar",
+              "Professional projects built with modern technologies"
+            )}
           </p>
-        </header>
+        </Reveal>
 
-        {/* Filter Buttons */}
-        <FilterButtons 
-          categories={categoriesList}
-          activeCategory={activeCategory}
-          onCategoryChange={handleCategoryChange}
-        />
-
-        {/* Projects Grid */}
-        {currentProjects.length > 0 ? (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7 md:gap-8 mb-12 sm:mb-16">
-              {currentProjects.map((project, index) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  index={index}
-                  language={language}
-                />
+        {/* ════ FILTER TABS ════
+              - mobile: scroll horizontally, left-aligned
+              - sm+: centered, no scroll needed
+        */}
+        <Reveal delay={60} className="mb-10 sm:mb-12">
+          <div
+            className="flex items-end gap-0 border-b border-[#e0dbd0] overflow-x-auto"
+            style={{ scrollbarWidth: "none", msOverflowStyle: "none", justifyContent: "flex-start" }}
+          >
+            <style>{`.pj-tabs::-webkit-scrollbar { display:none; }`}</style>
+            <div className="pj-tabs flex w-full items-end justify-start sm:justify-center gap-0">
+              {categoriesList.map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setActive(cat)}
+                  className="relative flex-shrink-0 cursor-pointer pb-3 px-3 sm:px-5"
+                >
+                  <span
+                    className="whitespace-nowrap text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.15em] transition-colors duration-200"
+                    style={{
+                      fontFamily: "'DM Mono', monospace",
+                      color: active === cat ? "#0f0f0f" : "#9a9a9a",
+                    }}
+                  >
+                    {cat}
+                  </span>
+                  {active === cat && (
+                    <span
+                      className="absolute bottom-0 left-3 right-3 sm:left-5 sm:right-5 h-[2px] rounded-t-full"
+                      style={{ background: "linear-gradient(90deg,#c8a96e,#a8824a)" }}
+                    />
+                  )}
+                </button>
               ))}
             </div>
+          </div>
+        </Reveal>
 
-            {/* Pagination */}
-            {totalPages > 1 && (
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={paginate}
-                onPrevPage={prevPage}
-                onNextPage={nextPage}
-                indexOfFirstProject={indexOfFirstProject}
-                indexOfLastProject={indexOfLastProject}
-                totalProjects={filteredProjects.length}
-                language={language}
-              />
-            )}
-          </>
+        {/* ════ GRID ════
+              mobile  : 1 col
+              sm      : 2 col
+              lg      : 3 col
+        */}
+        {filtered.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
+            {filtered.map((project, i) => (
+              <Reveal key={project.id} delay={Math.min(i * 55, 300)}>
+                <ProjectCard project={project} index={i} />
+              </Reveal>
+            ))}
+          </div>
         ) : (
-          <EmptyState language={language} allCategory={categoriesList[0]} />
+          <Reveal>
+            <div className="py-20 text-center">
+              <p
+                className="text-base sm:text-lg text-[#9a9a9a]"
+                style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
+              >
+                {t("Loyihalar topilmadi", "No projects found")}
+              </p>
+            </div>
+          </Reveal>
         )}
       </div>
 
-      {/* Minimal Animations */}
       <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-
-        .bg-gradient-radial {
-          background: radial-gradient(ellipse at center, var(--tw-gradient-stops));
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
         }
       `}</style>
     </section>
   );
-};
+}
 
-// FilterButtons component
-const FilterButtons = React.memo(({ categories, activeCategory, onCategoryChange }) => {
+/* ══════════════════════════════════════════════
+   PROJECT CARD
+══════════════════════════════════════════════ */
+const ProjectCard = memo(({ project, index }) => {
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const [hovered, setHovered]     = useState(false);
+  const idx = String(index + 1).padStart(2, "0");
+
   return (
-    <nav 
-      className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-10 sm:mb-12 md:mb-14 px-4"
-      aria-label="Loyiha filtrlari"
+    <div
+      className="group relative flex flex-col h-full overflow-hidden rounded-2xl bg-white"
+      style={{
+        border: `1px solid ${hovered ? "rgba(200,169,110,0.5)" : "rgba(220,214,203,0.85)"}`,
+        boxShadow: hovered
+          ? "0 20px 60px rgba(200,169,110,0.15), 0 6px 20px rgba(0,0,0,0.07)"
+          : "0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,1)",
+        transform: hovered ? "translateY(-5px)" : "translateY(0)",
+        transition: "box-shadow .4s ease, transform .4s cubic-bezier(.34,1.56,.64,1), border-color .3s ease",
+      }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
-      {categories.map((category) => (
-        <button
-          key={category}
-          onClick={() => onCategoryChange(category)}
-          aria-pressed={activeCategory === category}
-          className={`
-            relative px-4 sm:px-6 md:px-8 py-2 sm:py-2.5 md:py-3 rounded-full font-semibold text-xs sm:text-sm md:text-base
-            transition-all duration-300
-            ${activeCategory === category
-              ? 'bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 text-white shadow-lg shadow-cyan-500/30'
-              : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-white'
-            }
-          `}
+      {/* Gold top bar */}
+      <div
+        className="absolute top-0 left-0 right-0 z-10 h-[2px] transition-opacity duration-300"
+        style={{
+          background: "linear-gradient(90deg,#c8a96e,#a8824a,transparent)",
+          opacity: hovered ? 1 : 0,
+        }}
+      />
+
+      {/* ── IMAGE ──
+            height: 160px mobile / 176px sm / 200px lg
+      */}
+      <div className="relative h-40 sm:h-44 lg:h-48 flex-shrink-0 overflow-hidden">
+
+        {/* Skeleton */}
+        {!imgLoaded && (
+          <div className="absolute inset-0 animate-pulse bg-[#ede8e0]" />
+        )}
+
+        {/* Photo */}
+        <img
+          src={project.image}
+          alt={project.title}
+          className="block h-full w-full object-cover"
+          style={{
+            opacity: imgLoaded ? 1 : 0,
+            transform: hovered ? "scale(1.05)" : "scale(1)",
+            transition: "transform .7s cubic-bezier(.25,1,.5,1), opacity .3s ease",
+          }}
+          onLoad={() => setImgLoaded(true)}
+          onError={e => {
+            e.target.src = "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80";
+            setImgLoaded(true);
+          }}
+          loading="lazy"
+        />
+
+        {/* Dark gradient overlay */}
+        <div
+          className="absolute inset-0 transition-opacity duration-300"
+          style={{
+            background: "linear-gradient(to top, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.12) 45%, transparent 100%)",
+            opacity: hovered ? 1 : 0.45,
+          }}
+        />
+
+        {/* ── TOP-LEFT: index + category ── */}
+        <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 z-10 flex items-center gap-1.5">
+          <span
+            className="text-[9px] sm:text-[10px] font-bold text-white/50"
+            style={{ fontFamily: "'DM Mono', monospace" }}
+          >
+            {idx}
+          </span>
+          <span
+            className="rounded-full border border-white/20 bg-black/35 px-2 py-[2px] text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.12em] text-white/80"
+            style={{
+              backdropFilter: "blur(8px)",
+              WebkitBackdropFilter: "blur(8px)",
+              fontFamily: "'DM Mono', monospace",
+            }}
+          >
+            {project.category}
+          </span>
+        </div>
+
+        {/* ── TOP-RIGHT: action buttons (always visible) ── */}
+        <div className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 z-10 flex items-center gap-1.5 sm:gap-2">
+
+          {/* Live Demo */}
+          <a
+            href={project.demoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={e => e.stopPropagation()}
+            title="Live Demo"
+            className="group/demo flex items-center justify-center rounded-full transition-all duration-200 hover:scale-110 active:scale-95"
+            style={{
+              width: "clamp(28px, 3.5vw, 34px)",
+              height: "clamp(28px, 3.5vw, 34px)",
+              background: "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(252,246,232,0.92))",
+              border: "1px solid rgba(200,169,110,0.65)",
+              boxShadow: "0 3px 14px rgba(200,169,110,0.35), inset 0 1px 0 rgba(255,255,255,0.95)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+            }}
+          >
+            <ArrowUpRight
+              size={13}
+              strokeWidth={2.5}
+              style={{ color: "#8a6220" }}
+              className="transition-transform duration-200 group-hover/demo:translate-x-px group-hover/demo:-translate-y-px"
+            />
+          </a>
+
+          {/* GitHub */}
+          <a
+            href={project.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={e => e.stopPropagation()}
+            title="GitHub"
+            className="group/gh flex items-center justify-center rounded-full transition-all duration-200 hover:scale-110 active:scale-95"
+            style={{
+              width: "clamp(28px, 3.5vw, 34px)",
+              height: "clamp(28px, 3.5vw, 34px)",
+              background: "linear-gradient(135deg, rgba(20,20,20,0.92), rgba(8,8,8,0.90))",
+              border: "1px solid rgba(255,255,255,0.15)",
+              boxShadow: "0 3px 14px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+            }}
+          >
+            <Github
+              size={13}
+              strokeWidth={2}
+              style={{ color: "#ffffff" }}
+              className="transition-transform duration-200 group-hover/gh:rotate-12"
+            />
+          </a>
+        </div>
+      </div>
+
+      {/* ── CONTENT ── */}
+      <div
+        className="relative z-10 flex flex-1 flex-col p-3.5 sm:p-4 lg:p-5"
+        style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
+      >
+        {/* Title */}
+        <h3
+          className="mb-1.5 text-sm sm:text-[14px] lg:text-[15px] font-bold text-[#0f0f0f] leading-snug"
+          style={{ letterSpacing: "-0.02em" }}
         >
-          <span className="relative z-10 whitespace-nowrap">{category}</span>
-        </button>
-      ))}
-    </nav>
-  );
-});
+          {project.title}
+        </h3>
 
-FilterButtons.displayName = 'FilterButtons';
+        {/* Description */}
+        <p className="mb-3 sm:mb-4 flex-1 text-[11px] sm:text-[12px] lg:text-[13px] leading-relaxed text-[#6b6b6b] line-clamp-2">
+          {project.description}
+        </p>
 
-// ProjectCard component
-const ProjectCard = React.memo(({ project, index, language }) => {
-  const [imageLoaded, setImageLoaded] = useState(false);
+        {/* Divider */}
+        <div className="mb-2.5 sm:mb-3 h-px bg-[#ede8e0]" />
 
-  const handleImageError = (e) => {
-    e.target.src = 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=800&q=80';
-  };
-
-  const handleImageLoad = () => {
-    setImageLoaded(true);
-  };
-
-  return (
-    <article
-      className="group relative h-full flex flex-col"
-      style={{ animation: `fadeIn 0.4s ease-out ${index * 0.05}s both` }}
-    >
-      <div className="relative h-full flex flex-col rounded-2xl sm:rounded-3xl overflow-hidden transition-all duration-300 hover:-translate-y-1">
-        
-        {/* Card Content */}
-        <div className="relative bg-slate-900 rounded-2xl sm:rounded-3xl overflow-hidden h-full flex flex-col border border-slate-800 hover:border-cyan-500/50 transition-colors duration-300">
-          
-          {/* Image Container */}
-          <div className="relative h-48 sm:h-52 md:h-56 overflow-hidden flex-shrink-0 bg-slate-800">
-            {!imageLoaded && (
-              <div className="absolute inset-0 bg-slate-800 animate-pulse" />
-            )}
-            
-            <img
-              src={project.image}
-              alt={project.title}
-              className={`w-full h-full object-cover transition-all duration-500 ${
-                imageLoaded ? 'opacity-100 group-hover:scale-105' : 'opacity-0'
-              }`}
-              onError={handleImageError}
-              onLoad={handleImageLoad}
-              loading="lazy"
-            />
-            
-            {/* Gradient overlay */}
-            <div 
-              className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"
-              aria-hidden="true"
-            />
-            
-            {/* Action buttons */}
-            <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 right-3 sm:right-4 flex items-center gap-2">
-              <ActionButton
-                href={project.demoUrl}
-                icon={<ExternalLink className="w-4 h-4 sm:w-5 sm:h-5" />}
-                label="Demo"
-                variant="primary"
-              />
-              
-              <ActionButton
-                href={project.githubUrl}
-                icon={<Github className="w-4 h-4 sm:w-5 sm:h-5" />}
-                label="Code"
-                variant="secondary"
-              />
-            </div>
-          </div>
-
-          {/* Content Section */}
-          <div className="p-4 sm:p-5 md:p-6 flex flex-col flex-grow">
-            {/* Category badge */}
-            <div className="mb-3">
-              <span className="inline-flex items-center px-3 sm:px-4 py-1.5 bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 text-white text-xs sm:text-sm font-bold rounded-full uppercase tracking-wide">
-                {project.category}
-              </span>
-            </div>
-
-            {/* Title */}
-            <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-white mb-2 sm:mb-3 tracking-tight leading-tight group-hover:text-cyan-400 transition-colors duration-300 line-clamp-2">
-              {project.title}
-            </h3>
-
-            {/* Description */}
-            <p className="text-xs sm:text-sm md:text-base text-slate-400 mb-4 leading-relaxed line-clamp-2 sm:line-clamp-3 flex-grow">
-              {project.description}
-            </p>
-
-            {/* Technologies */}
-            <div className="flex flex-wrap gap-1.5 sm:gap-2 mt-auto">
-              {project.technologies.slice(0, 4).map((tech, techIndex) => (
-                <TechBadge key={techIndex} tech={tech} />
-              ))}
-              {project.technologies.length > 4 && (
-                <span className="px-2 sm:px-2.5 py-1 bg-slate-800 text-slate-400 rounded-lg text-xs font-medium">
-                  +{project.technologies.length - 4}
-                </span>
-              )}
-            </div>
-          </div>
+        {/* Tech tags */}
+        <div className="flex flex-wrap gap-1 sm:gap-1.5">
+          {project.technologies.map((tech, i) => (
+            <span
+              key={i}
+              className="rounded-md sm:rounded-lg border border-[#e0dbd0] bg-[#f6f2ec] px-1.5 sm:px-2 py-[2px] sm:py-[3px] text-[8px] sm:text-[9px] lg:text-[10px] font-medium text-[#5a5a5a] transition-all duration-200 hover:border-[rgba(200,169,110,0.5)] hover:text-[#0f0f0f] cursor-default select-none"
+              style={{ fontFamily: "'DM Mono', monospace" }}
+            >
+              {tech}
+            </span>
+          ))}
         </div>
       </div>
-    </article>
-  );
-});
-
-ProjectCard.displayName = 'ProjectCard';
-
-// Action Button Component
-const ActionButton = ({ href, icon, label, variant }) => {
-  const baseClasses = "flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-full font-medium text-xs sm:text-sm transition-all duration-300";
-  
-  const variantClasses = variant === 'primary'
-    ? "bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:shadow-lg hover:shadow-cyan-500/50"
-    : "bg-slate-800 text-white border border-slate-700 hover:border-cyan-500/50 hover:bg-slate-700";
-
-  return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      onClick={(e) => e.stopPropagation()}
-      className={`${baseClasses} ${variantClasses}`}
-      aria-label={`${label} - ${variant === 'primary' ? 'Live demo' : 'Source code'}`}
-    >
-      {icon}
-      <span className="hidden sm:inline">{label}</span>
-    </a>
-  );
-};
-
-// Tech Badge Component
-const TechBadge = React.memo(({ tech }) => (
-  <span className="px-2 sm:px-2.5 md:px-3 py-1 bg-slate-800 text-slate-300 rounded-lg text-xs font-medium hover:bg-slate-700 hover:text-cyan-400 transition-all duration-300 cursor-default border border-slate-700/50">
-    {tech}
-  </span>
-));
-
-TechBadge.displayName = 'TechBadge';
-
-// Pagination Component
-const Pagination = React.memo(({ 
-  currentPage, 
-  totalPages, 
-  onPageChange, 
-  onPrevPage, 
-  onNextPage,
-  indexOfFirstProject,
-  indexOfLastProject,
-  totalProjects,
-  language
-}) => {
-  const getPageNumbers = () => {
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 640;
-    const maxVisible = isMobile ? 3 : 5;
-    const pages = [];
-    
-    if (totalPages <= maxVisible + 2) {
-      return Array.from({ length: totalPages }, (_, i) => i + 1);
-    }
-    
-    pages.push(1);
-    
-    let start = Math.max(2, currentPage - Math.floor(maxVisible / 2));
-    let end = Math.min(totalPages - 1, start + maxVisible - 1);
-    
-    if (end - start < maxVisible - 1) {
-      start = Math.max(2, end - maxVisible + 1);
-    }
-    
-    if (start > 2) pages.push('...');
-    
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-    
-    if (end < totalPages - 1) pages.push('...');
-    pages.push(totalPages);
-    
-    return pages;
-  };
-
-  return (
-    <nav aria-label="Loyiha sahifalari" className="px-4">
-      <div className="flex flex-col items-center gap-6">
-        {/* Page Info */}
-        <div className="text-center text-slate-400 text-xs sm:text-sm order-1 sm:order-2" role="status">
-          <span className="font-medium text-cyan-400">{indexOfFirstProject + 1}-{Math.min(indexOfLastProject, totalProjects)}</span>
-          <span className="mx-2">/</span>
-          <span className="font-medium text-slate-300">{totalProjects}</span>
-          <span className="ml-2">{language === 'uz' ? 'loyiha' : 'projects'}</span>
-        </div>
-
-        {/* Pagination Controls */}
-        <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 order-2 sm:order-1">
-          {/* Previous Button */}
-          <button
-            onClick={onPrevPage}
-            disabled={currentPage === 1}
-            aria-label={language === 'uz' ? 'Oldingi sahifa' : 'Previous page'}
-            className={`
-              flex items-center gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-full font-semibold text-xs sm:text-sm
-              transition-all duration-300
-              ${currentPage === 1
-                ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
-                : 'bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/50'
-              }
-            `}
-          >
-            <ChevronLeft className="w-4 h-4" aria-hidden="true" />
-            <span className="hidden sm:inline">{language === 'uz' ? 'Oldingi' : 'Previous'}</span>
-          </button>
-
-          {/* Page Numbers */}
-          <div className="flex items-center gap-1 sm:gap-2">
-            {getPageNumbers().map((pageNumber, index) => {
-              if (pageNumber === '...') {
-                return (
-                  <span 
-                    key={`ellipsis-${index}`}
-                    className="px-2 text-slate-500 text-sm"
-                    aria-hidden="true"
-                  >
-                    ...
-                  </span>
-                );
-              }
-              
-              return (
-                <button
-                  key={pageNumber}
-                  onClick={() => onPageChange(pageNumber)}
-                  aria-label={`${language === 'uz' ? 'Sahifa' : 'Page'} ${pageNumber}`}
-                  aria-current={currentPage === pageNumber ? 'page' : undefined}
-                  className={`
-                    w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-full font-bold text-xs sm:text-sm md:text-base
-                    transition-all duration-300
-                    ${currentPage === pageNumber
-                      ? 'bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 text-white shadow-lg shadow-cyan-500/50'
-                      : 'bg-slate-800 text-slate-300 hover:bg-slate-700 hover:text-cyan-400'
-                    }
-                  `}
-                >
-                  {pageNumber}
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Next Button */}
-          <button
-            onClick={onNextPage}
-            disabled={currentPage === totalPages}
-            aria-label={language === 'uz' ? 'Keyingi sahifa' : 'Next page'}
-            className={`
-              flex items-center gap-2 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-full font-semibold text-xs sm:text-sm
-              transition-all duration-300
-              ${currentPage === totalPages
-                ? 'bg-slate-800 text-slate-600 cursor-not-allowed'
-                : 'bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 text-white hover:shadow-lg hover:shadow-cyan-500/50'
-              }
-            `}
-          >
-            <span className="hidden sm:inline">{language === 'uz' ? 'Keyingi' : 'Next'}</span>
-            <ChevronRight className="w-4 h-4" aria-hidden="true" />
-          </button>
-        </div>
-      </div>
-    </nav>
-  );
-});
-
-Pagination.displayName = 'Pagination';
-
-// Empty State Component
-const EmptyState = ({ language, allCategory }) => (
-  <div className="text-center py-20 sm:py-24 md:py-32 px-4" role="status">
-    <div className="text-6xl sm:text-7xl md:text-8xl mb-6" aria-hidden="true">
-      🔍
     </div>
-    
-    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-3 sm:mb-4">
-      {language === 'uz' ? 'Hech qanday loyiha topilmadi' : 'No projects found'}
-    </h3>
-    
-    <p className="text-sm sm:text-base md:text-lg text-slate-400 max-w-md mx-auto">
-      {language === 'uz' 
-        ? `Boshqa kategoriyani tanlang yoki barcha loyihalarni ko'rish uchun "${allCategory}" tugmasini bosing`
-        : `Select another category or click "${allCategory}" to view all projects`}
-    </p>
-  </div>
-);
-
-export default Projects;
+  );
+});
+ProjectCard.displayName = "ProjectCard";

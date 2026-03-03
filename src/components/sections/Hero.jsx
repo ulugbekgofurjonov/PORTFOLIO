@@ -1,418 +1,381 @@
-import { useState, useEffect } from "react";
-import { ChevronDown, Star, Sparkles, Code2, Rocket, Zap, ArrowRight } from "lucide-react";
+import { useState, useEffect, useRef, memo } from "react";
+import {
+  ArrowRight, Download, MousePointer2,
+  ChevronDown, Sparkles,
+} from "lucide-react";
 import { PERSONAL_INFO, STATS } from "../../utils/constants";
 import { scrollToSection } from "../../hooks/useScrollSpy";
-import FadeIn from "../animations/FadeIn";
-import RadialGradientBackground from "../backgrounds/RadialGradientBackground";
 import { useLanguage } from "../../contexts/LanguageContext";
 
-const Hero = () => {
+export default function Hero() {
   const { language } = useLanguage();
   const personalInfo = PERSONAL_INFO[language];
-  const stats = STATS[language];
-  
-  const [displayedText, setDisplayedText] = useState("");
-  const [isTypingComplete, setIsTypingComplete] = useState(false);
-  const [cursorVisible, setCursorVisible] = useState(true);
+  const stats        = STATS[language];
 
-  const fullText = personalInfo.name;
+  const [typed,    setTyped]    = useState("");
+  const [done,     setDone]     = useState(false);
+  const [blink,    setBlink]    = useState(true);
+  const [visible,  setVisible]  = useState(false);
 
-  // Typing animation with cursor blink
+  const fullText = personalInfo.name ?? "Ulugbek Gofurjonov";
+
   useEffect(() => {
-    let currentIndex = 0;
-    const typingInterval = setInterval(() => {
-      if (currentIndex <= fullText.length) {
-        setDisplayedText(fullText.slice(0, currentIndex));
-        currentIndex++;
-      } else {
-        setIsTypingComplete(true);
-        clearInterval(typingInterval);
-      }
-    }, 100);
+    const t = setTimeout(() => setVisible(true), 80);
+    return () => clearTimeout(t);
+  }, []);
 
-    return () => clearInterval(typingInterval);
+  useEffect(() => {
+    setTyped(""); setDone(false);
+    let i = 0;
+    const id = setInterval(() => {
+      if (i <= fullText.length) { setTyped(fullText.slice(0, i)); i++; }
+      else { setDone(true); clearInterval(id); }
+    }, 90);
+    return () => clearInterval(id);
   }, [fullText]);
 
-  // Cursor blink effect
   useEffect(() => {
-    if (isTypingComplete) {
-      const cursorInterval = setInterval(() => {
-        setCursorVisible((prev) => !prev);
-      }, 530);
-      return () => clearInterval(cursorInterval);
-    }
-  }, [isTypingComplete]);
+    const id = setInterval(() => setBlink((v) => !v), 520);
+    return () => clearInterval(id);
+  }, []);
+
+  const ctaLabel  = language === "uz" ? "Bog'lanish"      : "Contact Me";
+  const cvLabel   = language === "uz" ? "CV Yuklab olish" : "Download CV";
+  const scrollLbl = language === "uz" ? "Ko'proq ko'rish" : "Explore more";
 
   return (
     <section
-      className="relative min-h-screen flex items-center justify-center overflow-hidden py-16 sm:py-20"
       id="hero"
+      className="relative min-h-screen w-full overflow-hidden"
+      // ← background yo'q: Background component (#faf9f6, grid, glow) dan keladi
     >
-      <RadialGradientBackground />
+      {/* ── Floating decorative blobs (hero ga xos dekor) ── */}
+      <Blob
+        className="absolute -right-32 top-20 h-[500px] w-[500px] opacity-[0.07]"
+        color="#c8a96e"
+        blur={80}
+      />
+      <Blob
+        className="absolute -left-48 bottom-10 h-[400px] w-[400px] opacity-[0.05]"
+        color="#0f0f0f"
+        blur={100}
+      />
 
-      {/* Content container */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full text-center">
-        {/* Premium Badge with glassmorphism */}
-        <FadeIn delay={0}>
-          <div className="inline-flex items-center gap-2 sm:gap-3 px-4 sm:px-6 lg:px-7 py-2 sm:py-2.5 lg:py-3 mb-4 sm:mb-6 lg:mb-8 backdrop-blur-2xl bg-white/5 border border-white/10 rounded-full shadow-2xl hover:bg-blue-500/10 hover:border-blue-400/30 transition-all duration-500 group hover:scale-105 relative overflow-hidden">
-            {/* Shimmer effect */}
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-            
-            <div className="relative">
-              <Star className="w-4 sm:w-5 h-4 sm:h-5 text-blue-400 fill-blue-400 group-hover:rotate-180 transition-transform duration-500" />
-              <Sparkles className="w-2.5 sm:w-3 h-2.5 sm:h-3 text-blue-300 absolute -top-1 -right-1 animate-pulse" />
-            </div>
-            
-            <span
-              className="text-xs sm:text-sm lg:text-base text-white tracking-widest font-semibold uppercase bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text group-hover:text-transparent transition-all duration-500 relative"
-              style={{ fontFamily: "var(--font-display), sans-serif" }}
-            >
-              {personalInfo.title}
-            </span>
-            
-            <Code2 className="w-3.5 sm:w-4 lg:w-4.5 h-3.5 sm:h-4 lg:h-4.5 text-blue-400/70 group-hover:rotate-12 group-hover:scale-110 transition-transform duration-500" />
-            
-            {/* Glow effect */}
-            <div className="absolute inset-0 bg-blue-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full" />
-          </div>
-        </FadeIn>
-
-        {/* Main Heading with typing effect and cursor */}
-        <FadeIn delay={100}>
-          <div className="relative mb-3 sm:mb-4 lg:mb-5 px-2">
-            <h1
-              className="text-white leading-tight relative z-10"
-              style={{
-                fontSize: "clamp(2.25rem, 10vw, 5rem)",
-                lineHeight: "1.15",
-                fontWeight: "800",
-                letterSpacing: "-0.02em",
-                fontFamily: "var(--font-display), sans-serif",
-                wordBreak: "break-word",
-              }}
-            >
-              <span className="relative inline-block">
-                <span className="bg-gradient-to-r from-blue-300 via-blue-400 to-blue-500 bg-clip-text text-transparent">
-                  {displayedText}
-                  {!isTypingComplete && (
-                    <span
-                      className={`inline-block w-0.5 sm:w-[3px] h-[1em] bg-blue-400 ml-1 sm:ml-2 align-middle ${
-                        cursorVisible ? "opacity-100" : "opacity-0"
-                      }`}
-                      style={{ 
-                        transition: "opacity 0.1s",
-                        boxShadow: "0 0 20px rgba(59, 130, 246, 0.8)"
-                      }}
-                    />
-                  )}
-                </span>
-                
-                {/* Text glow effect */}
-                <span
-                  className="absolute inset-0 bg-gradient-to-r from-blue-300 via-blue-400 to-blue-500 bg-clip-text text-transparent blur-2xl opacity-50"
-                  aria-hidden="true"
-                >
-                  {displayedText}
-                </span>
-              </span>
-            </h1>
-            
-            {/* Animated underline */}
-            <div className="relative mt-2 sm:mt-3 flex justify-center">
-              <div
-                className="w-16 sm:w-24 lg:w-28 h-0.5 sm:h-1 rounded-full relative overflow-hidden"
-                style={{
-                  background: "linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.6), transparent)",
-                }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/60 to-transparent animate-shimmer-slow" />
-              </div>
-            </div>
-          </div>
-        </FadeIn>
-
-        {/* Subtitle with gradient */}
-        <FadeIn delay={150}>
-          <div className="relative mb-4 sm:mb-6 lg:mb-7 px-2">
-            <p
-              className={`font-bold mb-2 sm:mb-3 bg-gradient-to-r from-blue-100 via-white to-blue-100 bg-clip-text text-transparent transition-all duration-1000 ${
-                isTypingComplete ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
-              style={{
-                fontFamily: "var(--font-display), sans-serif",
-                fontSize: "clamp(0.75rem, 2vw, 1.25rem)",
-                letterSpacing: "0.1em",
-              }}
-            >
-              FRONTEND DEVELOPER PORTFOLIO
-            </p>
-            
-            <div className="flex items-center justify-center gap-2">
-              <div
-                className="w-6 sm:w-10 lg:w-12 h-[2px] rounded-full"
-                style={{
-                  background: "linear-gradient(90deg, transparent, rgba(147, 197, 253, 0.8))",
-                }}
-              />
-              <div className="relative">
-                <Rocket className="w-3.5 sm:w-4 lg:w-5 h-3.5 sm:h-4 lg:h-5 text-blue-200 animate-bounce-slow" />
-                <div className="absolute inset-0 bg-blue-400/50 blur-lg rounded-full animate-pulse" />
-              </div>
-              <div
-                className="w-6 sm:w-10 lg:w-12 h-[2px] rounded-full"
-                style={{
-                  background: "linear-gradient(90deg, rgba(147, 197, 253, 0.8), transparent)",
-                }}
-              />
-            </div>
-          </div>
-        </FadeIn>
-
-        {/* Description with enhanced glassmorphism */}
-        <FadeIn delay={200}>
-          <div className="max-w-3xl mx-auto mb-6 sm:mb-8 lg:mb-10 px-2">
-            <div
-              className="backdrop-blur-2xl bg-gradient-to-br from-white/5 via-white/8 to-white/5 border border-white/15 rounded-xl sm:rounded-2xl lg:rounded-2xl p-4 sm:p-5 lg:p-6 shadow-2xl hover:bg-white/10 hover:border-blue-200/30 transition-all duration-500 group hover:scale-[1.02] relative overflow-hidden"
-              style={{
-                boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
-              }}
-            >
-              {/* Animated background gradient */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-cyan-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              
-              {/* Shimmer effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1500" />
-              
-              <p
-                className="text-sm sm:text-base lg:text-base text-white/90 leading-relaxed group-hover:text-white transition-colors duration-300 relative z-10"
-                style={{ fontFamily: "var(--font-body), sans-serif" }}
-              >
-                {personalInfo.tagline}
-              </p>
-              
-              {/* Corner glow accents */}
-              <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="absolute bottom-0 left-0 w-20 h-20 bg-cyan-500/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700" />
-            </div>
-          </div>
-        </FadeIn>
-
-        {/* Premium CTA Button */}
-        <FadeIn delay={300}>
-          <button
-            onClick={() => scrollToSection("contact")}
-            className="group mb-8 sm:mb-10 lg:mb-12 inline-block relative"
+      {/* ════════════════════════════════════════
+          MAIN CONTENT
+          ════════════════════════════════════════ */}
+      <div
+        className={`relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col px-5 pt-24 pb-16 transition-all duration-700 sm:px-8 lg:px-10 lg:pt-28 ${
+          visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
+        }`}
+      >
+        {/* ── Status badge ── */}
+        <div
+          className="mb-10 self-start"
+          style={{ animation: "fadeSlideUp 0.6s ease both" }}
+        >
+          <span
+            className="inline-flex items-center gap-2 rounded-full border border-[#e0dbd0] bg-white/80 px-4 py-1.5 shadow-sm"
+            style={{ backdropFilter: "blur(8px)" }}
           >
-            {/* Outer glow effect */}
-            <div
-              className="absolute -inset-2 sm:-inset-3 rounded-[20px] blur-xl opacity-50 group-hover:opacity-100 transition-all duration-500"
-              style={{
-                background: "linear-gradient(90deg, rgba(147, 197, 253, 0.6), rgba(59, 130, 246, 0.8), rgba(147, 197, 253, 0.6))",
-                animation: "pulse-glow 3s ease-in-out infinite",
-              }}
-            />
-
-            {/* Button content */}
-            <div
-              className="relative z-10 bg-gradient-to-r from-blue-50 via-sky-50 to-blue-100 text-gray-900 rounded-xl sm:rounded-2xl px-6 sm:px-10 lg:px-12 py-2.5 sm:py-3 lg:py-3.5 text-sm sm:text-base lg:text-lg font-bold border-2 border-white/90 hover:scale-105 active:scale-95 transition-all duration-300 shadow-2xl flex items-center gap-2 sm:gap-2.5 lg:gap-3 overflow-hidden"
-              style={{
-                fontFamily: "var(--font-body), sans-serif",
-                boxShadow: "0 10px 40px rgba(59, 130, 246, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.8)",
-              }}
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            </span>
+            <span
+              className="text-[11px] font-medium tracking-widest text-[#6b6b6b] uppercase"
+              style={{ fontFamily: "'DM Mono', monospace" }}
             >
-              {/* Shimmer effect */}
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
-              
-              <Zap className="w-4 sm:w-4.5 lg:w-5 h-4 sm:h-4.5 lg:h-5 text-blue-600 group-hover:scale-110 transition-transform duration-300 relative z-10" />
-              
-              <span className="bg-gradient-to-r from-blue-700 via-blue-600 to-sky-600 bg-clip-text text-transparent group-hover:from-blue-800 group-hover:to-sky-700 transition-all duration-300 relative z-10 font-black">
-                {language === 'uz' ? "Bog'lanish" : "Contact Me"}
+              {language === "uz" ? "Ishga tayyor" : "Available for work"}
+            </span>
+          </span>
+        </div>
+
+        {/* ── SPLIT LAYOUT ── */}
+        <div className="flex flex-1 flex-col gap-12 lg:flex-row lg:items-center lg:gap-16 xl:gap-24">
+
+          {/* ════ LEFT COLUMN ════ */}
+          <div className="flex-1">
+
+            <div
+              className="mb-5 flex items-center gap-3"
+              style={{ animation: "fadeSlideUp 0.6s ease 0.08s both" }}
+            >
+              <div className="h-px w-8 bg-[#c8a96e]" />
+              <span
+                className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#c8a96e]"
+                style={{ fontFamily: "'DM Mono', monospace" }}
+              >
+                Frontend Developer
               </span>
-              
-              <ArrowRight className="w-4 sm:w-4.5 lg:w-5 h-4 sm:h-4.5 lg:h-5 text-blue-600 group-hover:translate-x-1 transition-transform duration-300 relative z-10" />
             </div>
 
-            {/* Animated ring */}
-            <div className="absolute inset-0 rounded-xl sm:rounded-2xl ring-2 ring-blue-400/0 group-hover:ring-blue-400/50 transition-all duration-500" />
-            
-            {/* Inner glow on hover */}
-            <div
-              className="absolute inset-0 blur-2xl rounded-xl opacity-0 group-hover:opacity-60 transition-opacity duration-500"
+            <h1
+              className="relative mb-6 text-left"
               style={{
-                background: "radial-gradient(circle at center, rgba(59, 130, 246, 0.6), transparent 70%)",
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+                fontSize: "clamp(3rem, 8vw, 6rem)",
+                fontWeight: 800,
+                letterSpacing: "-0.035em",
+                lineHeight: 1.05,
+                color: "#0f0f0f",
+                animation: "fadeSlideUp 0.65s ease 0.12s both",
               }}
-            />
-          </button>
-        </FadeIn>
-
-        {/* Premium Stats with cards */}
-        <FadeIn delay={400}>
-          <div className="grid grid-cols-3 gap-2 sm:gap-3 lg:gap-4 xl:gap-5 max-w-4xl mx-auto px-2">
-            {stats.map((stat, index) => (
-              <div
-                key={index}
-                className="group relative backdrop-blur-2xl bg-gradient-to-br from-white/5 via-white/8 to-white/5 border border-white/15 rounded-lg sm:rounded-xl lg:rounded-2xl p-3 sm:p-4 lg:p-5 xl:p-6 hover:bg-white/12 hover:border-blue-200/40 transition-all duration-500 hover:scale-105 hover:-translate-y-1 overflow-hidden"
+            >
+              {typed}
+              <span
                 style={{
-                  boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1)",
-                  animationDelay: `${index * 100}ms`,
+                  display: "inline-block",
+                  width: "3px",
+                  height: "0.82em",
+                  background: done ? "transparent" : "#c8a96e",
+                  borderRadius: "2px",
+                  marginLeft: "6px",
+                  verticalAlign: "middle",
+                  opacity: blink ? 1 : 0,
+                  transition: "opacity 0.1s, background 0.3s",
+                  boxShadow: done ? "none" : "0 0 12px rgba(200,169,110,0.7)",
                 }}
-              >
-                {/* Animated background gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-cyan-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                
-                {/* Card glow on hover */}
-                <div
-                  className="absolute -inset-[1px] rounded-lg sm:rounded-xl lg:rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-md"
-                  style={{
-                    background: "linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(147, 197, 253, 0.4))",
-                  }}
-                />
+              />
+              <span
+                className="absolute bottom-[-6px] left-0 h-[3px] rounded-full"
+                style={{
+                  width: done ? "min(200px, 40%)" : "0px",
+                  background: "linear-gradient(90deg, #c8a96e, #a8824a, transparent)",
+                  transition: "width 0.9s cubic-bezier(0.34,1.56,0.64,1)",
+                }}
+              />
+            </h1>
 
-                {/* Shimmer effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1500 rounded-lg sm:rounded-xl lg:rounded-2xl" />
+            <p
+              className="mb-8 max-w-lg text-base leading-relaxed text-[#6b6b6b] sm:text-lg"
+              style={{
+                fontFamily: "'DM Sans', system-ui, sans-serif",
+                animation: "fadeSlideUp 0.65s ease 0.18s both",
+              }}
+            >
+              {personalInfo.tagline ?? "Crafting fast, beautiful & accessible digital experiences with modern web technologies."}
+            </p>
 
-                <div className="text-center relative z-10">
-                  <div
-                    className="font-black mb-1 sm:mb-1.5 lg:mb-2 relative inline-block"
-                    style={{
-                      fontSize: "clamp(1.5rem, 4vw, 2.25rem)",
-                      fontFamily: "var(--font-display), sans-serif",
-                    }}
-                  >
-                    <span
-                      className="bg-gradient-to-br from-white via-blue-100 to-blue-200 bg-clip-text text-transparent"
-                      style={{
-                        textShadow: "0 0 40px rgba(147, 197, 253, 0.5)",
-                      }}
-                    >
-                      {stat.value}
-                    </span>
-                    
-                    {/* Number glow */}
-                    <span
-                      className="absolute inset-0 bg-gradient-to-br from-white via-blue-100 to-blue-200 bg-clip-text text-transparent blur-xl opacity-50"
-                      aria-hidden="true"
-                    >
-                      {stat.value}
-                    </span>
-                  </div>
-                  
+            <div
+              className="flex flex-wrap gap-3"
+              style={{ animation: "fadeSlideUp 0.65s ease 0.24s both" }}
+            >
+              <PrimaryBtn onClick={() => scrollToSection("contact")}>
+                <MousePointer2 size={15} strokeWidth={2} />
+                {ctaLabel}
+                <ArrowRight size={14} strokeWidth={2.5} className="opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-200" />
+              </PrimaryBtn>
+
+              <SecondaryBtn onClick={() => {
+                const a = Object.assign(document.createElement("a"), {
+                  href: "/resume.pdf",
+                  download: "Ulugbek_Gofurjonov_Resume.pdf",
+                });
+                document.body.appendChild(a); a.click(); document.body.removeChild(a);
+              }}>
+                <Download size={14} strokeWidth={2} style={{ color: "#c8a96e" }} className="group-hover:-translate-y-0.5 transition-transform duration-200" />
+                {cvLabel}
+              </SecondaryBtn>
+            </div>
+          </div>
+
+          {/* ════ RIGHT COLUMN ════ */}
+          <div
+            className="flex w-full flex-col gap-4 lg:w-[340px] xl:w-[380px]"
+            style={{ animation: "fadeSlideUp 0.7s ease 0.28s both" }}
+          >
+            {/* Profile glass card */}
+            <div className="glass-card group relative overflow-hidden rounded-2xl p-6">
+              <div
+                className="absolute inset-x-0 top-0 h-[2px] rounded-t-2xl"
+                style={{ background: "linear-gradient(90deg, #c8a96e, #a8824a, transparent)" }}
+              />
+              <div className="mb-4 flex items-start justify-between">
+                <div>
                   <p
-                    className="text-white/80 font-semibold tracking-wider uppercase group-hover:text-blue-100 transition-colors duration-300"
-                    style={{
-                      fontSize: "clamp(8px, 1.8vw, 12px)",
-                      fontFamily: "var(--font-body), sans-serif",
-                      letterSpacing: "0.08em",
-                    }}
+                    className="mb-1 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#c8a96e]"
+                    style={{ fontFamily: "'DM Mono', monospace" }}
                   >
-                    {stat.label}
+                    {language === "uz" ? "Profil" : "Profile"}
+                  </p>
+                  <p
+                    className="text-lg font-bold text-[#0f0f0f]"
+                    style={{ fontFamily: "'DM Sans', system-ui, sans-serif", letterSpacing: "-0.02em" }}
+                  >
+                    {personalInfo.name ?? "Ulugbek"}
                   </p>
                 </div>
-
-                {/* Corner accents with animation */}
-                <div className="absolute top-1.5 sm:top-2 right-1.5 sm:right-2 w-1 sm:w-1.5 lg:w-2 h-1 sm:h-1.5 lg:h-2 bg-blue-400 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-500 group-hover:scale-150" />
-                <div className="absolute bottom-1.5 sm:bottom-2 left-1.5 sm:left-2 w-1 sm:w-1.5 lg:w-2 h-1 sm:h-1.5 lg:h-2 bg-cyan-400 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-700 delay-100 group-hover:scale-150" />
-                
-                {/* Orbiting particle */}
-                <div className="absolute top-1/2 left-1/2 w-1 h-1 bg-blue-300 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-orbit-stat transition-opacity duration-500" />
+                <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#0f0f0f]">
+                  <Sparkles size={16} strokeWidth={1.8} className="text-white" />
+                </span>
               </div>
-            ))}
-          </div>
-        </FadeIn>
 
-        {/* Scroll indicator */}
-        <FadeIn delay={500}>
-          <div className="mt-8 sm:mt-10 lg:mt-12 flex flex-col items-center gap-2 sm:gap-3 opacity-70 hover:opacity-100 transition-opacity duration-300 cursor-pointer group" onClick={() => scrollToSection("about")}>
-            <p className="text-xs sm:text-sm text-white/60 uppercase tracking-widest font-semibold group-hover:text-white/80 transition-colors duration-300">
-              {language === 'uz' ? 'Pastga suring' : 'Scroll down'}
-            </p>
-            <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-blue-300 animate-bounce-slow group-hover:text-blue-200 transition-colors duration-300" />
+              {[
+                { key: language === "uz" ? "Mutaxassislik" : "Specialty", val: "Frontend Development" },
+                { key: language === "uz" ? "Joylashuv"    : "Location",  val: personalInfo.location ?? "Uzbekistan" },
+                { key: language === "uz" ? "Holat"        : "Status",    val: language === "uz" ? "Ochiq" : "Open to work", gold: true },
+              ].map(({ key, val, gold }) => (
+                <div key={key} className="flex items-center justify-between border-t border-[#ede8e0] py-2.5">
+                  <span className="text-xs text-[#9a9a9a]" style={{ fontFamily: "'DM Mono', monospace" }}>
+                    {key}
+                  </span>
+                  <span
+                    className="text-right text-sm font-medium"
+                    style={{ fontFamily: "'DM Sans', system-ui, sans-serif", color: gold ? "#c8a96e" : "#3a3a3a" }}
+                  >
+                    {val}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-3 gap-3">
+              {stats.map((s, i) => <StatChip key={i} stat={s} delay={i * 60} />)}
+            </div>
+
+            {/* Tech stack */}
+            <div className="glass-card rounded-2xl p-4">
+              <p
+                className="mb-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#9a9a9a]"
+                style={{ fontFamily: "'DM Mono', monospace" }}
+              >
+                {language === "uz" ? "Texnologiyalar" : "Tech Stack"}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {["React", "Next.js", "TypeScript", "Tailwind", "Figma", "Git"].map((t) => (
+                  <span
+                    key={t}
+                    className="rounded-lg border border-[#e0dbd0] bg-white/70 px-2.5 py-1 text-[11px] font-medium text-[#5a5a5a] transition-all duration-200 hover:border-[#c8a96e]/40 hover:text-[#0f0f0f]"
+                    style={{ fontFamily: "'DM Mono', monospace" }}
+                  >
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
-        </FadeIn>
+        </div>
+
+        {/* ── Scroll indicator ── */}
+        <div
+          className="mt-12 self-center"
+          style={{ animation: "fadeSlideUp 0.65s ease 0.5s both" }}
+        >
+          <button
+            onClick={() => scrollToSection("about")}
+            className="cursor-pointer group flex flex-col items-center gap-2 opacity-40 transition-opacity duration-300 hover:opacity-80 focus:outline-none"
+          >
+            <span
+              className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#9a9a9a]"
+              style={{ fontFamily: "'DM Mono', monospace" }}
+            >
+              {scrollLbl}
+            </span>
+            <div className="relative h-8 w-5 overflow-hidden rounded-full border border-[#ddd8cf]">
+              <div
+                className="absolute left-1/2 -translate-x-1/2 top-1.5 h-1.5 w-1.5 rounded-full bg-[#c8a96e]"
+                style={{ animation: "scrollPill 2s ease-in-out infinite" }}
+              />
+            </div>
+          </button>
+        </div>
       </div>
 
-      {/* Enhanced CSS Animations */}
-      <style jsx>{`
-        @keyframes shimmer-slow {
-          0% {
-            transform: translateX(-100%);
-          }
-          100% {
-            transform: translateX(100%);
-          }
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=DM+Mono:wght@400;500&display=swap');
+
+        .glass-card {
+          background: rgba(255,255,255,0.65);
+          border: 1px solid rgba(224,219,208,0.9);
+          box-shadow: 0 2px 16px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.9);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          transition: border-color .3s, box-shadow .3s, transform .3s;
+        }
+        .glass-card:hover {
+          border-color: rgba(200,169,110,0.3);
+          box-shadow: 0 8px 32px rgba(200,169,110,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
+          transform: translateY(-2px);
         }
 
-        @keyframes bounce-slow {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(-8px);
-          }
+        @keyframes fadeSlideUp {
+          from { opacity: 0; transform: translateY(18px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
 
-        @keyframes pulse-glow {
-          0%, 100% {
-            opacity: 0.5;
-            transform: scale(1);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.05);
-          }
+        @keyframes scrollPill {
+          0%   { top: 6px;  opacity: 1; }
+          80%  { top: 20px; opacity: 0; }
+          81%  { top: 6px;  opacity: 0; }
+          100% { top: 6px;  opacity: 1; }
         }
 
-        @keyframes orbit-stat {
-          0% {
-            transform: translate(-50%, -50%) rotate(0deg) translateX(30px) rotate(0deg);
-          }
-          100% {
-            transform: translate(-50%, -50%) rotate(360deg) translateX(30px) rotate(-360deg);
-          }
-        }
-
-        .animate-shimmer-slow {
-          animation: shimmer-slow 3s linear infinite;
-        }
-
-        .animate-bounce-slow {
-          animation: bounce-slow 2s ease-in-out infinite;
-        }
-
-        .animate-orbit-stat {
-          animation: orbit-stat 4s linear infinite;
+        @keyframes chipIn {
+          from { opacity: 0; transform: scale(0.88); }
+          to   { opacity: 1; transform: scale(1); }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          *,
-          *::before,
-          *::after {
-            animation-duration: 0.01ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.01ms !important;
+          *, *::before, *::after {
+            animation-duration: .01ms !important;
+            transition-duration: .01ms !important;
           }
-        }
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-          width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-          background: rgba(0, 0, 0, 0.2);
-        }
-
-        ::-webkit-scrollbar-thumb {
-          background: rgba(59, 130, 246, 0.5);
-          border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-          background: rgba(59, 130, 246, 0.7);
         }
       `}</style>
     </section>
   );
-};
+}
 
-export default Hero;
+/* ── Sub-components ── */
+
+const Blob = memo(({ className, color, blur }) => (
+  <div
+    aria-hidden
+    className={`pointer-events-none rounded-full ${className}`}
+    style={{ background: color, filter: `blur(${blur}px)` }}
+  />
+));
+
+const PrimaryBtn = memo(({ children, onClick }) => (
+  <button
+    onClick={onClick}
+    className="cursor-pointer group relative flex items-center gap-2 overflow-hidden rounded-xl bg-[#0f0f0f] px-6 py-3 text-sm font-semibold text-white shadow-[0_4px_18px_rgba(0,0,0,0.2)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#1a1a1a] hover:shadow-[0_10px_32px_rgba(0,0,0,0.25)] active:translate-y-0 sm:px-7 sm:py-3.5"
+    style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
+  >
+    <span className="absolute inset-0 -translate-x-full skew-x-[-12deg] bg-gradient-to-r from-transparent via-white/12 to-transparent transition-transform duration-500 group-hover:translate-x-full" />
+    {children}
+  </button>
+));
+
+const SecondaryBtn = memo(({ children, onClick }) => (
+  <button
+    onClick={onClick}
+    className="cursor-pointer group relative flex items-center gap-2 overflow-hidden rounded-xl border border-[#e0dbd0] bg-white/70 px-6 py-3 text-sm font-semibold text-[#0f0f0f] shadow-[0_2px_10px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.9)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#c8a96e]/40 hover:shadow-[0_6px_24px_rgba(200,169,110,0.14)] active:translate-y-0 sm:px-7 sm:py-3.5"
+    style={{ fontFamily: "'DM Sans', system-ui, sans-serif", backdropFilter: "blur(10px)" }}
+  >
+    <span className="absolute inset-0 -translate-x-full skew-x-[-12deg] bg-gradient-to-r from-transparent via-[#c8a96e]/8 to-transparent transition-transform duration-500 group-hover:translate-x-full" />
+    {children}
+  </button>
+));
+
+const StatChip = memo(({ stat, delay }) => (
+  <div
+    className="glass-card flex flex-col items-center justify-center rounded-xl p-3 text-center"
+    style={{ animation: `chipIn 0.5s cubic-bezier(0.34,1.56,0.64,1) ${delay + 320}ms both` }}
+  >
+    <span
+      className="block font-black leading-tight text-[#0f0f0f]"
+      style={{ fontFamily: "'DM Sans', system-ui, sans-serif", fontSize: "clamp(1.2rem, 3.5vw, 1.6rem)", letterSpacing: "-0.03em" }}
+    >
+      {stat.value}
+    </span>
+    <span
+      className="mt-0.5 block text-center text-[#9a9a9a]"
+      style={{ fontFamily: "'DM Mono', monospace", fontSize: "clamp(7px, 1.4vw, 9.5px)", fontWeight: 500, textTransform: "uppercase", letterSpacing: "0.1em" }}
+    >
+      {stat.label}
+    </span>
+  </div>
+));

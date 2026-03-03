@@ -1,486 +1,390 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect, memo } from "react";
 import {
-  User,
-  MapPin,
-  Mail,
-  Briefcase,
-  GraduationCap,
-  Code,
-  Lightbulb,
-  Target,
-  Award,
-  Phone,
-  Copy,
-  Check,
+  Mail, MapPin, Phone, Copy, Check,
+  Briefcase, GraduationCap, Code2,
+  Lightbulb, Target, Award,
 } from "lucide-react";
 import { PERSONAL_INFO } from "../../utils/constants";
 import { useLanguage } from "../../contexts/LanguageContext";
-import FadeIn from "../animations/FadeIn";
-import RadialGradientBackground from "../backgrounds/RadialGradientBackground";
 
-const About = () => {
-  const { language } = useLanguage();
-  const personalInfo = PERSONAL_INFO[language];
-  
-  const [copiedPhone, setCopiedPhone] = useState(false);
+/* ─── Intersection reveal hook ─── */
+const useReveal = () => {
+  const ref = useRef(null);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setOn(true); io.disconnect(); } },
+      { threshold: 0.01 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return [ref, on];
+};
 
-  // Professional journey
-  const journey = language === 'uz' ? [
+const Reveal = memo(({ children, delay = 0, style = {}, className = "" }) => {
+  const [ref, on] = useReveal();
+  return (
+    <div
+      ref={ref}
+      className={className}
+      style={{
+        opacity:   1,
+        transform: on ? "translateY(0)" : "translateY(24px)",
+        transition: `transform .6s cubic-bezier(.16,1,.3,1) ${delay}ms`,
+        ...style,
+      }}
+    >
+      {children}
+    </div>
+  );
+});
+
+export default function About() {
+  const { language }        = useLanguage();
+  const personalInfo        = PERSONAL_INFO[language];
+  const [copied, setCopied] = useState(false);
+  const uz = language === "uz";
+  const t  = (u, e) => (uz ? u : e);
+
+  const journey = [
     {
-      year: "2025",
-      title: "Frontend Development ni Boshlash",
-      description:
+      year:  "2025",
+      title: t("Frontend Development ni Boshlash", "Starting Frontend Development"),
+      desc:  t(
         "Web development dunyosiga qiziqish paydo bo'ldi va HTML, CSS, JavaScript o'rganishni boshladim",
+        "Got interested in web development and started learning HTML, CSS and JavaScript"
+      ),
     },
     {
-      year: "2026",
-      title: "React.js ga O'tish",
-      description:
-        "React.js frameworkini o'rganib, zamonaviy SPA (Single Page Application) yaratishni boshladim",
+      year:  "2026",
+      title: t("React.js ga O'tish", "Transition to React.js"),
+      desc:  t(
+        "React.js frameworkini o'rganib, zamonaviy SPA ilovalar yaratishni boshladim",
+        "Learned React.js and started creating modern Single Page Applications"
+      ),
     },
     {
-      year: "2026",
-      title: "Next.js va Professional Rivojlanish",
-      description:
+      year:  "2026",
+      title: t("Next.js va Professional Rivojlanish", "Next.js & Professional Growth"),
+      desc:  t(
         "Next.js orqali SSR va SEO-friendly ilovalar yaratishni o'rgandim. Hozir 10+ loyihaga ega",
-    },
-  ] : [
-    {
-      year: "2025",
-      title: "Starting Frontend Development",
-      description:
-        "Got interested in web development and started learning HTML, CSS, JavaScript",
-    },
-    {
-      year: "2026",
-      title: "Transition to React.js",
-      description:
-        "Learned React.js framework and started creating modern SPAs (Single Page Applications)",
-    },
-    {
-      year: "2026",
-      title: "Next.js and Professional Growth",
-      description:
-        "Learned to create SSR and SEO-friendly applications with Next.js. Currently have 10+ projects",
+        "Learned SSR and SEO-friendly apps with Next.js. Currently have 10+ projects"
+      ),
     },
   ];
 
-  // Core values
-  const values = language === 'uz' ? [
-    {
-      icon: Code,
-      title: "Clean Code",
-      description:
-        "Har doim o'qilishi oson, tushunarli va maintainable kod yozishga harakat qilaman",
-      color: "from-blue-500 to-cyan-500",
-    },
-    {
-      icon: Lightbulb,
-      title: "Doimiy O'rganish",
-      description:
-        "Texnologiyalar tez rivojlanadi, shuning uchun har kuni yangi narsalarni o'rganishga intilaman",
-      color: "from-cyan-500 to-sky-500",
-    },
-    {
-      icon: Target,
-      title: "User Experience",
-      description:
-        "Foydalanuvchi tajribasi birinchi o'rinda. Har bir loyihada UX/UI ga katta e'tibor beraman",
-      color: "from-sky-500 to-blue-500",
-    },
-    {
-      icon: Award,
-      title: "Sifat va Standartlar",
-      description:
-        "Best practices, responsive design va web standartlariga doim rioya qilaman",
-      color: "from-purple-500 to-blue-500",
-    },
-  ] : [
-    {
-      icon: Code,
-      title: "Clean Code",
-      description:
-        "I always strive to write readable, understandable and maintainable code",
-      color: "from-blue-500 to-cyan-500",
-    },
-    {
-      icon: Lightbulb,
-      title: "Continuous Learning",
-      description:
-        "Technologies evolve rapidly, so I strive to learn new things every day",
-      color: "from-cyan-500 to-sky-500",
-    },
-    {
-      icon: Target,
-      title: "User Experience",
-      description:
-        "User experience comes first. I pay great attention to UX/UI in every project",
-      color: "from-sky-500 to-blue-500",
-    },
-    {
-      icon: Award,
-      title: "Quality and Standards",
-      description:
-        "I always adhere to best practices, responsive design and web standards",
-      color: "from-purple-500 to-blue-500",
-    },
+  const values = [
+    { Icon: Code2,     title: "Clean Code",                       desc: t("O'qilishi oson, tushunarli va maintainable kod yozaman", "I write readable, understandable and maintainable code") },
+    { Icon: Lightbulb, title: t("Doimiy O'rganish", "Continuous Learning"), desc: t("Har kuni yangi narsalarni o'rganishga intilaman", "I strive to learn new things every single day") },
+    { Icon: Target,    title: "User Experience",                  desc: t("Foydalanuvchi tajribasi har doim birinchi o'rinda", "User experience always comes first in my work") },
+    { Icon: Award,     title: t("Sifat va Standartlar", "Quality & Standards"), desc: t("Best practices va responsive design standartlariga amal qilaman", "I follow best practices and responsive design standards") },
   ];
 
-  // What I do
-  const expertise = language === 'uz' ? [
+  const expertise = [
     {
       title: "Frontend Development",
-      description:
-        "React.js va Next.js yordamida zamonaviy, tez va responsive veb-ilovalar yarataman",
-      skills: ["React.js", "Next.js", "JavaScript ES6+"],
+      desc:  t("React.js va Next.js yordamida tez va responsive ilovalar yarataman", "Building fast, responsive applications with React.js and Next.js"),
+      tags:  ["React.js", "Next.js", "JavaScript ES6+"],
     },
     {
       title: "UI/UX Implementation",
-      description:
-        "Dizayndan kodga - pixel-perfect interfeys va ajoyib foydalanuvchi tajribasi",
-      skills: ["Tailwind CSS", "Responsive Design", "Animations"],
+      desc:  t("Dizayndan kodga — pixel-perfect interfeys va ajoyib UX", "From design to code — pixel-perfect interface and excellent UX"),
+      tags:  ["Tailwind CSS", "Responsive Design", "Animations"],
     },
     {
-      title: "Performance Optimization",
-      description:
-        "Veb-saytlarni tezlashtirish, SEO optimizatsiya va eng yaxshi amaliyotlarni qo'llash",
-      skills: ["SEO", "Core Web Vitals", "Code Splitting"],
-    },
-  ] : [
-    {
-      title: "Frontend Development",
-      description:
-        "Creating modern, fast and responsive web applications using React.js and Next.js",
-      skills: ["React.js", "Next.js", "JavaScript ES6+"],
-    },
-    {
-      title: "UI/UX Implementation",
-      description:
-        "From design to code - pixel-perfect interface and excellent user experience",
-      skills: ["Tailwind CSS", "Responsive Design", "Animations"],
-    },
-    {
-      title: "Performance Optimization",
-      description:
-        "Speeding up websites, SEO optimization and applying best practices",
-      skills: ["SEO", "Core Web Vitals", "Code Splitting"],
+      title: t("Performance va SEO", "Performance & SEO"),
+      desc:  t("Sayt tezligi, SEO optimizatsiya va Core Web Vitals", "Site speed, SEO optimization and Core Web Vitals"),
+      tags:  ["SEO", "Core Web Vitals", "Code Splitting"],
     },
   ];
 
-  const handleCopyPhone = async () => {
+  const copy = async () => {
     try {
       await navigator.clipboard.writeText(personalInfo.phone);
-      setCopiedPhone(true);
-      setTimeout(() => setCopiedPhone(false), 2000);
-    } catch (error) {
-      console.error("Failed to copy:", error);
-    }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {}
   };
 
   return (
-    <section
-      id="about"
-      className="relative min-h-screen py-16 sm:py-20 lg:py-24 overflow-hidden"
-    >
-      <RadialGradientBackground />
-      
-      <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
-        {/* Header */}
-        <FadeIn delay={0}>
-          <div className="text-center mb-12 sm:mb-16 lg:mb-20">
-            <div className="inline-flex items-center gap-2 sm:gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 mb-5 sm:mb-6 backdrop-blur-2xl bg-white/5 border border-white/10 rounded-full shadow-xl hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500 group">
-              <User className="w-4 h-4 text-blue-400 group-hover:scale-110 transition-transform duration-300" />
-              <span className="text-xs sm:text-sm text-white/90 font-semibold tracking-wider uppercase">
-                {language === 'uz' ? 'Men Haqimda' : 'About Me'}
-              </span>
-            </div>
+    <section id="about" className="relative w-full overflow-hidden">
+      {/* background yo'q — App.jsx body dan keladi */}
 
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white mb-4 sm:mb-6 px-4">
-              {language === 'uz' ? 'Salom, Men' : 'Hello, I\'m'}{" "}
-              <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-sky-400 bg-clip-text text-transparent">
-                {personalInfo.name}
-              </span>
-            </h2>
+      <div className="relative mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28 lg:px-10 lg:py-32">
 
-            <p className="text-base sm:text-lg lg:text-xl xl:text-2xl text-gray-300 max-w-3xl mx-auto font-medium px-4">
-              {personalInfo.title}
-            </p>
+        {/* ══════════════ HEADER ══════════════ */}
+        <Reveal className="mb-16 sm:mb-20 lg:mb-24 text-center">
+          <div className="mb-5 flex items-center justify-center gap-3">
+            <div className="h-px w-8 bg-[#c8a96e]" />
+            <span className="ab-mono text-[11px] font-semibold uppercase tracking-[0.18em] text-[#c8a96e]">
+              {t("Men Haqimda", "About Me")}
+            </span>
+            <div className="h-px w-8 bg-[#c8a96e]" />
           </div>
-        </FadeIn>
 
-        {/* Main Content Grid */}
-        <div className="grid lg:grid-cols-2 gap-6 sm:gap-8 lg:gap-12 xl:gap-16 mb-12 sm:mb-16 lg:mb-20">
-          {/* Left Column - Bio & Contact */}
-          <div className="space-y-6 sm:space-y-8">
-            {/* Bio Card */}
-            <FadeIn delay={100}>
-              <div className="backdrop-blur-2xl bg-gradient-to-br from-white/5 via-white/8 to-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500 group relative overflow-hidden">
-                {/* Shimmer effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1500" />
-                
-                <div className="flex items-center gap-3 mb-5 sm:mb-6 relative z-10">
-                  <div className="p-2 sm:p-2.5 bg-blue-500/20 rounded-lg sm:rounded-xl group-hover:bg-blue-500/30 transition-colors duration-300">
-                    <Briefcase className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white">
-                    {language === 'uz' ? 'Mening Hikoyam' : 'My Story'}
-                  </h3>
-                </div>
+          <h2 className="ab-sans mb-4" style={{
+            fontSize: "clamp(2.2rem,5vw,4rem)",
+            fontWeight: 800, letterSpacing: "-0.035em", lineHeight: 1.08, color: "#0f0f0f",
+          }}>
+            {t("Salom, Men ", "Hello, I'm ")}
+            <span style={{
+              background: "linear-gradient(135deg,#c8a96e 0%,#a8824a 100%)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            }}>
+              {personalInfo.name}
+            </span>
+          </h2>
 
-                <div className="space-y-3 sm:space-y-4 text-gray-300 leading-relaxed relative z-10">
-                  {personalInfo.bio.map((paragraph, index) => (
-                    <p key={index} className="text-sm sm:text-base">
-                      {paragraph}
-                    </p>
-                  ))}
+          <p className="ab-sans mx-auto max-w-xl text-base leading-relaxed text-[#6b6b6b] sm:text-lg">
+            {personalInfo.title}
+          </p>
+        </Reveal>
+
+        {/* ══════════════ MAIN GRID ══════════════ */}
+        <div className="grid gap-6 lg:grid-cols-2 lg:gap-10 mb-16 sm:mb-20">
+
+          {/* LEFT: Bio + Contact */}
+          <div className="flex flex-col gap-5">
+
+            <Reveal delay={60}>
+              <div className="ab-card relative overflow-hidden rounded-2xl p-6 sm:p-8">
+                <div aria-hidden className="ab-shine" />
+                <GoldTopBar />
+                <CardHead icon={<Briefcase size={16} strokeWidth={1.8} className="text-white" />}>
+                  {t("Mening Hikoyam", "My Story")}
+                </CardHead>
+                <div className="space-y-3 text-sm leading-[1.8] text-[#5a5a5a] sm:text-[15px]"
+                  style={{ fontFamily:"'DM Sans',system-ui,sans-serif" }}>
+                  {personalInfo.bio.map((p, i) => <p key={i}>{p}</p>)}
                 </div>
-                
-                {/* Corner accent */}
-                <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
-            </FadeIn>
+            </Reveal>
 
-            {/* Contact Info Card */}
-            <FadeIn delay={150}>
-              <div className="backdrop-blur-2xl bg-gradient-to-br from-white/5 via-white/8 to-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500 group relative overflow-hidden">
-                {/* Shimmer effect */}
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1500" />
-                
-                <div className="flex items-center gap-3 mb-5 sm:mb-6 relative z-10">
-                  <div className="p-2 sm:p-2.5 bg-cyan-500/20 rounded-lg sm:rounded-xl group-hover:bg-cyan-500/30 transition-colors duration-300">
-                    <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-cyan-400" />
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white">
-                    {language === 'uz' ? "Bog'lanish" : 'Contact'}
-                  </h3>
-                </div>
-
-                <div className="space-y-4 sm:space-y-5 relative z-10">
-                  {/* Email */}
-                  <div className="flex items-start gap-3 sm:gap-4 group/item">
-                    <div className="p-2 bg-blue-500/10 rounded-lg mt-0.5 sm:mt-1 group-hover/item:bg-blue-500/20 transition-colors duration-300">
-                      <Mail className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs sm:text-sm text-gray-400 mb-1">Email</p>
-                      <a
-                        href={`mailto:${personalInfo.email}`}
-                        className="text-sm sm:text-base text-white hover:text-blue-400 transition-colors font-medium break-all"
-                      >
-                        {personalInfo.email}
+            <Reveal delay={130}>
+              <div className="ab-card relative overflow-hidden rounded-2xl p-6 sm:p-8">
+                <div aria-hidden className="ab-shine" />
+                <CardHead icon={<Mail size={16} strokeWidth={1.8} className="text-white" />}>
+                  {t("Bog'lanish", "Contact")}
+                </CardHead>
+                <div className="space-y-5">
+                  <ContactRow icon={<Mail size={14} strokeWidth={1.8} className="text-[#c8a96e]" />} label="Email">
+                    <a href={`mailto:${personalInfo.email}`}
+                      className="ab-sans break-all text-sm font-medium text-[#0f0f0f] transition-colors hover:text-[#c8a96e] sm:text-base">
+                      {personalInfo.email}
+                    </a>
+                  </ContactRow>
+                  <ContactRow icon={<Phone size={14} strokeWidth={1.8} className="text-[#c8a96e]" />} label={t("Telefon", "Phone")}>
+                    <div className="flex items-center gap-2.5">
+                      <a href={`tel:${personalInfo.phone}`}
+                        className="ab-sans text-sm font-medium text-[#0f0f0f] transition-colors hover:text-[#c8a96e] sm:text-base">
+                        {personalInfo.phone}
                       </a>
+                      <button onClick={copy} aria-label="Copy phone"
+                        className="cursor-pointer flex h-7 w-7 items-center justify-center rounded-lg border border-[#e0dbd0] bg-[#f6f2ec] transition-all duration-200 hover:border-[#c8a96e]/50 hover:bg-[#ede8e0]">
+                        {copied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} className="text-[#9a9a9a]" />}
+                      </button>
                     </div>
-                  </div>
-
-                  {/* Phone */}
-                  <div className="flex items-start gap-3 sm:gap-4 group/item">
-                    <div className="p-2 bg-blue-500/10 rounded-lg mt-0.5 sm:mt-1 group-hover/item:bg-blue-500/20 transition-colors duration-300">
-                      <Phone className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs sm:text-sm text-gray-400 mb-1">
-                        {language === 'uz' ? 'Telefon raqam' : 'Phone Number'}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <a
-                          href={`tel:${personalInfo.phone}`}
-                          className="text-sm sm:text-base text-white hover:text-blue-400 transition-colors font-medium"
-                        >
-                          {personalInfo.phone}
-                        </a>
-                        <button
-                          onClick={handleCopyPhone}
-                          className="p-1.5 hover:bg-blue-500/10 rounded-lg transition-all duration-300 group/copy relative"
-                          title={language === 'uz' ? 'Nusxalash' : 'Copy'}
-                          aria-label="Copy phone number"
-                        >
-                          {copiedPhone ? (
-                            <Check className="w-4 h-4 text-green-400" />
-                          ) : (
-                            <Copy className="w-4 h-4 text-gray-400 group-hover/copy:text-blue-400 transition-colors" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Location */}
-                  <div className="flex items-start gap-3 sm:gap-4 group/item">
-                    <div className="p-2 bg-cyan-500/10 rounded-lg mt-0.5 sm:mt-1 group-hover/item:bg-cyan-500/20 transition-colors duration-300">
-                      <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-cyan-400" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs sm:text-sm text-gray-400 mb-1">
-                        {language === 'uz' ? 'Joylashuv' : 'Location'}
-                      </p>
-                      <p className="text-sm sm:text-base text-white font-medium">
-                        {personalInfo.location}
-                      </p>
-                    </div>
-                  </div>
+                  </ContactRow>
+                  <ContactRow icon={<MapPin size={14} strokeWidth={1.8} className="text-[#c8a96e]" />} label={t("Joylashuv", "Location")}>
+                    <span className="ab-sans text-sm font-medium text-[#0f0f0f] sm:text-base">
+                      {personalInfo.location}
+                    </span>
+                  </ContactRow>
                 </div>
-                
-                {/* Corner accent */}
-                <div className="absolute bottom-0 left-0 w-24 h-24 bg-cyan-500/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               </div>
-            </FadeIn>
+            </Reveal>
           </div>
 
-          {/* Right Column - Journey */}
-          <div className="space-y-6 sm:space-y-8">
-            {/* Journey Timeline */}
-            <FadeIn delay={200}>
-              <div>
-                <div className="flex items-center gap-3 mb-5 sm:mb-6">
-                  <div className="p-2 sm:p-2.5 bg-purple-500/20 rounded-lg sm:rounded-xl">
-                    <GraduationCap className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-bold text-white">
-                    {language === 'uz' ? "Mening Yo'lim" : 'My Journey'}
-                  </h3>
-                </div>
-
-                <div className="space-y-4 sm:space-y-6">
-                  {journey.map((step, index) => (
-                    <div
-                      key={index}
-                      className="relative backdrop-blur-2xl bg-gradient-to-br from-white/5 via-white/8 to-white/5 border border-white/10 rounded-xl p-5 sm:p-6 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500 group overflow-hidden"
-                    >
-                      {/* Shimmer effect */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1500" />
-                      
-                      <div className="flex gap-3 sm:gap-4 relative z-10">
-                        <div className="flex-shrink-0">
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-sm sm:text-base shadow-lg group-hover:scale-110 transition-transform duration-300">
-                            {index + 1}
-                          </div>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
-                            <span className="text-sm sm:text-base text-blue-400 font-semibold">
-                              {step.year}
-                            </span>
-                          </div>
-                          <h4 className="text-base sm:text-lg font-bold text-white mb-1.5 sm:mb-2">
-                            {step.title}
-                          </h4>
-                          <p className="text-xs sm:text-sm text-gray-400 leading-relaxed">
-                            {step.description}
-                          </p>
+          {/* RIGHT: Journey */}
+          <Reveal delay={80}>
+            <div className="ab-card relative overflow-hidden rounded-2xl p-6 sm:p-8 h-full">
+              <div aria-hidden className="ab-shine" />
+              <CardHead icon={<GraduationCap size={16} strokeWidth={1.8} className="text-white" />}>
+                {t("Mening Yo'lim", "My Journey")}
+              </CardHead>
+              <div className="relative">
+                <div aria-hidden className="absolute left-[19px] top-5 bottom-2 w-px"
+                  style={{ background: "linear-gradient(to bottom,#c8a96e 0%,rgba(200,169,110,0.15) 100%)" }} />
+                <div className="space-y-0">
+                  {journey.map((step, i) => (
+                    <div key={i} className="journey-step relative flex gap-5 pb-8 last:pb-0">
+                      <div className="relative z-10 flex-shrink-0 mt-0.5">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#c8a96e]"
+                          style={{ background: "#faf9f6", boxShadow: "0 0 0 4px rgba(200,169,110,0.10)" }}>
+                          <span className="ab-mono text-[11px] font-bold text-[#c8a96e]">
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
                         </div>
                       </div>
-
-                      {/* Connection line */}
-                      {index < journey.length - 1 && (
-                        <div className="absolute left-[2.25rem] sm:left-[2.75rem] top-[4.5rem] sm:top-[5rem] w-[2px] h-4 sm:h-6 bg-gradient-to-b from-blue-400/50 to-transparent" />
-                      )}
-                      
-                      {/* Corner glow */}
-                      <div className="absolute top-0 right-0 w-20 h-20 bg-blue-500/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                      <div className="flex-1 pt-1.5">
+                        <span className="ab-mono mb-1 block text-[11px] font-semibold tracking-[0.12em] uppercase text-[#c8a96e]">
+                          {step.year}
+                        </span>
+                        <h4 className="ab-sans mb-1.5 text-[15px] font-bold text-[#0f0f0f] sm:text-base"
+                          style={{ letterSpacing: "-0.015em" }}>
+                          {step.title}
+                        </h4>
+                        <p className="ab-sans text-[13px] leading-relaxed text-[#6b6b6b] sm:text-sm">
+                          {step.desc}
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>
               </div>
-            </FadeIn>
-          </div>
+            </div>
+          </Reveal>
         </div>
 
-        {/* Values Section */}
-        <FadeIn delay={250}>
-          <div className="mb-12 sm:mb-16 lg:mb-20">
-            <div className="text-center mb-8 sm:mb-12">
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 px-4">
-                {language === 'uz' ? 'Qadriyatlarim' : 'My Values'}
-              </h3>
-              <p className="text-sm sm:text-base text-gray-400 max-w-2xl mx-auto px-4">
-                {language === 'uz' 
-                  ? 'Men ishlash jarayonimda quyidagi printsiplarga amal qilaman' 
-                  : 'The principles I follow in my work process'}
-              </p>
-            </div>
+        {/* ══════════════ VALUES ══════════════ */}
+        <Reveal>
+          <AbSectionLabel>{t("Qadriyatlarim", "My Values")}</AbSectionLabel>
+        </Reveal>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
-              {values.map((value, index) => {
-                const Icon = value.icon;
-                return (
-                  <div
-                    key={index}
-                    className="backdrop-blur-2xl bg-gradient-to-br from-white/5 via-white/8 to-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-5 sm:p-6 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500 hover:-translate-y-2 group relative overflow-hidden"
-                  >
-                    {/* Shimmer effect */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1500" />
-                    
-                    <div
-                      className={`w-11 h-11 sm:w-12 sm:h-12 rounded-lg sm:rounded-xl bg-gradient-to-br ${value.color} flex items-center justify-center mb-3 sm:mb-4 group-hover:scale-110 transition-transform duration-300 shadow-lg relative z-10`}
-                    >
-                      <Icon className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                    </div>
-                    <h4 className="text-base sm:text-lg font-bold text-white mb-2 relative z-10">
-                      {value.title}
-                    </h4>
-                    <p className="text-xs sm:text-sm text-gray-400 leading-relaxed relative z-10">
-                      {value.description}
-                    </p>
-                    
-                    {/* Glow effect */}
-                    <div className="absolute -inset-px rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm bg-gradient-to-br from-blue-500/20 to-cyan-500/20" />
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </FadeIn>
+        <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-16 sm:mb-20">
+          {values.map(({ Icon, title, desc }, i) => (
+            <Reveal key={i} delay={i * 70}>
+              <div className="ab-card value-card relative overflow-hidden rounded-2xl p-5 sm:p-6 h-full">
+                <div aria-hidden className="ab-shine" />
+                <div aria-hidden className="value-glow absolute -bottom-4 -right-4 h-20 w-20 rounded-full opacity-0"
+                  style={{ background: "rgba(200,169,110,0.18)", filter: "blur(24px)" }} />
+                <span className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-[#0f0f0f]">
+                  <Icon size={16} strokeWidth={1.8} className="text-white" />
+                </span>
+                <h4 className="ab-sans mb-2 text-sm font-bold text-[#0f0f0f] sm:text-[15px]"
+                  style={{ letterSpacing: "-0.015em" }}>{title}</h4>
+                <p className="ab-sans text-[12px] leading-relaxed text-[#6b6b6b] sm:text-[13px]">{desc}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
 
-        {/* What I Do Section */}
-        <FadeIn delay={300}>
-          <div>
-            <div className="text-center mb-8 sm:mb-12">
-              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-3 sm:mb-4 px-4">
-                {language === 'uz' ? 'Nima Qilaman' : 'What I Do'}
-              </h3>
-              <p className="text-sm sm:text-base text-gray-400 max-w-2xl mx-auto px-4">
-                {language === 'uz' 
-                  ? 'Mening asosiy yo\'nalishlarim va tajribalarim' 
-                  : 'My main directions and experiences'}
-              </p>
-            </div>
+        {/* ══════════════ EXPERTISE ══════════════ */}
+        <Reveal>
+          <AbSectionLabel>{t("Nima Qilaman", "What I Do")}</AbSectionLabel>
+        </Reveal>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6 lg:gap-8">
-              {expertise.map((item, index) => (
-                <div
-                  key={index}
-                  className="backdrop-blur-2xl bg-gradient-to-br from-white/5 via-white/8 to-white/5 border border-white/10 rounded-xl sm:rounded-2xl p-6 sm:p-8 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-500 hover:scale-105 group relative overflow-hidden"
-                >
-                  {/* Shimmer effect */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1500" />
-                  
-                  <h4 className="text-lg sm:text-xl font-bold text-white mb-2 sm:mb-3 group-hover:text-blue-400 transition-colors relative z-10">
-                    {item.title}
-                  </h4>
-                  <p className="text-sm sm:text-base text-gray-400 mb-5 sm:mb-6 leading-relaxed relative z-10">
-                    {item.description}
-                  </p>
-                  <div className="flex flex-wrap gap-2 relative z-10">
-                    {item.skills.map((skill, idx) => (
-                      <span
-                        key={idx}
-                        className="px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full hover:bg-blue-500/20 hover:border-blue-500/30 transition-all duration-300"
-                      >
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
-                  
-                  {/* Corner glow */}
-                  <div className="absolute bottom-0 right-0 w-24 h-24 bg-blue-500/10 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+          {expertise.map((item, i) => (
+            <Reveal key={i} delay={i * 80}>
+              <div className="ab-card expertise-card relative overflow-hidden rounded-2xl p-6 sm:p-8 h-full">
+                <div aria-hidden className="ab-shine" />
+                <div aria-hidden className="expertise-line absolute inset-x-0 top-0 h-[2px] rounded-t-2xl" />
+                <h4 className="ab-sans mb-3 text-base font-bold text-[#0f0f0f] sm:text-lg"
+                  style={{ letterSpacing: "-0.02em" }}>{item.title}</h4>
+                <p className="ab-sans mb-5 text-sm leading-relaxed text-[#6b6b6b]">{item.desc}</p>
+                <div className="flex flex-wrap gap-2">
+                  {item.tags.map(tag => (
+                    <span key={tag}
+                      className="ab-mono rounded-lg border border-[#e0dbd0] bg-white/60 px-2.5 py-1 text-[11px] font-medium text-[#5a5a5a] transition-all duration-200 hover:border-[#c8a96e]/40 hover:text-[#0f0f0f]">
+                      {tag}
+                    </span>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        </FadeIn>
+
+              </div>
+            </Reveal>
+          ))}
+        </div>
+
       </div>
+
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+
+        .ab-sans { font-family: 'DM Sans', system-ui, sans-serif; }
+        .ab-mono { font-family: 'DM Mono', monospace; }
+
+        /* ── Card: doim oq, to'liq tiniq ── */
+        .ab-card {
+          background: #ffffff;
+          border: 1px solid rgba(224,219,208,0.9);
+          box-shadow: 0 2px 16px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.95);
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+          transition: border-color .3s, box-shadow .35s, transform .35s cubic-bezier(.34,1.56,.64,1);
+        }
+        /* hover da faqat border va shadow o'zgaradi, opacity emas */
+        .ab-card:hover {
+          border-color: rgba(200,169,110,0.4);
+          box-shadow: 0 12px 40px rgba(200,169,110,0.12), inset 0 1px 0 rgba(255,255,255,0.95);
+          transform: translateY(-3px);
+        }
+
+        /* ── Shine sweep ── */
+        .ab-shine {
+          position: absolute; inset: 0; pointer-events: none; z-index: 0;
+          background: linear-gradient(105deg,transparent 35%,rgba(255,255,255,0.55) 50%,transparent 65%);
+          background-size: 250% 100%;
+          background-position: -100% 0;
+          transition: background-position .7s ease;
+        }
+        .ab-card:hover .ab-shine { background-position: 200% 0; }
+
+        /* ── Value card glow ── */
+        .value-card:hover .value-glow { opacity: 1 !important; }
+
+        /* ── Expertise top line ── */
+        .expertise-line {
+          background: linear-gradient(90deg,#c8a96e,#a8824a,transparent);
+          opacity: 0; transition: opacity .35s;
+        }
+        .expertise-card:hover .expertise-line { opacity: 1; }
+
+        /* ── Journey step hover ── */
+        .journey-step { transition: transform .28s cubic-bezier(.34,1.56,.64,1); }
+        .journey-step:hover { transform: translateX(5px); }
+
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
+        }
+      `}</style>
     </section>
   );
-};
+}
 
-export default About;
+/* ─── Helpers ─── */
+const GoldTopBar = () => (
+  <div aria-hidden className="absolute inset-x-0 top-0 h-[2px] rounded-t-2xl"
+    style={{ background: "linear-gradient(90deg,#c8a96e,#a8824a,transparent)" }} />
+);
+
+const CardHead = memo(({ icon, children }) => (
+  <div className="relative z-10 mb-5 flex items-center gap-3">
+    <span className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-[#0f0f0f]">
+      {icon}
+    </span>
+    <h3 className="ab-sans text-[17px] font-bold text-[#0f0f0f] sm:text-lg"
+      style={{ letterSpacing: "-0.02em" }}>
+      {children}
+    </h3>
+  </div>
+));
+
+const ContactRow = memo(({ icon, label, children }) => (
+  <div className="flex items-start gap-3">
+    <span className="mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-[#e0dbd0] bg-[#f6f2ec]">
+      {icon}
+    </span>
+    <div>
+      <p className="ab-mono mb-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#9a9a9a]">
+        {label}
+      </p>
+      {children}
+    </div>
+  </div>
+));
+
+const AbSectionLabel = memo(({ children }) => (
+  <div className="flex items-center gap-4">
+    <span className="ab-mono inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-[11px] font-semibold uppercase tracking-[0.15em] text-[#c8a96e]"
+      style={{ borderColor: "rgba(200,169,110,0.28)", background: "rgba(200,169,110,0.07)" }}>
+      {children}
+    </span>
+    <div className="h-px flex-1"
+      style={{ background: "linear-gradient(90deg,rgba(200,169,110,0.35),transparent)" }} />
+  </div>
+));
