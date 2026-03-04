@@ -1,56 +1,60 @@
-import React, { useState, useMemo, useRef, useEffect, memo } from "react";
+import { useState, useMemo, useEffect, memo } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, Github } from "lucide-react";
 import { projects, categories } from "../../data/projects";
 import { useLanguage } from "../../contexts/LanguageContext";
+import FadeIn, { EASE } from "../animations/FadeIn";
 
-/* ─────────────────────────────────────
-   Scroll Reveal hook
-───────────────────────────────────── */
-const useReveal = () => {
-  const ref = useRef(null);
-  const [on, setOn] = useState(false);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    const io = new IntersectionObserver(
-      ([e]) => { if (e.isIntersecting) { setOn(true); io.disconnect(); } },
-      { threshold: 0.01 }
-    );
-    io.observe(el);
-    return () => io.disconnect();
-  }, []);
-  return [ref, on];
+/*
+ ╔══════════════════════════════════════════════════════════╗
+ ║  PROJECTS  —  Framer Motion + FadeIn Premium Edition     ║
+ ║                                                          ║
+ ║  • Header     → framer whileInView stagger (qayta)       ║
+ ║  • Filter     → FadeIn once={false} + framer tab spring  ║
+ ║  • Cards      → AnimatePresence layout filter transition ║
+ ║                 + FadeIn once={false} qayta scroll        ║
+ ║  • Card hover → framer spring physics                    ║
+ ║  • Buttons    → whileHover + whileTap                    ║
+ ╚══════════════════════════════════════════════════════════╝
+*/
+
+/* ── Variants ── */
+const vStaggerWrap = {
+  hidden:  {},
+  visible: { transition: { staggerChildren: 0.09, delayChildren: 0.04 } },
+};
+const vStaggerChild = {
+  hidden:  { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
 };
 
-const Reveal = memo(({ children, delay = 0, className = "" }) => {
-  const [ref, on] = useReveal();
-  return (
-    <div
-      ref={ref}
-      className={className}
-      style={{
-        opacity: 1,
-        transform: on ? "translateY(0)" : "translateY(22px)",
-        transition: `transform .65s cubic-bezier(.16,1,.3,1) ${delay}ms`,
-      }}
-    >
-      {children}
-    </div>
-  );
-});
-Reveal.displayName = "Reveal";
+/* Card enter/exit for AnimatePresence */
+const vCard = {
+  hidden:  { opacity: 0, y: 24, scale: 0.96 },
+  visible: (i) => ({
+    opacity: 1, y: 0, scale: 1,
+    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: Math.min(i * 0.06, 0.3) },
+  }),
+  exit: {
+    opacity: 0, y: -12, scale: 0.97,
+    transition: { duration: 0.3, ease: [0.4, 0, 1, 1] },
+  },
+};
+
+const VP    = { once: false, amount: 0.2  };
+const VP_SM = { once: false, amount: 0.06 };
 
 /* ══════════════════════════════════════════════
    MAIN
 ══════════════════════════════════════════════ */
 export default function Projects() {
   const { language }        = useLanguage();
-  const projectsList        = useMemo(() => projects[language] || [], [language]);
+  const projectsList        = useMemo(() => projects[language]   || [], [language]);
   const categoriesList      = useMemo(() => categories[language] || [], [language]);
   const [active, setActive] = useState(categoriesList[0]);
   const t = (u, e) => language === "uz" ? u : e;
 
-  useEffect(() => { setActive(categoriesList[0]); }, [language]);
+  useEffect(() => { setActive(categoriesList[0]); }, [language, categoriesList]);
 
   const filtered = useMemo(() => {
     const all = categoriesList[0];
@@ -61,131 +65,167 @@ export default function Projects() {
 
   return (
     <section id="projects" className="relative w-full overflow-hidden bg-[#faf9f6]">
-      {/* ── Ambient glow ── */}
+
+      {/* Ambient glow */}
       <div
         className="pointer-events-none absolute -top-32 right-0 h-[500px] w-[500px] rounded-full opacity-30"
-        style={{ background: "radial-gradient(circle, rgba(200,169,110,0.14) 0%, transparent 70%)" }}
+        style={{ background: "radial-gradient(circle,rgba(200,169,110,0.14) 0%,transparent 70%)" }}
       />
 
       <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-24 lg:px-10 lg:py-32">
 
-        {/* ════ HEADER ════ */}
-        <Reveal className="mb-10 sm:mb-14 text-center">
-          {/* Label */}
-          <div className="mb-4 flex items-center justify-center gap-3">
-            <div className="h-px w-8 bg-gradient-to-r from-transparent to-[#c8a96e]" />
-            <span
-              className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.18em] text-[#c8a96e]"
-              style={{ fontFamily: "'DM Mono', monospace" }}
-            >
+        {/* ════ HEADER — framer stagger, qayta ishlaydi ════ */}
+        <motion.div
+          className="mb-10 sm:mb-14 text-center"
+          variants={vStaggerWrap}
+          initial="hidden"
+          whileInView="visible"
+          viewport={VP}
+        >
+          {/* Eyebrow */}
+          <motion.div variants={vStaggerChild} className="mb-4 flex items-center justify-center gap-3">
+            <motion.div
+              className="h-px bg-gradient-to-r from-transparent to-[#c8a96e]"
+              initial={{ width: 0 }}
+              whileInView={{ width: 32 }}
+              viewport={VP}
+              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+            />
+            <span className="pj-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.18em] text-[#c8a96e]">
               {t("Loyihalar", "Projects")}
             </span>
-            <div className="h-px w-8 bg-gradient-to-l from-transparent to-[#c8a96e]" />
-          </div>
+            <motion.div
+              className="h-px bg-gradient-to-l from-transparent to-[#c8a96e]"
+              initial={{ width: 0 }}
+              whileInView={{ width: 32 }}
+              viewport={VP}
+              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.07 }}
+            />
+          </motion.div>
 
           {/* Title */}
-          <h2
-            className="mb-3 sm:mb-4"
+          <motion.h2
+            variants={vStaggerChild}
+            className="pj-sans mb-3 sm:mb-4"
             style={{
-              fontFamily: "'DM Sans', system-ui, sans-serif",
-              fontSize: "clamp(1.9rem, 5.5vw, 4.5rem)",
-              fontWeight: 800,
-              letterSpacing: "-0.04em",
-              lineHeight: 1.05,
-              color: "#0f0f0f",
+              fontSize: "clamp(1.9rem,5.5vw,4.5rem)",
+              fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.05, color: "#0f0f0f",
             }}
           >
             {t("Mening ", "My ")}
-            <span
-              style={{
-                background: "linear-gradient(135deg,#c8a96e,#e8c880,#a8824a)",
-                WebkitBackgroundClip: "text",
-                WebkitTextFillColor: "transparent",
-              }}
-            >
+            <span style={{
+              background: "linear-gradient(135deg,#c8a96e,#e8c880,#a8824a)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            }}>
               {t("Loyihalarim", "Projects")}
             </span>
-          </h2>
+          </motion.h2>
 
           {/* Subtitle */}
-          <p
-            className="mx-auto max-w-xl text-sm sm:text-base leading-relaxed text-[#6b6b6b]"
-            style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
+          <motion.p
+            variants={vStaggerChild}
+            className="pj-sans mx-auto max-w-xl text-sm sm:text-base leading-relaxed text-[#6b6b6b]"
           >
             {t(
               "Zamonaviy texnologiyalar bilan yaratilgan professional loyihalar",
               "Professional projects built with modern technologies"
             )}
-          </p>
-        </Reveal>
+          </motion.p>
+        </motion.div>
 
-        {/* ════ FILTER TABS ════
-              - mobile: scroll horizontally, left-aligned
-              - sm+: centered, no scroll needed
-        */}
-        <Reveal delay={60} className="mb-10 sm:mb-12">
-          <div
-            className="flex items-end gap-0 border-b border-[#e0dbd0] overflow-x-auto"
-            style={{ scrollbarWidth: "none", msOverflowStyle: "none", justifyContent: "flex-start" }}
-          >
-            <style>{`.pj-tabs::-webkit-scrollbar { display:none; }`}</style>
-            <div className="pj-tabs flex w-full items-end justify-start sm:justify-center gap-0">
-              {categoriesList.map(cat => (
-                <button
-                  key={cat}
-                  onClick={() => setActive(cat)}
-                  className="relative flex-shrink-0 cursor-pointer pb-3 px-3 sm:px-5"
-                >
-                  <span
-                    className="whitespace-nowrap text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.15em] transition-colors duration-200"
-                    style={{
-                      fontFamily: "'DM Mono', monospace",
-                      color: active === cat ? "#0f0f0f" : "#9a9a9a",
-                    }}
+        {/* ════ FILTER TABS — FadeIn + framer tab indicator ════ */}
+        <FadeIn delay={60} duration={550} y={16} ease={EASE.smooth} once={false} threshold={0.1}>
+          <div className="mb-10 sm:mb-12">
+            <div
+              className="flex items-end gap-0 border-b border-[#e0dbd0] overflow-x-auto pj-tabs"
+              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+            >
+              <div className="flex w-full items-end justify-start sm:justify-center gap-0">
+                {categoriesList.map(cat => (
+                  <motion.button
+                    key={cat}
+                    onClick={() => setActive(cat)}
+                    className="relative flex-shrink-0 cursor-pointer pb-3 px-3 sm:px-5 focus:outline-none"
+                    whileHover={{ opacity: 1 }}
+                    whileTap={{ scale: 0.95 }}
                   >
-                    {cat}
-                  </span>
-                  {active === cat && (
                     <span
-                      className="absolute bottom-0 left-3 right-3 sm:left-5 sm:right-5 h-[2px] rounded-t-full"
-                      style={{ background: "linear-gradient(90deg,#c8a96e,#a8824a)" }}
-                    />
-                  )}
-                </button>
-              ))}
+                      className="pj-mono whitespace-nowrap text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.15em] transition-colors duration-200"
+                      style={{ color: active === cat ? "#0f0f0f" : "#9a9a9a" }}
+                    >
+                      {cat}
+                    </span>
+                    {/* Animated underline */}
+                    <AnimatePresence>
+                      {active === cat && (
+                        <motion.span
+                          layoutId="tabUnderline"
+                          className="absolute bottom-0 left-3 right-3 sm:left-5 sm:right-5 h-[2px] rounded-t-full"
+                          style={{ background: "linear-gradient(90deg,#c8a96e,#a8824a)" }}
+                          initial={{ opacity: 0, scaleX: 0 }}
+                          animate={{ opacity: 1, scaleX: 1 }}
+                          exit={{ opacity: 0, scaleX: 0 }}
+                          transition={{ duration: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
+                        />
+                      )}
+                    </AnimatePresence>
+                  </motion.button>
+                ))}
+              </div>
             </div>
           </div>
-        </Reveal>
+        </FadeIn>
 
-        {/* ════ GRID ════
-              mobile  : 1 col
-              sm      : 2 col
-              lg      : 3 col
-        */}
-        {filtered.length > 0 ? (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6">
-            {filtered.map((project, i) => (
-              <Reveal key={project.id} delay={Math.min(i * 55, 300)}>
-                <ProjectCard project={project} index={i} />
-              </Reveal>
-            ))}
-          </div>
-        ) : (
-          <Reveal>
-            <div className="py-20 text-center">
-              <p
-                className="text-base sm:text-lg text-[#9a9a9a]"
-                style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
-              >
+        {/* ════ GRID — AnimatePresence for filter switch ════ */}
+        <AnimatePresence mode="wait">
+          {filtered.length > 0 ? (
+            <motion.div
+              key={active}
+              className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6"
+              initial="hidden"
+              animate="visible"
+              exit={{ opacity: 0, transition: { duration: 0.2 } }}
+            >
+              {filtered.map((project, i) => (
+                <FadeIn
+                  key={project.id}
+                  delay={Math.min(i * 55, 280)}
+                  duration={580}
+                  y={26}
+                  scale={0.97}
+                  ease={EASE.smooth}
+                  once={false}
+                  threshold={0.04}
+                >
+                  <motion.div variants={vCard} custom={i}>
+                    <ProjectCard project={project} index={i} />
+                  </motion.div>
+                </FadeIn>
+              ))}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="empty"
+              className="py-20 text-center"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <p className="pj-sans text-base sm:text-lg text-[#9a9a9a]">
                 {t("Loyihalar topilmadi", "No projects found")}
               </p>
-            </div>
-          </Reveal>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
       </div>
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
+        .pj-sans { font-family: 'DM Sans', system-ui, sans-serif; }
+        .pj-mono { font-family: 'DM Mono', monospace; }
+        .pj-tabs::-webkit-scrollbar { display: none; }
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
         }
@@ -199,35 +239,33 @@ export default function Projects() {
 ══════════════════════════════════════════════ */
 const ProjectCard = memo(({ project, index }) => {
   const [imgLoaded, setImgLoaded] = useState(false);
-  const [hovered, setHovered]     = useState(false);
   const idx = String(index + 1).padStart(2, "0");
 
   return (
-    <div
+    <motion.div
       className="group relative flex flex-col h-full overflow-hidden rounded-2xl bg-white"
       style={{
-        border: `1px solid ${hovered ? "rgba(200,169,110,0.5)" : "rgba(220,214,203,0.85)"}`,
-        boxShadow: hovered
-          ? "0 20px 60px rgba(200,169,110,0.15), 0 6px 20px rgba(0,0,0,0.07)"
-          : "0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,1)",
-        transform: hovered ? "translateY(-5px)" : "translateY(0)",
-        transition: "box-shadow .4s ease, transform .4s cubic-bezier(.34,1.56,.64,1), border-color .3s ease",
+        border: "1px solid rgba(220,214,203,0.85)",
+        boxShadow: "0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,1)",
       }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      whileHover={{
+        y: -6,
+        boxShadow: "0 22px 64px rgba(200,169,110,0.16), 0 6px 20px rgba(0,0,0,0.07)",
+        borderColor: "rgba(200,169,110,0.5)",
+        transition: { duration: 0.35, ease: [0.34, 1.56, 0.64, 1] },
+      }}
+      whileTap={{ scale: 0.99 }}
     >
-      {/* Gold top bar */}
-      <div
-        className="absolute top-0 left-0 right-0 z-10 h-[2px] transition-opacity duration-300"
-        style={{
-          background: "linear-gradient(90deg,#c8a96e,#a8824a,transparent)",
-          opacity: hovered ? 1 : 0,
-        }}
+      {/* Gold top bar — reveals on hover */}
+      <motion.div
+        className="absolute top-0 left-0 right-0 z-10 h-[2px]"
+        style={{ background: "linear-gradient(90deg,#c8a96e,#a8824a,transparent)" }}
+        initial={{ opacity: 0, scaleX: 0.6, originX: 0 }}
+        whileHover={{ opacity: 1, scaleX: 1 }}
+        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
       />
 
-      {/* ── IMAGE ──
-            height: 160px mobile / 176px sm / 200px lg
-      */}
+      {/* ── IMAGE ── */}
       <div className="relative h-40 sm:h-44 lg:h-48 flex-shrink-0 overflow-hidden">
 
         {/* Skeleton */}
@@ -235,16 +273,13 @@ const ProjectCard = memo(({ project, index }) => {
           <div className="absolute inset-0 animate-pulse bg-[#ede8e0]" />
         )}
 
-        {/* Photo */}
-        <img
+        {/* Photo — zoom on card hover */}
+        <motion.img
           src={project.image}
           alt={project.title}
           className="block h-full w-full object-cover"
-          style={{
-            opacity: imgLoaded ? 1 : 0,
-            transform: hovered ? "scale(1.05)" : "scale(1)",
-            transition: "transform .7s cubic-bezier(.25,1,.5,1), opacity .3s ease",
-          }}
+          style={{ opacity: imgLoaded ? 1 : 0, transition: "opacity .3s ease" }}
+          whileHover={{ scale: 1.06, transition: { duration: 0.7, ease: [0.25, 1, 0.5, 1] } }}
           onLoad={() => setImgLoaded(true)}
           onError={e => {
             e.target.src = "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80";
@@ -253,104 +288,85 @@ const ProjectCard = memo(({ project, index }) => {
           loading="lazy"
         />
 
-        {/* Dark gradient overlay */}
-        <div
-          className="absolute inset-0 transition-opacity duration-300"
-          style={{
-            background: "linear-gradient(to top, rgba(0,0,0,0.58) 0%, rgba(0,0,0,0.12) 45%, transparent 100%)",
-            opacity: hovered ? 1 : 0.45,
-          }}
+        {/* Gradient overlay */}
+        <motion.div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(to top,rgba(0,0,0,0.58) 0%,rgba(0,0,0,0.12) 45%,transparent 100%)" }}
+          initial={{ opacity: 0.45 }}
+          whileHover={{ opacity: 1, transition: { duration: 0.3 } }}
         />
 
-        {/* ── TOP-LEFT: index + category ── */}
+        {/* TOP-LEFT: index + category */}
         <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 z-10 flex items-center gap-1.5">
+          <span className="pj-mono text-[9px] sm:text-[10px] font-bold text-white/50">{idx}</span>
           <span
-            className="text-[9px] sm:text-[10px] font-bold text-white/50"
-            style={{ fontFamily: "'DM Mono', monospace" }}
-          >
-            {idx}
-          </span>
-          <span
-            className="rounded-full border border-white/20 bg-black/35 px-2 py-[2px] text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.12em] text-white/80"
-            style={{
-              backdropFilter: "blur(8px)",
-              WebkitBackdropFilter: "blur(8px)",
-              fontFamily: "'DM Mono', monospace",
-            }}
+            className="pj-mono rounded-full border border-white/20 bg-black/35 px-2 py-[2px] text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.12em] text-white/80"
+            style={{ backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
           >
             {project.category}
           </span>
         </div>
 
-        {/* ── TOP-RIGHT: action buttons (always visible) ── */}
+        {/* TOP-RIGHT: action buttons */}
         <div className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 z-10 flex items-center gap-1.5 sm:gap-2">
 
           {/* Live Demo */}
-          <a
+          <motion.a
             href={project.demoUrl}
             target="_blank"
             rel="noopener noreferrer"
             onClick={e => e.stopPropagation()}
             title="Live Demo"
-            className="group/demo flex items-center justify-center rounded-full transition-all duration-200 hover:scale-110 active:scale-95"
+            className="flex items-center justify-center rounded-full"
             style={{
-              width: "clamp(28px, 3.5vw, 34px)",
-              height: "clamp(28px, 3.5vw, 34px)",
-              background: "linear-gradient(135deg, rgba(255,255,255,0.95), rgba(252,246,232,0.92))",
+              width: "clamp(28px,3.5vw,34px)",
+              height: "clamp(28px,3.5vw,34px)",
+              background: "linear-gradient(135deg,rgba(255,255,255,0.95),rgba(252,246,232,0.92))",
               border: "1px solid rgba(200,169,110,0.65)",
-              boxShadow: "0 3px 14px rgba(200,169,110,0.35), inset 0 1px 0 rgba(255,255,255,0.95)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
+              boxShadow: "0 3px 14px rgba(200,169,110,0.35),inset 0 1px 0 rgba(255,255,255,0.95)",
+              backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
             }}
+            whileHover={{ scale: 1.15, boxShadow: "0 6px 20px rgba(200,169,110,0.5)", transition: { duration: 0.25, ease: [0.34, 1.56, 0.64, 1] } }}
+            whileTap={{ scale: 0.9 }}
           >
-            <ArrowUpRight
-              size={13}
-              strokeWidth={2.5}
-              style={{ color: "#8a6220" }}
-              className="transition-transform duration-200 group-hover/demo:translate-x-px group-hover/demo:-translate-y-px"
-            />
-          </a>
+            <ArrowUpRight size={13} strokeWidth={2.5} style={{ color: "#8a6220" }} />
+          </motion.a>
 
           {/* GitHub */}
-          <a
+          <motion.a
             href={project.githubUrl}
             target="_blank"
             rel="noopener noreferrer"
             onClick={e => e.stopPropagation()}
             title="GitHub"
-            className="group/gh flex items-center justify-center rounded-full transition-all duration-200 hover:scale-110 active:scale-95"
+            className="flex items-center justify-center rounded-full"
             style={{
-              width: "clamp(28px, 3.5vw, 34px)",
-              height: "clamp(28px, 3.5vw, 34px)",
-              background: "linear-gradient(135deg, rgba(20,20,20,0.92), rgba(8,8,8,0.90))",
+              width: "clamp(28px,3.5vw,34px)",
+              height: "clamp(28px,3.5vw,34px)",
+              background: "linear-gradient(135deg,rgba(20,20,20,0.92),rgba(8,8,8,0.90))",
               border: "1px solid rgba(255,255,255,0.15)",
-              boxShadow: "0 3px 14px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
+              boxShadow: "0 3px 14px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08)",
+              backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
             }}
+            whileHover={{ scale: 1.15, rotate: 12, boxShadow: "0 6px 20px rgba(0,0,0,0.6)", transition: { duration: 0.25, ease: [0.34, 1.56, 0.64, 1] } }}
+            whileTap={{ scale: 0.9 }}
           >
-            <Github
-              size={13}
-              strokeWidth={2}
-              style={{ color: "#ffffff" }}
-              className="transition-transform duration-200 group-hover/gh:rotate-12"
-            />
-          </a>
+            <Github size={13} strokeWidth={2} style={{ color: "#ffffff" }} />
+          </motion.a>
         </div>
       </div>
 
       {/* ── CONTENT ── */}
-      <div
-        className="relative z-10 flex flex-1 flex-col p-3.5 sm:p-4 lg:p-5"
-        style={{ fontFamily: "'DM Sans', system-ui, sans-serif" }}
-      >
+      <div className="pj-sans relative z-10 flex flex-1 flex-col p-3.5 sm:p-4 lg:p-5">
+
         {/* Title */}
-        <h3
+        <motion.h3
           className="mb-1.5 text-sm sm:text-[14px] lg:text-[15px] font-bold text-[#0f0f0f] leading-snug"
           style={{ letterSpacing: "-0.02em" }}
+          whileHover={{ x: 2, transition: { duration: 0.2 } }}
         >
           {project.title}
-        </h3>
+        </motion.h3>
 
         {/* Description */}
         <p className="mb-3 sm:mb-4 flex-1 text-[11px] sm:text-[12px] lg:text-[13px] leading-relaxed text-[#6b6b6b] line-clamp-2">
@@ -360,20 +376,34 @@ const ProjectCard = memo(({ project, index }) => {
         {/* Divider */}
         <div className="mb-2.5 sm:mb-3 h-px bg-[#ede8e0]" />
 
-        {/* Tech tags */}
-        <div className="flex flex-wrap gap-1 sm:gap-1.5">
+        {/* Tech tags — stagger on card mount */}
+        <motion.div
+          className="flex flex-wrap gap-1 sm:gap-1.5"
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.04 } } }}
+          initial="hidden"
+          animate="visible"
+        >
           {project.technologies.map((tech, i) => (
-            <span
+            <motion.span
               key={i}
-              className="rounded-md sm:rounded-lg border border-[#e0dbd0] bg-[#f6f2ec] px-1.5 sm:px-2 py-[2px] sm:py-[3px] text-[8px] sm:text-[9px] lg:text-[10px] font-medium text-[#5a5a5a] transition-all duration-200 hover:border-[rgba(200,169,110,0.5)] hover:text-[#0f0f0f] cursor-default select-none"
-              style={{ fontFamily: "'DM Mono', monospace" }}
+              className="pj-mono rounded-md sm:rounded-lg border border-[#e0dbd0] bg-[#f6f2ec] px-1.5 sm:px-2 py-[2px] sm:py-[3px] text-[8px] sm:text-[9px] lg:text-[10px] font-medium text-[#5a5a5a] cursor-default select-none"
+              variants={{
+                hidden:  { opacity: 0, scale: 0.85 },
+                visible: { opacity: 1, scale: 1, transition: { duration: 0.35, ease: [0.34, 1.56, 0.64, 1] } },
+              }}
+              whileHover={{
+                scale: 1.08, y: -1,
+                borderColor: "rgba(200,169,110,0.5)",
+                color: "#0f0f0f",
+                transition: { duration: 0.18 },
+              }}
             >
               {tech}
-            </span>
+            </motion.span>
           ))}
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 });
 ProjectCard.displayName = "ProjectCard";

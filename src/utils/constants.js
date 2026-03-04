@@ -7,7 +7,7 @@ export const PERSONAL_INFO = {
         location: "Uzbekistan",
         email: "ulugbekgofurjonov001@gmail.com",
         phone: "+998 88 202 70 72",
-        tagline: "Men frontend dasturchiman. Zamonaviy veb-texnologiyalar orqali foydalanuvchilar uchun qulay va tezkor interfeyslar yarataman!",
+        tagline: "G‘oyalarni React va Next.js yordamida web-ilovlarga aylantiraman — har piksel o‘ylangan, har qator ishlaydi.",
         resume: "./resume.pdf",
         bio: [
             "React.js va Next.js frameworklarida amaliy tajribaga ega. 10+ real loyiha orqali responsiv interfeyslar, API integratsiyasi va modern UI komponentlar yaratdim. Zamonaviy texnologiyalar orqali har bir loyiha bilan ko'nikmalarimni yangi bosqichga olib chiqmoqdaman"
@@ -19,7 +19,7 @@ export const PERSONAL_INFO = {
         location: "Uzbekistan",
         email: "ulugbekgofurjonov001@gmail.com",
         phone: "+998 88 202 70 72",
-        tagline: "I am a frontend developer. I create user-friendly and fast interfaces using modern web technologies!",
+        tagline: "I turn ideas into web applications using React and Next.js — every pixel is thought out, every line works.",
         resume: "./resume.pdf",
         bio: [
             "I have practical experience with React.js and Next.js frameworks. Through 10+ real projects, I've created responsive interfaces, API integrations, and modern UI components. With each project using modern technologies, I'm taking my skills to the next level"

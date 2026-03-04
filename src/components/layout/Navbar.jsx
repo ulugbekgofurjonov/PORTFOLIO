@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, memo } from "react";
+import FadeIn from "../animations/FadeIn";
 import { Code2, Download, Globe, ArrowRight, X } from "lucide-react";
 import { NAV_LINKS } from "../../utils/constants";
 import { useScrollSpy } from "../../hooks/useScrollSpy";
@@ -8,15 +9,13 @@ export default function Navbar() {
   const [scrolled,  setScrolled]  = useState(false);
   const [progress,  setProgress]  = useState(0);
   const [menuOpen,  setMenuOpen]  = useState(false);
-  const [mounted,   setMounted]   = useState(false);
   const rafRef  = useRef(null);
   const prevTop = useRef(0);
 
   const { language, toggleLanguage } = useLanguage();
-  const navLinks      = NAV_LINKS[language];
-  const activeSection = useScrollSpy(navLinks.map((l) => l.id));
-
-  useEffect(() => { requestAnimationFrame(() => setMounted(true)); }, []);
+  const allLinks      = NAV_LINKS[language];
+  const navLinks      = allLinks.filter((l) => !l.hidden); // nav da ko'rsatiladigan linklar
+  const activeSection = useScrollSpy(allLinks.map((l) => l.id)); // barcha idlar spy uchun
 
   const onScroll = useCallback(() => {
     if (rafRef.current) return;
@@ -70,8 +69,6 @@ export default function Navbar() {
       */}
       <header
         className={`fixed inset-x-0 top-0 z-[9999] w-full transition-all duration-400 ${
-          mounted ? "opacity-100" : "opacity-0"
-        } ${
           scrolled
             ? "border-b border-[#ddd8cf] shadow-[0_4px_24px_rgba(0,0,0,0.07)]"
             : "border-b border-[#e0dbd0]"
@@ -89,31 +86,35 @@ export default function Navbar() {
           style={{ transform:`scaleX(${progress})`, background:"linear-gradient(90deg,#c8a96e,#a8824a)", transition:"transform .15s linear" }}
         />
 
-        <div className="mx-auto flex h-[68px] max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-8">
+        <FadeIn y={-10} duration={500} delay={0} threshold={0} as="div"
+          className="relative mx-auto flex h-[68px] max-w-7xl items-center px-4 sm:px-6 lg:px-8">
 
-          {/* LOGO */}
-          <Logo onPress={() => { window.scrollTo({ top:0, behavior:"smooth" }); close(); }} />
+          {/* LOGO — chap */}
+          <div className="flex-shrink-0">
+            <Logo onPress={() => { window.scrollTo({ top:0, behavior:"smooth" }); close(); }} />
+          </div>
 
-          {/* DESKTOP NAV */}
-          <nav aria-label="Primary navigation" className="hidden lg:flex items-center gap-0.5 rounded-full border border-[#ddd8cf] bg-[#ede8e0] p-1">
+          {/* DESKTOP NAV — mutlaq markaz */}
+          <nav
+            aria-label="Primary navigation"
+            className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-0.5 rounded-full border border-[#ddd8cf] bg-[#ede8e0] p-1"
+          >
             {navLinks.map((l) => (
               <DeskLink key={l.id} label={l.label} active={activeSection === l.id} onClick={() => goto(l.id)} />
             ))}
           </nav>
 
-          {/* DESKTOP ACTIONS */}
-          <div className="hidden lg:flex items-center gap-2.5">
+          {/* DESKTOP ACTIONS — o'ng */}
+          <div className="hidden lg:flex items-center gap-2.5 ml-auto">
             <LangBtn lang={language} onToggle={toggleLanguage} />
             <CVBtn label={cvLabel} onClick={download} />
           </div>
 
-          {/*
-            HAMBURGER — lg:hidden
-            Bu tugma headerda — menu ochilganda ham o'z joyida turadi
-            chunki header z-[9999], menu esa z-[9998] (pastroq)
-          */}
-          <HamBtn open={menuOpen} onToggle={() => setMenuOpen(v => !v)} />
-        </div>
+          {/* HAMBURGER — lg:hidden, o'ng */}
+          <div className="ml-auto lg:hidden">
+            <HamBtn open={menuOpen} onToggle={() => setMenuOpen(v => !v)} />
+          </div>
+        </FadeIn>
       </header>
 
       {/*
@@ -271,7 +272,7 @@ const Logo = memo(({ onPress }) => (
       <Code2 size={14} strokeWidth={2.5} />
     </span>
     <span className="text-[15px] font-semibold text-[#0f0f0f]" style={{ fontFamily:"'DM Sans',system-ui,sans-serif", letterSpacing:"-0.025em" }}>
-      <em style={{ fontStyle:"normal", fontWeight:800 }}>U</em>lgubek
+      <em style={{ fontStyle:"normal", fontWeight:800 }}>P</em>ortfolio
       <span style={{ color:"#c8a96e", fontSize:20, lineHeight:0, verticalAlign:"-1px" }}>.</span>
     </span>
   </button>

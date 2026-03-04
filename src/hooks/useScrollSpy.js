@@ -29,9 +29,9 @@ export const useScrollSpy = (sectionIds = [], offset = 80) => {
 
     if (ids.length === 0) return "";
 
-    // Sahifaning eng pastida → oxirgi nav section
+    // Sahifaning eng pastida — hech narsa yonmasin (footer zone)
     if (scrollY + winH >= docH - 2) {
-      return ids[ids.length - 1];
+      return "";
     }
 
     // Birinchi nav sectionning tepasidan ham yuqorida →
