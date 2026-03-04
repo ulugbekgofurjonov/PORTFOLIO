@@ -22,40 +22,39 @@
 
 
 @theme {
-  --font-display: "Xirod", sans-serif;    /* ✅ Xirod - maxsus shrift */
-  --font-body: "Inter", sans-serif;       /* ✅ Inter - asosiy shrift */
+  --font-display: "Xirod", sans-serif;
+  --font-body: "Inter", sans-serif;
   --breakpoint-3xl: 1920px;
   --color-primary: #3b82f6;
 }
 
 @layer base {
-  /* ✅ Barcha matnlar uchun Inter (asosiy) */
   html, body {
     font-family: var(--font-body), sans-serif;
     scroll-behavior: smooth;
   }
   
   body {
-    -webkit-font-shoothing: antialiased;
+    -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: #000000;
     color: #ffffff;
     overflow-x: hidden;
   }
 
-  /* ✅ Sarlavhalar uchun Xirod */
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-display), sans-serif;
   }
   
-  /* Logo va brand nomi uchun Xirod */
   .logo, .brand-name {
     font-family: var(--font-display), sans-serif;
   }
 
-  /* Qolgan scrollbar va animatsiyalar */
+  /* ═══════════════════════════════════════
+     PREMIUM SCROLLBAR — Gold Theme
+  ═══════════════════════════════════════ */
   ::-webkit-scrollbar {
-    width: 10px;
+    width: 5px;
   }
   
   ::-webkit-scrollbar-track {
@@ -63,17 +62,19 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #1e3a8a, #1e40af);
-    border-radius: 5px;
+    background: linear-gradient(180deg, #c8a96e, #e8c880, #a8824a);
+    border-radius: 999px;
+    box-shadow: 0 0 6px rgba(200, 169, 110, 0.4);
   }
   
   ::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #60a5fa, #3b82f6);
+    background: linear-gradient(180deg, #d4b478, #f0d490, #b8924e);
+    box-shadow: 0 0 10px rgba(200, 169, 110, 0.65);
   }
 
   * {
     scrollbar-width: thin;
-    scrollbar-color: #1e40af #0a0a0a;
+    scrollbar-color: #c8a96e #0a0a0a;
   }
 
   .hide-scrollbar {
@@ -101,7 +102,7 @@
   }
 
   .animate-fadeIn {
-    animation: fadeIn 0.5s ease-out; /* ✅ 's' qo'shildi */
+    animation: fadeIn 0.5s ease-out;
   }
   
   .animate-pulse {
