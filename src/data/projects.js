@@ -25,7 +25,7 @@ export const projects = {
             title: "Todo App",
             description: "Oddiy va funktsional dastur",
             image: "./images/tda.jpg",
-            category: "Web Saytlar",
+            category: "Web Ilovalar",
             technologies: ["JavaScript", "HTML", "CSS"],
             demoUrl: "https://to-do-app-navy-five.vercel.app/",
             githubUrl: "https://github.com/ulugbekgofurjonov/to-do-app.git"
@@ -35,7 +35,7 @@ export const projects = {
             title: "Notes App",
             description: "Eslatmalarni yozib boruvchi dastur",
             image: "./images/noteapp.jpg",
-            category: "Web Saytlar",
+            category: "Web Ilovalar",
             technologies: ["JavaScript", "HTML", "CSS"],
             demoUrl: "https://notes-app-project-ug.vercel.app/",
             githubUrl: "https://github.com/ulugbekgofurjonov/Notes-App.git"
@@ -67,7 +67,7 @@ export const projects = {
             title: "Todo App",
             description: "Simple and functional application",
             image: "./images/tda.jpg",
-            category: "Websites",
+            category: "Web Apps",
             technologies: ["JavaScript", "HTML", "CSS"],
             demoUrl: "https://to-do-app-navy-five.vercel.app/",
             githubUrl: "https://github.com/ulugbekgofurjonov/to-do-app.git"
@@ -77,7 +77,7 @@ export const projects = {
             title: "Notes App",
             description: "Note-taking program",
             image: "./images/noteapp.jpg",
-            category: "Websites",
+            category: "Web Apps",
             technologies: ["JavaScript", "HTML", "CSS"],
             demoUrl: "https://notes-app-project-ug.vercel.app/",
             githubUrl: "https://github.com/ulugbekgofurjonov/Notes-App.git"
