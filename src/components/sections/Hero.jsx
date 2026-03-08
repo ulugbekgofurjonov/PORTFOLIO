@@ -230,8 +230,8 @@ export default function Hero() {
                 <motion.div variants={staggerItem}>
                   <SecondaryBtn onClick={() => {
                     const a = Object.assign(document.createElement("a"), {
-                      href: "/resume.pdf", 
-                      download: "Ulugbek_Gofurjonov_Resume.pdf",
+                      href: "/UlugbekGofurjonov.pdf", 
+                      download: "Ulug'bek G'ofurjonov Frontend Developer Resume.pdf",
                     });
                     document.body.appendChild(a); 
                     a.click(); 

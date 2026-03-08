@@ -8,9 +8,9 @@ export const PERSONAL_INFO = {
         email: "ulugbekgofurjonov001@gmail.com",
         phone: "+998 88 202 70 72",
         tagline: "G‘oyalarni React va Next.js yordamida web-ilovlarga aylantiraman — har piksel o‘ylangan, har qator ishlaydi.",
-        resume: "./resume.pdf",
+        resume: "/UlugbekGofurjonov.pdf",
         bio: [
-            "React.js va Next.js frameworklarida amaliy tajribaga ega. 10+ real loyiha orqali responsiv interfeyslar, API integratsiyasi va modern UI komponentlar yaratdim. Zamonaviy texnologiyalar orqali har bir loyiha bilan ko'nikmalarimni yangi bosqichga olib chiqmoqdaman"
+            "React.js va Next.js frameworklarida amaliy tajribaga ega. 10+ real loyiha orqali responsiv interfeyslar, API integratsiyasi va modern UI komponentlar yaratdim. Zamonaviy texnologiyalar orqali har bir loyiha bilan ko'nikmalarimни yangi bosqichga olib chiqmoqdaman"
         ]
     },
     en: {
@@ -20,7 +20,7 @@ export const PERSONAL_INFO = {
         email: "ulugbekgofurjonov001@gmail.com",
         phone: "+998 88 202 70 72",
         tagline: "I turn ideas into web applications using React and Next.js — every pixel is thought out, every line works.",
-        resume: "./resume.pdf",
+        resume: "/UlugbekGofurjonov.pdf",
         bio: [
             "I have practical experience with React.js and Next.js frameworks. Through 10+ real projects, I've created responsive interfaces, API integrations, and modern UI components. With each project using modern technologies, I'm taking my skills to the next level"
         ]

@@ -46,6 +46,16 @@ const Footer = () => {
 
   const techStack = ["React.js", "Next.js", "Tailwind CSS", "TypeScript"];
 
+  const handleResumeDownload = () => {
+    const a = Object.assign(document.createElement("a"), {
+      href: "/UlugbekGofurjonov.pdf",
+      download: "Ulug'bek G'ofurjonov Frontend Developer Resume.pdf",
+    });
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
+
   return (
     <footer
       className="relative w-full overflow-hidden"
@@ -175,17 +185,16 @@ const Footer = () => {
                   <ArrowUpRight size={14} strokeWidth={2.5} className="transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                 </motion.a>
 
-                {/* Secondary — ghost dark */}
-                <motion.a
+                {/* Secondary — Resume download */}
+                <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.97 }}
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={VP}
                   transition={{ delay: 0.6 }}
-                  href={personalInfo.resume}
-                  download
-                  className="group flex items-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold transition-all duration-300"
+                  onClick={handleResumeDownload}
+                  className="group flex items-center gap-2 rounded-xl px-6 py-3.5 text-sm font-semibold transition-all duration-300 cursor-pointer"
                   style={{
                     fontFamily: F_SANS,
                     background: "rgba(15,15,15,0.06)",
@@ -195,7 +204,7 @@ const Footer = () => {
                 >
                   <Download size={14} strokeWidth={2} />
                   <span>{t("Resume", "Resume")}</span>
-                </motion.a>
+                </motion.button>
               </div>
             </div>
           </motion.div>
@@ -265,7 +274,7 @@ const Footer = () => {
                   <a
                     href={`#${link.id}`}
                     className="group flex items-center gap-2 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 hover:bg-[rgba(200,169,110,0.08)]"
-                    style={{ fontFamily: F_SANS, color: "#6b6b6b", hover: { color: "#0f0f0f" } }}
+                    style={{ fontFamily: F_SANS, color: "#6b6b6b" }}
                   >
                     <ChevronRight
                       size={13}

@@ -14,8 +14,8 @@ export default function Navbar() {
 
   const { language, toggleLanguage } = useLanguage();
   const allLinks      = NAV_LINKS[language];
-  const navLinks      = allLinks.filter((l) => !l.hidden); // nav da ko'rsatiladigan linklar
-  const activeSection = useScrollSpy(allLinks.map((l) => l.id)); // barcha idlar spy uchun
+  const navLinks      = allLinks.filter((l) => !l.hidden);
+  const activeSection = useScrollSpy(allLinks.map((l) => l.id));
 
   const onScroll = useCallback(() => {
     if (rafRef.current) return;
@@ -51,22 +51,16 @@ export default function Navbar() {
   }, [close]);
   const download = useCallback(() => {
     const a = Object.assign(document.createElement("a"), {
-      href: "/resume.pdf", download: "Ulugbek_Gofurjonov_Resume.pdf",
+      href: "/UlugbekGofurjonov.pdf", download: "Ulug'bek G'ofurjonov Frontend Developer Resume.pdf",
     });
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     close();
   }, [close]);
 
-  const cvLabel = language === "uz" ? "Yuklab olish" : "Download CV";
+  const cvLabel = language === "uz" ? "Resume" : "Resume";
 
   return (
     <>
-      {/*
-        ┌──────────────────────────────────────────────┐
-        │  HEADER  z-[9999]  — DOIM TEPADA, O'ZGARMAYDI│
-        │  Menu ochilsa ham bu element siljimaydi       │
-        └──────────────────────────────────────────────┘
-      */}
       <header
         className={`fixed inset-x-0 top-0 z-[9999] w-full transition-all duration-400 ${
           scrolled
@@ -89,12 +83,12 @@ export default function Navbar() {
         <FadeIn y={-10} duration={500} delay={0} threshold={0} as="div"
           className="relative mx-auto flex h-[68px] max-w-7xl items-center px-4 sm:px-6 lg:px-8">
 
-          {/* LOGO — chap */}
+          {/* LOGO */}
           <div className="flex-shrink-0">
             <Logo onPress={() => { window.scrollTo({ top:0, behavior:"smooth" }); close(); }} />
           </div>
 
-          {/* DESKTOP NAV — mutlaq markaz */}
+          {/* DESKTOP NAV */}
           <nav
             aria-label="Primary navigation"
             className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-0.5 rounded-full border border-[#ddd8cf] bg-[#ede8e0] p-1"
@@ -104,34 +98,26 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* DESKTOP ACTIONS — o'ng */}
+          {/* DESKTOP ACTIONS */}
           <div className="hidden lg:flex items-center gap-2.5 ml-auto">
             <LangBtn lang={language} onToggle={toggleLanguage} />
             <CVBtn label={cvLabel} onClick={download} />
           </div>
 
-          {/* HAMBURGER — lg:hidden, o'ng */}
+          {/* HAMBURGER */}
           <div className="ml-auto lg:hidden">
             <HamBtn open={menuOpen} onToggle={() => setMenuOpen(v => !v)} />
           </div>
         </FadeIn>
       </header>
 
-      {/*
-        ┌──────────────────────────────────────────────┐
-        │  MOBILE MENU  z-[9998]  — HEADERDAN PAST     │
-        │  top: 68px  →  header ostidan boshlanadi     │
-        │  Header va uning elementlari ko'rinadi        │
-        └──────────────────────────────────────────────┘
-      */}
-
-      {/* Backdrop — header ostidan, faqat menu maydoni */}
+      {/* Backdrop */}
       <div
         aria-hidden
         onClick={close}
         className="lg:hidden fixed inset-x-0 bottom-0 z-[9997]"
         style={{
-          top: 68,                       /* headerdan past */
+          top: 68,
           background: "rgba(15,15,15,0.18)",
           backdropFilter: "blur(3px)",
           WebkitBackdropFilter: "blur(3px)",
@@ -148,7 +134,7 @@ export default function Navbar() {
         aria-hidden={!menuOpen}
         className="lg:hidden fixed inset-x-0 bottom-0 z-[9998] flex flex-col"
         style={{
-          top: 68,                        /* headerdan past — tepaga chiqmaydi */
+          top: 68,
           background: "#faf9f6",
           transform: menuOpen ? "translateY(0)" : "translateY(-110%)",
           opacity: menuOpen ? 1 : 0,
