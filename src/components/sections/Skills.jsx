@@ -5,18 +5,6 @@ import { skills } from "../../data/skills";
 import { useLanguage } from "../../contexts/LanguageContext";
 import FadeIn, { EASE } from "../animations/FadeIn";
 
-/*
- ╔══════════════════════════════════════════════════════════╗
- ║  SKILLS  —  Framer Motion + FadeIn Premium Edition       ║
- ║                                                          ║
- ║  • Header    → framer whileInView stagger (qayta)        ║
- ║  • Stats     → FadeIn once={false} scaleIn spring        ║
- ║  • Rows      → FadeIn once={false} + framer hover        ║
- ║  • Icon box  → framer whileHover spring rotate           ║
- ║  • Bars      → IntersectionObserver animate (qayta)      ║
- ╚══════════════════════════════════════════════════════════╝
-*/
-
 /* ── Brand colors ── */
 const BRAND = {
   "HTML":         "#E34F26",
@@ -63,7 +51,6 @@ const vScaleStat = {
   }),
 };
 
-/* viewport — once:false so repeats on scroll */
 const VP    = { once: false, amount: 0.2  };
 const VP_SM = { once: false, amount: 0.06 };
 
@@ -86,7 +73,7 @@ export default function Skills() {
     <section id="skills" className="relative w-full overflow-hidden">
       <div className="relative mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28 lg:px-10 lg:py-32">
 
-        {/* ════ HEADER — framer stagger, qayta ishlaydi ════ */}
+        {/* ════ HEADER ════ */}
         <motion.div
           className="mb-10 sm:mb-12 text-center"
           variants={vStaggerWrap}
@@ -94,7 +81,6 @@ export default function Skills() {
           whileInView="visible"
           viewport={VP}
         >
-          {/* Eyebrow */}
           <motion.div variants={vStaggerChild} className="mb-5 flex items-center justify-center gap-3">
             <motion.div
               className="h-px bg-[#c8a96e]"
@@ -115,7 +101,6 @@ export default function Skills() {
             />
           </motion.div>
 
-          {/* Title */}
           <motion.h2
             variants={vStaggerChild}
             className="sk-sans"
@@ -133,7 +118,6 @@ export default function Skills() {
             </span>
           </motion.h2>
 
-          {/* Subtitle */}
           <motion.p
             variants={vStaggerChild}
             className="sk-sans mx-auto mt-4 max-w-xl text-base leading-relaxed text-[#6b6b6b] sm:text-lg"
@@ -145,10 +129,10 @@ export default function Skills() {
           </motion.p>
         </motion.div>
 
-        {/* ════ STATS — FadeIn once=false + framer scaleIn stagger ════ */}
+        {/* ════ STATS — har doim 3 kolonna ════ */}
         <FadeIn delay={0} duration={500} y={16} ease={EASE.smooth} once={false} threshold={0.1}>
           <motion.div
-            className="mb-14 sm:mb-16 flex items-center justify-center gap-3 sm:gap-5 flex-wrap"
+            className="mb-14 sm:mb-16 grid grid-cols-3 gap-3 sm:gap-4 max-w-sm mx-auto sm:max-w-md"
             variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
             initial="hidden"
             whileInView="visible"
@@ -157,16 +141,22 @@ export default function Skills() {
             {stats.map(({ v, l }, i) => (
               <motion.div
                 key={i}
-                className="sk-stat-pill flex flex-col items-center rounded-2xl px-6 py-4 min-w-[90px]"
+                className="sk-stat-pill flex flex-col items-center rounded-2xl px-3 py-4 sm:px-6"
                 variants={vScaleStat}
                 custom={i}
                 whileHover={{ y: -3, transition: { duration: 0.28, ease: [0.34, 1.56, 0.64, 1] } }}
               >
-                <span className="sk-sans text-2xl font-black text-[#0f0f0f] sm:text-3xl"
-                  style={{ letterSpacing: "-0.04em", lineHeight: 1.1 }}>
+                <span
+                  className="sk-sans font-black text-[#0f0f0f]"
+                  style={{
+                    fontSize: "clamp(1.2rem, 5vw, 1.75rem)",
+                    letterSpacing: "-0.04em",
+                    lineHeight: 1.1,
+                  }}
+                >
                   {v}
                 </span>
-                <span className="sk-mono mt-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#9a9a9a] sm:text-[10px]">
+                <span className="sk-mono mt-1 text-center text-[8px] font-semibold uppercase tracking-[0.12em] text-[#9a9a9a] sm:text-[10px]">
                   {l}
                 </span>
               </motion.div>
@@ -244,7 +234,6 @@ export default function Skills() {
         }
         .sk-row:hover { background: rgba(200,169,110,0.025); }
 
-        /* accent bar */
         .sk-accent-bar {
           position: absolute; left: 0; top: 0; bottom: 0;
           width: 3px; border-radius: 0 2px 2px 0;
@@ -253,11 +242,9 @@ export default function Skills() {
         }
         .sk-row:hover .sk-accent-bar { transform: scaleY(1); }
 
-        /* name slide */
         .sk-row-name { transition: transform .3s cubic-bezier(.16,1,.3,1); }
         .sk-row:hover .sk-row-name { transform: translateX(4px); }
 
-        /* bar */
         .sk-bar { width: 5px; border-radius: 3px; flex-shrink: 0; }
 
         @media (prefers-reduced-motion: reduce) {
@@ -281,7 +268,6 @@ const SkillRow = memo(({ skill, index }) => {
   const color   = gc(skill.name);
   const idx     = String(index + 1).padStart(2, "0");
 
-  /* bars — IntersectionObserver, once:false */
   const barsRef = useRef(null);
   const [barsOn, setBarsOn] = useState(false);
 
@@ -293,7 +279,6 @@ const SkillRow = memo(({ skill, index }) => {
         if (e.isIntersecting) {
           setTimeout(() => setBarsOn(true), 50 + index * 28);
         } else {
-          /* reset when scrolled away — so it re-animates on re-enter */
           setBarsOn(false);
         }
       },
@@ -317,7 +302,7 @@ const SkillRow = memo(({ skill, index }) => {
         <span className="sk-mono text-[11px] font-medium text-[#c8a96e] sm:text-xs">{idx}</span>
       </div>
 
-      {/* Icon box — framer spring on hover */}
+      {/* Icon box */}
       <div className="w-10 flex-shrink-0 sm:w-12">
         <motion.div
           className="flex h-9 w-9 items-center justify-center rounded-xl sm:h-10 sm:w-10"
@@ -383,7 +368,6 @@ const SkillRow = memo(({ skill, index }) => {
           })}
         </div>
 
-        {/* Percentage — framer count-up feel via opacity+x */}
         <motion.span
           className="sk-mono w-9 text-right text-xs font-bold sm:text-sm"
           style={{ color }}
