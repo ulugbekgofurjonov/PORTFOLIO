@@ -7,14 +7,13 @@ import FadeIn, { EASE } from "../animations/FadeIn";
 
 /*
  ╔══════════════════════════════════════════════════════════╗
- ║  PROJECTS  —  Framer Motion + FadeIn Premium Edition     ║
+ ║  PROJECTS  —  Premium Edition v2                         ║
  ║                                                          ║
- ║  • Header     → framer whileInView stagger (qayta)       ║
- ║  • Filter     → FadeIn once={false} + framer tab spring  ║
- ║  • Cards      → AnimatePresence layout filter transition ║
- ║                 + FadeIn once={false} qayta scroll        ║
- ║  • Card hover → framer spring physics                    ║
- ║  • Buttons    → whileHover + whileTap                    ║
+ ║  FIX: Cards now uniform height via flex + clamp          ║
+ ║  • Image      → fixed 200px, object-cover                ║
+ ║  • Title      → 2-line clamp, fixed min-height           ║
+ ║  • Description→ strict 3-line clamp, flex-1              ║
+ ║  • Tags       → fixed-height scroll zone                 ║
  ╚══════════════════════════════════════════════════════════╝
 */
 
@@ -24,25 +23,24 @@ const vStaggerWrap = {
   visible: { transition: { staggerChildren: 0.09, delayChildren: 0.04 } },
 };
 const vStaggerChild = {
-  hidden:  { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
+  hidden:  { opacity: 0, y: 22 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] } },
 };
 
-/* Card enter/exit for AnimatePresence */
 const vCard = {
-  hidden:  { opacity: 0, y: 24, scale: 0.96 },
+  hidden:  { opacity: 0, y: 28, scale: 0.95 },
   visible: (i) => ({
     opacity: 1, y: 0, scale: 1,
-    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: Math.min(i * 0.06, 0.3) },
+    transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: Math.min(i * 0.06, 0.32) },
   }),
   exit: {
-    opacity: 0, y: -12, scale: 0.97,
-    transition: { duration: 0.3, ease: [0.4, 0, 1, 1] },
+    opacity: 0, y: -14, scale: 0.97,
+    transition: { duration: 0.28, ease: [0.4, 0, 1, 1] },
   },
 };
 
-const VP    = { once: false, amount: 0.2  };
-const VP_SM = { once: false, amount: 0.06 };
+const VP    = { once: false, amount: 0.18 };
+const VP_SM = { once: false, amount: 0.05 };
 
 /* ══════════════════════════════════════════════
    MAIN
@@ -66,56 +64,75 @@ export default function Projects() {
   return (
     <section id="projects" className="relative w-full overflow-hidden bg-[#faf9f6]">
 
-      {/* Ambient glow */}
+      {/* Ambient glows */}
       <div
-        className="pointer-events-none absolute -top-32 right-0 h-[500px] w-[500px] rounded-full opacity-30"
-        style={{ background: "radial-gradient(circle,rgba(200,169,110,0.14) 0%,transparent 70%)" }}
+        className="pointer-events-none absolute -top-40 right-0 h-[600px] w-[600px] rounded-full"
+        style={{ background: "radial-gradient(circle,rgba(200,169,110,0.10) 0%,transparent 68%)" }}
+      />
+      <div
+        className="pointer-events-none absolute bottom-0 left-0 h-[400px] w-[400px] rounded-full"
+        style={{ background: "radial-gradient(circle,rgba(168,130,74,0.07) 0%,transparent 70%)" }}
       />
 
-      <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-24 lg:px-10 lg:py-32">
+      {/* Subtle dot pattern */}
+      <div
+        className="pointer-events-none absolute inset-0 opacity-[0.018]"
+        style={{
+          backgroundImage: "radial-gradient(circle,#6b5a3e 1px,transparent 1px)",
+          backgroundSize: "28px 28px",
+        }}
+      />
 
-        {/* ════ HEADER — framer stagger, qayta ishlaydi ════ */}
+      <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 lg:px-10 lg:py-32">
+
+        {/* ════ HEADER ════ */}
         <motion.div
-          className="mb-10 sm:mb-14 text-center"
+          className="mb-12 sm:mb-16 text-center"
           variants={vStaggerWrap}
           initial="hidden"
           whileInView="visible"
           viewport={VP}
         >
-          {/* Eyebrow */}
-          <motion.div variants={vStaggerChild} className="mb-4 flex items-center justify-center gap-3">
+          {/* Eyebrow line */}
+          <motion.div variants={vStaggerChild} className="mb-5 flex items-center justify-center gap-4">
             <motion.div
-              className="h-px bg-gradient-to-r from-transparent to-[#c8a96e]"
+              className="h-px"
+              style={{ background: "linear-gradient(to right,transparent,#c8a96e)" }}
               initial={{ width: 0 }}
-              whileInView={{ width: 32 }}
+              whileInView={{ width: 40 }}
               viewport={VP}
-              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
             />
-            <span className="pj-mono text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.18em] text-[#c8a96e]">
-              {t("Loyihalar", "Projects")}
+            <span className="pj-mono text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.22em] text-[#c8a96e]">
+              {t("Loyihalar", "Portfolio")}
             </span>
             <motion.div
-              className="h-px bg-gradient-to-l from-transparent to-[#c8a96e]"
+              className="h-px"
+              style={{ background: "linear-gradient(to left,transparent,#c8a96e)" }}
               initial={{ width: 0 }}
-              whileInView={{ width: 32 }}
+              whileInView={{ width: 40 }}
               viewport={VP}
-              transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1], delay: 0.07 }}
+              transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
             />
           </motion.div>
 
           {/* Title */}
           <motion.h2
             variants={vStaggerChild}
-            className="pj-sans mb-3 sm:mb-4"
+            className="pj-sans mb-4"
             style={{
-              fontSize: "clamp(1.9rem,5.5vw,4.5rem)",
-              fontWeight: 800, letterSpacing: "-0.04em", lineHeight: 1.05, color: "#0f0f0f",
+              fontSize: "clamp(2rem,5.5vw,4.2rem)",
+              fontWeight: 800,
+              letterSpacing: "-0.045em",
+              lineHeight: 1.04,
+              color: "#0e0e0e",
             }}
           >
             {t("Mening ", "My ")}
             <span style={{
-              background: "linear-gradient(135deg,#c8a96e,#e8c880,#a8824a)",
-              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+              background: "linear-gradient(135deg,#b8914e 0%,#e8c880 45%,#a07838 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
             }}>
               {t("Loyihalarim", "Projects")}
             </span>
@@ -124,48 +141,50 @@ export default function Projects() {
           {/* Subtitle */}
           <motion.p
             variants={vStaggerChild}
-            className="pj-sans mx-auto max-w-xl text-sm sm:text-base leading-relaxed text-[#6b6b6b]"
+            className="pj-sans mx-auto max-w-lg text-sm sm:text-[15px] leading-relaxed"
+            style={{ color: "#7a7670" }}
           >
             {t(
               "Zamonaviy texnologiyalar bilan yaratilgan professional loyihalar",
-              "Professional projects built with modern technologies"
+              "Professional projects crafted with modern technologies"
             )}
           </motion.p>
         </motion.div>
 
-        {/* ════ FILTER TABS — FadeIn + framer tab indicator ════ */}
-        <FadeIn delay={60} duration={550} y={16} ease={EASE.smooth} once={false} threshold={0.1}>
+        {/* ════ FILTER TABS ════ */}
+        <FadeIn delay={60} duration={550} y={14} ease={EASE.smooth} once={false} threshold={0.08}>
           <div className="mb-10 sm:mb-12">
             <div
-              className="flex items-end gap-0 border-b border-[#e0dbd0] overflow-x-auto pj-tabs"
-              style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+              className="flex items-end gap-0 border-b pj-tabs overflow-x-auto"
+              style={{ borderColor: "rgba(200,169,110,0.2)", scrollbarWidth: "none", msOverflowStyle: "none" }}
             >
               <div className="flex w-full items-end justify-start sm:justify-center gap-0">
                 {categoriesList.map(cat => (
                   <motion.button
                     key={cat}
                     onClick={() => setActive(cat)}
-                    className="relative flex-shrink-0 cursor-pointer pb-3 px-3 sm:px-5 focus:outline-none"
-                    whileHover={{ opacity: 1 }}
-                    whileTap={{ scale: 0.95 }}
+                    className="relative flex-shrink-0 cursor-pointer pb-3.5 px-4 sm:px-6 focus:outline-none"
+                    whileTap={{ scale: 0.94 }}
                   >
                     <span
-                      className="pj-mono whitespace-nowrap text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.15em] transition-colors duration-200"
-                      style={{ color: active === cat ? "#0f0f0f" : "#9a9a9a" }}
+                      className="pj-mono whitespace-nowrap text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.18em] transition-colors duration-200"
+                      style={{ color: active === cat ? "#0e0e0e" : "#b0aa9e" }}
                     >
                       {cat}
                     </span>
-                    {/* Animated underline */}
                     <AnimatePresence>
                       {active === cat && (
                         <motion.span
                           layoutId="tabUnderline"
-                          className="absolute bottom-0 left-3 right-3 sm:left-5 sm:right-5 h-[2px] rounded-t-full"
-                          style={{ background: "linear-gradient(90deg,#c8a96e,#a8824a)" }}
+                          className="absolute bottom-0 left-4 right-4 sm:left-6 sm:right-6 rounded-t-full"
+                          style={{
+                            height: "2px",
+                            background: "linear-gradient(90deg,#c8a96e,#a8824a)",
+                          }}
                           initial={{ opacity: 0, scaleX: 0 }}
                           animate={{ opacity: 1, scaleX: 1 }}
                           exit={{ opacity: 0, scaleX: 0 }}
-                          transition={{ duration: 0.35, ease: [0.34, 1.56, 0.64, 1] }}
+                          transition={{ duration: 0.38, ease: [0.34, 1.56, 0.64, 1] }}
                         />
                       )}
                     </AnimatePresence>
@@ -176,28 +195,32 @@ export default function Projects() {
           </div>
         </FadeIn>
 
-        {/* ════ GRID — AnimatePresence for filter switch ════ */}
+        {/* ════ GRID ════ */}
         <AnimatePresence mode="wait">
           {filtered.length > 0 ? (
             <motion.div
               key={active}
-              className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 lg:gap-6"
+              className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-7"
+              /* Make all cards in the row the same height */
+              style={{ alignItems: "stretch" }}
               initial="hidden"
               animate="visible"
-              exit={{ opacity: 0, transition: { duration: 0.2 } }}
+              exit={{ opacity: 0, transition: { duration: 0.18 } }}
             >
               {filtered.map((project, i) => (
                 <FadeIn
                   key={project.id}
-                  delay={Math.min(i * 55, 280)}
-                  duration={580}
-                  y={26}
+                  delay={Math.min(i * 50, 260)}
+                  duration={560}
+                  y={28}
                   scale={0.97}
                   ease={EASE.smooth}
                   once={false}
                   threshold={0.04}
+                  /* Let FadeIn wrapper stretch to full height */
+                  style={{ display: "flex", flexDirection: "column" }}
                 >
-                  <motion.div variants={vCard} custom={i}>
+                  <motion.div variants={vCard} custom={i} style={{ flex: 1, display: "flex", flexDirection: "column" }}>
                     <ProjectCard project={project} index={i} />
                   </motion.div>
                 </FadeIn>
@@ -206,13 +229,13 @@ export default function Projects() {
           ) : (
             <motion.div
               key="empty"
-              className="py-20 text-center"
-              initial={{ opacity: 0, y: 10 }}
+              className="py-24 text-center"
+              initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.4 }}
             >
-              <p className="pj-sans text-base sm:text-lg text-[#9a9a9a]">
+              <p className="pj-sans text-base text-[#a0a0a0]">
                 {t("Loyihalar topilmadi", "No projects found")}
               </p>
             </motion.div>
@@ -222,9 +245,9 @@ export default function Projects() {
       </div>
 
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap');
-        .pj-sans { font-family: 'DM Sans', system-ui, sans-serif; }
-        .pj-mono { font-family: 'DM Mono', monospace; }
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+        .pj-sans { font-family: 'Outfit', system-ui, sans-serif; }
+        .pj-mono { font-family: 'JetBrains Mono', monospace; }
         .pj-tabs::-webkit-scrollbar { display: none; }
         @media (prefers-reduced-motion: reduce) {
           *, *::before, *::after { animation-duration:.01ms !important; transition-duration:.01ms !important; }
@@ -235,7 +258,15 @@ export default function Projects() {
 }
 
 /* ══════════════════════════════════════════════
-   PROJECT CARD
+   PROJECT CARD  — UNIFORM HEIGHT
+   Strategy:
+   • flex flex-col + h-full → card stretches to row height
+   • Image: fixed 200px
+   • Content: flex-1 flex-col
+     – Title:       2-line clamp, fixed min-height
+     – Description: flex-1 + 3-line clamp  ← key fix
+     – Divider
+     – Tags:        fixed 52px overflow-hidden
 ══════════════════════════════════════════════ */
 const ProjectCard = memo(({ project, index }) => {
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -245,41 +276,44 @@ const ProjectCard = memo(({ project, index }) => {
     <motion.div
       className="group relative flex flex-col h-full overflow-hidden rounded-2xl bg-white"
       style={{
-        border: "1px solid rgba(220,214,203,0.85)",
-        boxShadow: "0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,1)",
+        border: "1px solid rgba(210,200,185,0.75)",
+        boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 8px 32px rgba(0,0,0,0.03), inset 0 1px 0 rgba(255,255,255,1)",
       }}
       whileHover={{
-        y: -6,
-        boxShadow: "0 22px 64px rgba(200,169,110,0.16), 0 6px 20px rgba(0,0,0,0.07)",
-        borderColor: "rgba(200,169,110,0.5)",
-        transition: { duration: 0.35, ease: [0.34, 1.56, 0.64, 1] },
+        y: -7,
+        boxShadow: "0 28px 70px rgba(180,140,70,0.15), 0 8px 24px rgba(0,0,0,0.07)",
+        borderColor: "rgba(200,169,110,0.55)",
+        transition: { duration: 0.38, ease: [0.34, 1.56, 0.64, 1] },
       }}
       whileTap={{ scale: 0.99 }}
     >
-      {/* Gold top bar — reveals on hover */}
+      {/* Gold shimmer bar — top border on hover */}
       <motion.div
-        className="absolute top-0 left-0 right-0 z-10 h-[2px]"
-        style={{ background: "linear-gradient(90deg,#c8a96e,#a8824a,transparent)" }}
-        initial={{ opacity: 0, scaleX: 0.6, originX: 0 }}
-        whileHover={{ opacity: 1, scaleX: 1 }}
-        transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+        className="absolute top-0 left-0 right-0 z-20"
+        style={{
+          height: "2px",
+          background: "linear-gradient(90deg,transparent,#c8a96e 30%,#e8d090 60%,transparent)",
+          transformOrigin: "left",
+        }}
+        initial={{ scaleX: 0, opacity: 0 }}
+        whileHover={{ scaleX: 1, opacity: 1 }}
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
       />
 
-      {/* ── IMAGE ── */}
-      <div className="relative h-40 sm:h-44 lg:h-48 flex-shrink-0 overflow-hidden">
+      {/* ── IMAGE — fixed 200px height ── */}
+      <div className="relative flex-shrink-0 overflow-hidden" style={{ height: 200 }}>
 
-        {/* Skeleton */}
+        {/* Skeleton pulse */}
         {!imgLoaded && (
-          <div className="absolute inset-0 animate-pulse bg-[#ede8e0]" />
+          <div className="absolute inset-0 animate-pulse bg-[#ece7de]" />
         )}
 
-        {/* Photo — zoom on card hover */}
         <motion.img
           src={project.image}
           alt={project.title}
           className="block h-full w-full object-cover"
-          style={{ opacity: imgLoaded ? 1 : 0, transition: "opacity .3s ease" }}
-          whileHover={{ scale: 1.06, transition: { duration: 0.7, ease: [0.25, 1, 0.5, 1] } }}
+          style={{ opacity: imgLoaded ? 1 : 0, transition: "opacity .35s ease" }}
+          whileHover={{ scale: 1.07, transition: { duration: 0.75, ease: [0.25, 1, 0.5, 1] } }}
           onLoad={() => setImgLoaded(true)}
           onError={e => {
             e.target.src = "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80";
@@ -289,27 +323,41 @@ const ProjectCard = memo(({ project, index }) => {
         />
 
         {/* Gradient overlay */}
-        <motion.div
+        <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(to top,rgba(0,0,0,0.58) 0%,rgba(0,0,0,0.12) 45%,transparent 100%)" }}
-          initial={{ opacity: 0.45 }}
-          whileHover={{ opacity: 1, transition: { duration: 0.3 } }}
+          style={{
+            background: "linear-gradient(to top,rgba(10,8,4,0.62) 0%,rgba(10,8,4,0.15) 40%,transparent 100%)",
+          }}
         />
 
-        {/* TOP-LEFT: index + category */}
-        <div className="absolute top-2.5 left-2.5 sm:top-3 sm:left-3 z-10 flex items-center gap-1.5">
-          <span className="pj-mono text-[9px] sm:text-[10px] font-bold text-white/50">{idx}</span>
+        {/* TOP-LEFT: index + category badge */}
+        <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
           <span
-            className="pj-mono rounded-full border border-white/20 bg-black/35 px-2 py-[2px] text-[8px] sm:text-[9px] font-semibold uppercase tracking-[0.12em] text-white/80"
-            style={{ backdropFilter: "blur(8px)", WebkitBackdropFilter: "blur(8px)" }}
+            className="pj-mono text-[9px] font-bold"
+            style={{
+              color: "rgba(255,255,255,0.35)",
+              letterSpacing: "0.05em",
+            }}
+          >
+            {idx}
+          </span>
+          <span
+            className="pj-mono rounded-full px-2.5 py-[3px] text-[8px] font-semibold uppercase"
+            style={{
+              letterSpacing: "0.12em",
+              background: "rgba(0,0,0,0.40)",
+              border: "1px solid rgba(200,169,110,0.30)",
+              color: "rgba(230,200,140,0.9)",
+              backdropFilter: "blur(10px)",
+              WebkitBackdropFilter: "blur(10px)",
+            }}
           >
             {project.category}
           </span>
         </div>
 
         {/* TOP-RIGHT: action buttons */}
-        <div className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 z-10 flex items-center gap-1.5 sm:gap-2">
-
+        <div className="absolute top-3 right-3 z-10 flex items-center gap-2">
           {/* Live Demo */}
           <motion.a
             href={project.demoUrl}
@@ -319,17 +367,21 @@ const ProjectCard = memo(({ project, index }) => {
             title="Live Demo"
             className="flex items-center justify-center rounded-full"
             style={{
-              width: "clamp(28px,3.5vw,34px)",
-              height: "clamp(28px,3.5vw,34px)",
-              background: "linear-gradient(135deg,rgba(255,255,255,0.95),rgba(252,246,232,0.92))",
-              border: "1px solid rgba(200,169,110,0.65)",
-              boxShadow: "0 3px 14px rgba(200,169,110,0.35),inset 0 1px 0 rgba(255,255,255,0.95)",
-              backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+              width: 32, height: 32,
+              background: "linear-gradient(145deg,rgba(255,252,245,0.96),rgba(248,238,215,0.94))",
+              border: "1px solid rgba(200,169,110,0.7)",
+              boxShadow: "0 4px 16px rgba(200,169,110,0.28), inset 0 1px 0 rgba(255,255,255,1)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
             }}
-            whileHover={{ scale: 1.15, boxShadow: "0 6px 20px rgba(200,169,110,0.5)", transition: { duration: 0.25, ease: [0.34, 1.56, 0.64, 1] } }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{
+              scale: 1.18,
+              boxShadow: "0 6px 22px rgba(200,169,110,0.5)",
+              transition: { duration: 0.22, ease: [0.34, 1.56, 0.64, 1] },
+            }}
+            whileTap={{ scale: 0.88 }}
           >
-            <ArrowUpRight size={13} strokeWidth={2.5} style={{ color: "#8a6220" }} />
+            <ArrowUpRight size={13} strokeWidth={2.5} style={{ color: "#7a5218" }} />
           </motion.a>
 
           {/* GitHub */}
@@ -341,68 +393,133 @@ const ProjectCard = memo(({ project, index }) => {
             title="GitHub"
             className="flex items-center justify-center rounded-full"
             style={{
-              width: "clamp(28px,3.5vw,34px)",
-              height: "clamp(28px,3.5vw,34px)",
-              background: "linear-gradient(135deg,rgba(20,20,20,0.92),rgba(8,8,8,0.90))",
-              border: "1px solid rgba(255,255,255,0.15)",
-              boxShadow: "0 3px 14px rgba(0,0,0,0.5),inset 0 1px 0 rgba(255,255,255,0.08)",
-              backdropFilter: "blur(12px)", WebkitBackdropFilter: "blur(12px)",
+              width: 32, height: 32,
+              background: "linear-gradient(145deg,rgba(18,16,12,0.94),rgba(6,5,3,0.92))",
+              border: "1px solid rgba(255,255,255,0.12)",
+              boxShadow: "0 4px 16px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.07)",
+              backdropFilter: "blur(14px)",
+              WebkitBackdropFilter: "blur(14px)",
             }}
-            whileHover={{ scale: 1.15, rotate: 12, boxShadow: "0 6px 20px rgba(0,0,0,0.6)", transition: { duration: 0.25, ease: [0.34, 1.56, 0.64, 1] } }}
-            whileTap={{ scale: 0.9 }}
+            whileHover={{
+              scale: 1.18,
+              rotate: 10,
+              boxShadow: "0 6px 22px rgba(0,0,0,0.55)",
+              transition: { duration: 0.22, ease: [0.34, 1.56, 0.64, 1] },
+            }}
+            whileTap={{ scale: 0.88 }}
           >
-            <Github size={13} strokeWidth={2} style={{ color: "#ffffff" }} />
+            <Github size={13} strokeWidth={2} style={{ color: "#fff" }} />
           </motion.a>
         </div>
       </div>
 
       {/* ── CONTENT ── */}
-      <div className="pj-sans relative z-10 flex flex-1 flex-col p-3.5 sm:p-4 lg:p-5">
+      <div
+        className="pj-sans relative z-10 flex flex-1 flex-col"
+        style={{ padding: "18px 20px 20px" }}
+      >
 
-        {/* Title */}
-        <motion.h3
-          className="mb-1.5 text-sm sm:text-[14px] lg:text-[15px] font-bold text-[#0f0f0f] leading-snug"
-          style={{ letterSpacing: "-0.02em" }}
-          whileHover={{ x: 2, transition: { duration: 0.2 } }}
+        {/* Title — 2-line clamp, fixed min-height so alignment stays consistent */}
+        <h3
+          className="pj-sans font-bold text-[#0e0e0e] leading-snug"
+          style={{
+            fontSize: 14,
+            letterSpacing: "-0.025em",
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            minHeight: "2.6em",           /* ← reserves space for 2 lines always */
+            marginBottom: 8,
+          }}
         >
           {project.title}
-        </motion.h3>
+        </h3>
 
-        {/* Description */}
-        <p className="mb-3 sm:mb-4 flex-1 text-[11px] sm:text-[12px] lg:text-[13px] leading-relaxed text-[#6b6b6b] line-clamp-2">
+        {/*
+          Description — KEY FIX:
+          flex-1 makes it fill remaining space equally in all cards.
+          3-line clamp truncates long text.
+          Combined effect → all cards identical height.
+        */}
+        <p
+          style={{
+            fontSize: 12,
+            lineHeight: 1.65,
+            color: "#7a7670",
+            display: "-webkit-box",
+            WebkitLineClamp: 3,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
+            flex: 1,                       /* ← fills remaining space */
+            marginBottom: 14,
+          }}
+        >
           {project.description}
         </p>
 
         {/* Divider */}
-        <div className="mb-2.5 sm:mb-3 h-px bg-[#ede8e0]" />
+        <div
+          style={{
+            height: 1,
+            background: "linear-gradient(to right,rgba(200,169,110,0.2),rgba(200,169,110,0.06),transparent)",
+            marginBottom: 12,
+          }}
+        />
 
-        {/* Tech tags — stagger on card mount */}
+        {/* Tech tags — fixed height zone, overflow hidden */}
         <motion.div
-          className="flex flex-wrap gap-1 sm:gap-1.5"
-          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.04 } } }}
+          className="flex flex-wrap gap-1.5"
+          style={{ maxHeight: 52, overflow: "hidden" }}   /* ← fixes tag area height */
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.045 } } }}
           initial="hidden"
           animate="visible"
         >
           {project.technologies.map((tech, i) => (
             <motion.span
               key={i}
-              className="pj-mono rounded-md sm:rounded-lg border border-[#e0dbd0] bg-[#f6f2ec] px-1.5 sm:px-2 py-[2px] sm:py-[3px] text-[8px] sm:text-[9px] lg:text-[10px] font-medium text-[#5a5a5a] cursor-default select-none"
+              className="pj-mono cursor-default select-none"
+              style={{
+                fontSize: 9,
+                fontWeight: 500,
+                letterSpacing: "0.04em",
+                padding: "3px 9px",
+                borderRadius: 6,
+                border: "1px solid rgba(200,169,110,0.22)",
+                background: "rgba(200,169,110,0.06)",
+                color: "#6a5f4e",
+              }}
               variants={{
-                hidden:  { opacity: 0, scale: 0.85 },
-                visible: { opacity: 1, scale: 1, transition: { duration: 0.35, ease: [0.34, 1.56, 0.64, 1] } },
+                hidden:  { opacity: 0, scale: 0.82 },
+                visible: { opacity: 1, scale: 1, transition: { duration: 0.32, ease: [0.34, 1.56, 0.64, 1] } },
               }}
               whileHover={{
-                scale: 1.08, y: -1,
+                scale: 1.07,
+                y: -1,
                 borderColor: "rgba(200,169,110,0.5)",
-                color: "#0f0f0f",
-                transition: { duration: 0.18 },
+                color: "#3a2e1e",
+                background: "rgba(200,169,110,0.13)",
+                transition: { duration: 0.16 },
               }}
             >
               {tech}
             </motion.span>
           ))}
         </motion.div>
+
       </div>
+
+      {/* Bottom gold micro-line */}
+      <motion.div
+        className="absolute bottom-0 left-0 right-0"
+        style={{
+          height: 1,
+          background: "linear-gradient(90deg,transparent,rgba(200,169,110,0.2),transparent)",
+        }}
+        initial={{ opacity: 0 }}
+        whileHover={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      />
     </motion.div>
   );
 });
