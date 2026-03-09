@@ -22,6 +22,16 @@ export const projects = {
         },
         {
             id: 3,
+            title: "Online Magazin",
+            description: "Fake Store Api saytidan foydalanib Online Magazine loyihasi yaratdim",
+            image: "./images/onmg.jpg",
+            category: "Web Ilovalar",
+            technologies: ["JavaScript", "HTML", "CSS"],
+            demoUrl: "https://ulugbekgofurjonov.github.io/onlinemagazine/",
+            githubUrl: "https://github.com/ulugbekgofurjonov/onlinemagazine.git"
+        },
+        {
+            id: 4,
             title: "Todo App",
             description: "Oddiy va funktsional dastur",
             image: "./images/tda.jpg",
@@ -31,7 +41,7 @@ export const projects = {
             githubUrl: "https://github.com/ulugbekgofurjonov/to-do-app.git"
         },
         {
-            id: 4,
+            id: 5,
             title: "Notes App",
             description: "Eslatmalarni yozib boruvchi dastur",
             image: "./images/noteapp.jpg",
@@ -64,6 +74,16 @@ export const projects = {
         },
         {
             id: 3,
+            title: "Online Magazine",
+            description: "I created an Online Magazine project using Fake Store Api site",
+            image: "./images/onmg.jpg",
+            category: "Web Apps",
+            technologies: ["JavaScript", "HTML", "CSS"],
+            demoUrl: "https://ulugbekgofurjonov.github.io/onlinemagazine/",
+            githubUrl: "https://github.com/ulugbekgofurjonov/onlinemagazine.git"
+        },
+        {
+            id: 4,
             title: "Todo App",
             description: "Simple and functional application",
             image: "./images/tda.jpg",
@@ -73,7 +93,7 @@ export const projects = {
             githubUrl: "https://github.com/ulugbekgofurjonov/to-do-app.git"
         },
         {
-            id: 4,
+            id: 5,
             title: "Notes App",
             description: "Note-taking program",
             image: "./images/noteapp.jpg",
