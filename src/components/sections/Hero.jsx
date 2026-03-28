@@ -2,28 +2,20 @@ import { useState, useEffect, memo } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import {
   ArrowRight, Download, MousePointer2, Sparkles,
-  Github, Send, Instagram,
+  Github, Send, Instagram, Linkedin,
 } from "lucide-react";
 import { PERSONAL_INFO, STATS, SOCIAL_LINKS } from "../../utils/constants";
 import { scrollToSection } from "../../hooks/useScrollSpy";
 import { useLanguage } from "../../contexts/LanguageContext";
 import FadeIn from "../animations/FadeIn";
 
-/*
- ╔══════════════════════════════════════════════════════════╗
- ║  HERO  —  FadeIn + Framer Motion Premium Edition         ║
- ║  Animations: staggered reveal, spring physics            ║
- ║  Palette : #faf9f6 · #0f0f0f · #c8a96e                  ║
- ╚══════════════════════════════════════════════════════════╝
-*/
-
 const SOCIALS = [
   { key: "github",    Icon: Github,    label: "GitHub",    href: SOCIAL_LINKS.github    },
   { key: "telegram",  Icon: Send,      label: "Telegram",  href: SOCIAL_LINKS.telegram  },
   { key: "instagram", Icon: Instagram, label: "Instagram", href: SOCIAL_LINKS.instagram },
+  { key: "linkedin",  Icon: Linkedin,  label: "LinkedIn",  href: SOCIAL_LINKS.linkedin  },
 ];
 
-/* ── Shared animation variants ── */
 const fadeUp = (delay = 0) => ({
   hidden:  { opacity: 0, y: 22 },
   visible: {
@@ -61,12 +53,8 @@ const staggerItem = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] } },
 };
 
-/* Viewport config for FadeIn */
 const VP = { once: false, amount: 0.2 };
 
-/* ══════════════════════════════════════════════
-   MAIN
-══════════════════════════════════════════════ */
 export default function Hero() {
   const reduced      = useReducedMotion();
   const { language } = useLanguage();
@@ -106,14 +94,12 @@ export default function Hero() {
   return (
     <section id="hero" className="relative min-h-screen w-full overflow-hidden bg-[#faf9f6]">
 
-      {/* Blobs */}
       <Blob className="absolute -right-40 top-16 h-[560px] w-[560px] opacity-[0.065]" color="#c8a96e" blur={90} />
       <Blob className="absolute -left-56 bottom-0  h-[420px] w-[420px] opacity-[0.04]"  color="#0f0f0f" blur={110} />
 
       <div className="relative z-10 mx-auto flex min-h-screen max-w-7xl flex-col
         px-5 pt-16 pb-10 sm:px-8 lg:px-10 lg:pt-20">
 
-        {/* ── Status badge ── */}
         <FadeIn y={15} duration={600} delay={0} once={false} threshold={0.2} className="mb-10 self-start">
           <motion.span
             className="inline-flex items-center gap-2 rounded-full border border-[#e0dbd0] bg-white/80 px-4 py-1.5 shadow-sm"
@@ -130,13 +116,11 @@ export default function Hero() {
           </motion.span>
         </FadeIn>
 
-        {/* ── Split layout ── */}
         <div className="flex flex-1 flex-col gap-12 lg:flex-row lg:items-center lg:gap-16 xl:gap-24">
 
           {/* ════ LEFT ════ */}
           <div className="flex-1">
 
-            {/* Eyebrow */}
             <FadeIn x={-15} duration={550} delay={60} once={false} threshold={0.2}>
               <div className="mb-5 flex items-center gap-3">
                 <motion.div
@@ -156,7 +140,6 @@ export default function Hero() {
               </div>
             </FadeIn>
 
-            {/* Name — typing */}
             <FadeIn y={15} duration={600} delay={100} once={false} threshold={0.2}>
               <div className="relative">
                 <h1
@@ -170,7 +153,6 @@ export default function Hero() {
                   }}
                 >
                   {typed}
-                  {/* cursor */}
                   <span
                     style={{
                       display: "inline-block", 
@@ -186,7 +168,6 @@ export default function Hero() {
                     }}
                   />
                 </h1>
-                {/* underline */}
                 {done && (
                   <motion.div
                     className="absolute bottom-0 left-0 h-[3px] rounded-full"
@@ -199,7 +180,6 @@ export default function Hero() {
               </div>
             </FadeIn>
 
-            {/* Tagline */}
             <FadeIn y={15} duration={600} delay={160} once={false} threshold={0.2}>
               <motion.p
                 className="h-sans mb-8 max-w-lg text-base leading-relaxed text-[#6b6b6b] sm:text-lg"
@@ -211,7 +191,6 @@ export default function Hero() {
               </motion.p>
             </FadeIn>
 
-            {/* CTA buttons */}
             <FadeIn y={15} duration={600} delay={220} once={false} threshold={0.2}>
               <motion.div
                 className="flex flex-wrap gap-3"
@@ -255,7 +234,6 @@ export default function Hero() {
               animate="visible"
             >
 
-              {/* Profile card */}
               <motion.div variants={staggerItem}>
                 <motion.div
                   className="h-glass group relative overflow-hidden rounded-2xl p-6"
@@ -300,7 +278,6 @@ export default function Hero() {
                 </motion.div>
               </motion.div>
 
-              {/* Stats — stagger */}
               <motion.div
                 className="grid grid-cols-3 gap-3"
                 variants={staggerContainer}
@@ -324,7 +301,7 @@ export default function Hero() {
                 ))}
               </motion.div>
 
-              {/* Social — horizontal chips with stagger */}
+              {/* Social */}
               <motion.div variants={staggerItem}>
                 <motion.div
                   className="h-glass rounded-2xl px-5 py-4"
@@ -334,11 +311,11 @@ export default function Hero() {
                     {language === "uz" ? "Ijtimoiy tarmoqlar" : "Social Networks"}
                   </p>
                   <motion.div
-                    className="flex items-center gap-2"
+                    className="grid grid-cols-2 gap-2"
                     variants={staggerContainer}
                   >
                     {SOCIALS.map(({ key, Icon, label, href }) => (
-                      <motion.div key={key} variants={staggerItem} className="flex-1">
+                      <motion.div key={key} variants={staggerItem}>
                         <motion.a
                           href={href}
                           target="_blank"
@@ -363,7 +340,6 @@ export default function Hero() {
           </FadeIn>
         </div>
 
-        {/* ── Scroll indicator ── */}
         <FadeIn y={15} duration={600} delay={480} once={false} threshold={0.2} className="mt-12 self-center">
           <motion.button
             onClick={() => scrollToSection("about")}
@@ -419,8 +395,6 @@ export default function Hero() {
     </section>
   );
 }
-
-/* ── Sub-components ── */
 
 const Blob = memo(({ className, color, blur }) => (
   <div aria-hidden className={`pointer-events-none rounded-full ${className}`}
