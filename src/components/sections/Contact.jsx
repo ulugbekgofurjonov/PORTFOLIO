@@ -4,7 +4,7 @@ import {
   Mail, MapPin, Phone, Send,
   CheckCircle2, Instagram, SendHorizontal,
   ArrowUpRight, Copy, Check, Github,
-  Zap, Sparkles,
+  Zap, Sparkles, Linkedin,
 } from 'lucide-react';
 import emailjs from '@emailjs/browser';
 import { PERSONAL_INFO, SOCIAL_LINKS } from '../../utils/constants';
@@ -25,6 +25,7 @@ import FadeIn, { EASE } from '../animations/FadeIn';
  ║    7. textarea required + aria-required added            ║
  ║    8. FormField aria-required added                      ║
  ║    9. SocialBtn Icon color → white on hover              ║
+ ║   10. LinkedIn added to socialItems                      ║
  ╚══════════════════════════════════════════════════════════╝
 */
 
@@ -144,10 +145,12 @@ const Contact = () => {
     { Icon: MapPin, label: t(language, 'Manzil', 'Location'), value: personalInfo.location },
   ], [personalInfo, copyPhone, copiedPhone, language]);
 
+  /* ── FIX 10: LinkedIn qo'shildi ── */
   const socialItems = useMemo(() => [
     { Icon: Github,         href: SOCIAL_LINKS.github,    label: 'GitHub',    sub: t(language, 'Loyihalar', 'Projects') },
     { Icon: SendHorizontal, href: SOCIAL_LINKS.telegram,  label: 'Telegram',  sub: t(language, 'Yozing', 'Message') },
     { Icon: Instagram,      href: SOCIAL_LINKS.instagram, label: 'Instagram', sub: t(language, 'Kuzating', 'Follow') },
+    { Icon: Linkedin,       href: SOCIAL_LINKS.linkedin,  label: 'LinkedIn',  sub: t(language, 'Ulaning', 'Connect') },
   ], [language]);
 
   return (
@@ -616,7 +619,8 @@ const SocialLinksCard = memo(({ items, language }) => (
           {t(language, 'Meni kuzatib boring', 'Follow me online')}
         </p>
       </div>
-      <div className="grid grid-cols-3 gap-2.5 sm:gap-3">
+      {/* ── 4 ta tugma uchun grid-cols-2 sm:grid-cols-4 ── */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
         {items.map((item, i) => <SocialBtn key={i} item={item} />)}
       </div>
     </div>
