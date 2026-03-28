@@ -30,7 +30,8 @@ export const PERSONAL_INFO = {
 export const SOCIAL_LINKS = {
     github: "https://github.com/ulugbekgofurjonov",
     telegram: "https://t.me/UlugbekGofurjonov",
-    instagram: "https://instagram.com/gofurrjonov"
+    instagram: "https://instagram.com/gofurrjonov",
+    linkedin: "https://linkedin.com/in/ulugbek-gofurjonov"
 };
 
 export const STATS = {
