@@ -1,6 +1,6 @@
 import React, { useState, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Github, Instagram, Send, Mail, MapPin, Phone, Download, ArrowUpRight, Code2, ChevronRight } from "lucide-react";
+import { Github, Instagram, Send, Mail, MapPin, Phone, Download, ArrowUpRight, Code2, ChevronRight, Linkedin } from "lucide-react";
 import { PERSONAL_INFO, SOCIAL_LINKS, NAV_LINKS } from "../../utils/constants";
 import { useLanguage } from "../../contexts/LanguageContext";
 import FadeIn, { EASE } from "../animations/FadeIn";
@@ -42,6 +42,7 @@ const Footer = () => {
     { Icon: Github,    href: SOCIAL_LINKS.github,    label: "GitHub",    sub: t("Kod", "Code") },
     { Icon: Send,      href: SOCIAL_LINKS.telegram,  label: "Telegram",  sub: t("Yozing", "Message") },
     { Icon: Instagram, href: SOCIAL_LINKS.instagram, label: "Instagram", sub: t("Kuzating", "Follow") },
+    { Icon: Linkedin,  href: SOCIAL_LINKS.linkedin,  label: "LinkedIn",  sub: t("Ulaning", "Connect") },
   ];
 
   const techStack = ["React.js", "Next.js", "Tailwind CSS", "TypeScript"];
