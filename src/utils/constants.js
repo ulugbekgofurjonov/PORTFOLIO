@@ -36,12 +36,12 @@ export const SOCIAL_LINKS = {
 
 export const STATS = {
     uz: [
-        { label: "Tajriba", value: "5 Oy" },
+        { label: "Tajriba", value: "6 Oy" },
         { label: "Loyihalar", value: "10+" },
         { label: "Texnologiya", value: "6+" },
     ],
     en: [
-        { label: "Experience", value: "5 M" },
+        { label: "Experience", value: "6 M" },
         { label: "Projects", value: "10+" },
         { label: "Technologies", value: "6+" },
     ]
@@ -49,13 +49,13 @@ export const STATS = {
 
 export const ABOUT_STATS = {
     uz: [
-        { label: 'GitHub Repolar', value: '12+' },
-        { label: 'Kod Commitlari', value: '150+' },
+        { label: 'GitHub Repolar', value: '15+' },
+        { label: 'Kod Commitlari', value: '200+'},
         { label: 'Real Loyihalar', value: '10+' }
     ],
     en: [
-        { label: 'GitHub Repos', value: '12+' },
-        { label: 'Code Commits', value: '150+' },
+        { label: 'GitHub Repos', value: '15+' },
+        { label: 'Code Commits', value: '200+' },
         { label: 'Real Projects', value: '10+' }
     ]
 };
